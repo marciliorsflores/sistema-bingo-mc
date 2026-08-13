@@ -1,3 +1,791 @@
+
+Gemini
+Nova conversa
+Pesquisar conversas
+Imagens
+Vídeos
+Biblioteca
+Novo notebook
+Problema ao Abrir Arquivo no GitHub
+Controle de Entrada e Saída Web
+Cobrança de Sinal Profissional para Pedidos
+Minizinha PagSeguro: Violação de Segurança
+Orientação Elétrica com Contatores Siemens
+Sapato Preto e Marrom
+Orçamento Lousa Magnética Escolar
+Resistência à água do Redmi Note 15
+Ajuda com a máquina hoje
+Diagnóstico Elétrico de Carro: Chave de Seta
+Bom Dia e Como Posso Ajudar
+Solicitação de Ativação de Modo
+Amor de Festa Junina, 20 Anos
+Urina Espumosa: Causas e Sinais
+Magnésio Quelado e Cãibras Musculares
+Magnésio Quelato e Cãibras Musculares
+Minimizar Cãibras: Hidratação e Nutrição
+Testosterona e Cãibras: Causas e Soluções
+Testosterona e Cãibras: Possível Relação
+Conversa com o Gemini
+SOU CONTROLADOR DE ENTRADA E SAIDA DE GAS E AGUA MINHERAL EM UMA EMPRESA AÇO UM CONTROLE MANUAL ASSIM COMO O ANEXO QUE VOU TE MOSTRAR MAS GOSTARIA DE AZER ESTA CONTROLE PELO NAVEGADOR E MANTER UM HISTORICO DE ATE 10 DIAS VE SE CONSEGUE ME AJUDAR HA TRABALHO COM APROXIMADAMETE 10 MOTORISTAS QUE ENTREGAM
+
+Com certeza! Dá para transformar essa ficha física em um aplicativo Web simples, limpo e direto, que roda direto no navegador (HTML, CSS e JavaScript puro) sem precisar instalar nada ou ter um servidor pago.
+
+Ele salva os dados direto no armazenamento do navegador (localStorage) e faz a limpeza automática dos registros com mais de 10 dias.
+
+Como vai funcionar
+Formulário de Entrada: Com os mesmos campos da sua tabela (Entregador, Carro, Pedra, Elan, Esta, P13, P5, P20, P45, Casco e Observações).
+
+Tabela de Histórico: Lista todas as movimentações lançadas, mostrando data e hora exatas.
+
+Limpeza Automática: Sempre que a página é aberta, o sistema apaga os registros com mais de 10 dias de idade.
+
+Exportação: Botão para baixar um relatório em .csv (abre no Excel) caso precise guardar algo antes dos 10 dias.
+
+Código Completo (Arquivo Único)
+Você pode salvar o código abaixo em um arquivo chamado index.html e dar dois cliques nele para abrir no seu navegador:
+
+PODE MANDAR
+
+Aqui está o código completo. Estruturei tudo em um único arquivo com HTML, CSS e JavaScript puros para facilitar. O script usa o localStorage do próprio navegador, então nada se perde quando você fecha a aba, e ele já tem a lógica para limpar automaticamente tudo que passar de 10 dias.
+
+Copie o código abaixo, cole em um bloco de notas (ou no seu editor de código favorito) e salve com o nome index.html. Depois, é só dar dois cliques para abrir no navegador.
+
+HTML
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Pátio e Cargas - JLH</title>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --bg-color: #f4f4f9;
+            --box-bg: #ffffff;
+            --border: #ccc;
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: var(--bg-color); 
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            background: var(--box-bg); 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        }
+        h1, h2 { text-align: center; color: #333; }
+        .grid-form { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            font-size: 14px;
+        }
+        input[type="text"], input[type="number"] { 
+            width: 100%; 
+            padding: 8px; 
+            box-sizing: border-box; 
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+        .full-width { grid-column: 1 / -1; }
+        .checkbox-group { 
+            display: flex; 
+            gap: 15px; 
+            padding-top: 5px;
+        }
+        .checkbox-group label { font-weight: normal; }
+        button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px 15px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 16px; 
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        button:hover { background: #004494; }
+        .btn-export { background: #28a745; margin-bottom: 15px; width: auto; }
+        .btn-export:hover { background: #218838; }
+        .btn-delete { background: #dc3545; padding: 5px 10px; font-size: 12px; width: auto; }
+        .btn-delete:hover { background: #c82333; }
+        
+        .table-responsive { overflow-x: auto; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 14px; 
+            min-width: 800px;
+        }
+        th, td { 
+            border: 1px solid var(--border); 
+            padding: 10px 5px; 
+            text-align: center; 
+        }
+        th { background: #e9ecef; }
+        td:nth-child(2), td:nth-child(3) { text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Pátio e Cargas</h1>
+        
+        <!-- Formulário de Entrada -->
+        <form id="registroForm">
+            <div class="grid-form">
+                <div style="grid-column: span 2;">
+                    <label for="entregador">Entregador:</label>
+                    <!-- Usando datalist para sugerir os 10 motoristas, mas permite digitar outros -->
+                    <input type="text" id="entregador" required list="listaMotoristas" autocomplete="off" placeholder="Nome do motorista">
+                    <datalist id="listaMotoristas">
+                        <option value="Motorista 1">
+                        <option value="Motorista 2">
+                        <option value="Motorista 3">
+                    </datalist>
+                </div>
+                <div style="grid-column: span 2;">
+                    <label for="carro">Carro:</label>
+                    <input type="text" id="carro" required placeholder="Placa ou modelo">
+                </div>
+                
+                <!-- Campos Numéricos (Água/Gás) -->
+                <div><label for="pedra">PEDRA:</label><input type="number" id="pedra" min="0"></div>
+                <div><label for="elan">ELAN:</label><input type="number" id="elan" min="0"></div>
+                <div><label for="esta">ESTA:</label><input type="number" id="esta" min="0"></div>
+                <div><label for="p13">P13:</label><input type="number" id="p13" min="0"></div>
+                <div><label for="p5">P5:</label><input type="number" id="p5" min="0"></div>
+                <div><label for="p20">P20:</label><input type="number" id="p20" min="0"></div>
+                <div><label for="p45">P45:</label><input type="number" id="p45" min="0"></div>
+                
+                <div style="grid-column: span 2;">
+                    <label>CASCO (Retorno):</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="casco_agua"> Água</label>
+                        <label><input type="checkbox" id="casco_p13"> P13</label>
+                    </div>
+                </div>
+                
+                <div class="full-width">
+                    <label for="obs">OBSS:</label>
+                    <input type="text" id="obs" placeholder="Alguma observação da carga?">
+                </div>
+            </div>
+            <button type="submit">Gravar Movimentação</button>
+        </form>
+
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ccc;">
+
+        <!-- Histórico -->
+        <h2>Histórico (Últimos 10 Dias)</h2>
+        <button onclick="exportarCSV()" class="btn-export"> Baixar Planilha Excel (CSV)</button>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Entregador</th>
+                        <th>Carro</th>
+                        <th>PEDRA</th>
+                        <th>ELAN</th>
+                        <th>ESTA</th>
+                        <th>P13</th>
+                        <th>P5</th>
+                        <th>P20</th>
+                        <th>P45</th>
+                        <th>CASCO</th>
+                        <th>OBSS</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaCorpo">
+                    <!-- Os registros inseridos aparecerão aqui -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('registroForm');
+        const tabelaCorpo = document.getElementById('tabelaCorpo');
+        const CHAVE_STORAGE = 'controleCargasJLH';
+        const DIAS_LIMITE = 10;
+
+        // Função principal que carrega os dados e limpa os antigos
+        function carregarRegistros() {
+            let registros = JSON.parse(localStorage.getItem(CHAVE_STORAGE)) || [];
+            const agora = new Date().getTime();
+            const limiteMilisegundos = DIAS_LIMITE * 24 * 60 * 60 * 1000;
+
+            // Mantém apenas os registros que têm menos de 10 dias
+            const registrosValidos = registros.filter(reg => (agora - reg.timestamp) <= limiteMilisegundos);
+            
+            // Se houve limpeza automática, salva o novo array no sistema
+            if (registros.length !== registrosValidos.length) {
+                localStorage.setItem(CHAVE_STORAGE, JSON.stringify(registrosValidos));
+            }
+
+            renderizarTabela(registrosValidos);
+        }
+
+        // Função para desenhar a tabela na tela
+        function renderizarTabela(registros) {
+            tabelaCorpo.innerHTML = '';
+            
+            // Ordena para o registro mais novo ficar no topo
+            registros.sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
+                const dataFormatada = new Date(reg.timestamp).toLocaleString('pt-BR');
+                const tr = document.createElement('tr');
+                
+                let cascos = [];
+                if(reg.cascoAgua) cascos.push('Água');
+                if(reg.cascoP13) cascos.push('P13');
+
+                tr.innerHTML = `
+                    <td>${dataFormatada}</td>
+                    <td>${reg.entregador}</td>
+                    <td>${reg.carro}</td>
+                    <td>${reg.pedra || '-'}</td>
+                    <td>${reg.elan || '-'}</td>
+                    <td>${reg.esta || '-'}</td>
+                    <td>${reg.p13 || '-'}</td>
+                    <td>${reg.p5 || '-'}</td>
+                    <td>${reg.p20 || '-'}</td>
+                    <td>${reg.p45 || '-'}</td>
+                    <td>${cascos.join(' / ') || '-'}</td>
+                    <td>${reg.obs || '-'}</td>
+                    <td><button class="btn-delete" onclick="deletarRegistro(${reg.timestamp})">Excluir</button></td>
+                `;
+                tabelaCorpo.appendChild(tr);
+            });
+        }
+
+        // Evento de envio do formulário
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const novoRegistro = {
+                timestamp: new Date().getTime(),
+                entregador: document.getElementById('entregador').value.trim(),
+                carro: document.getElementById('carro').value.trim(),
+                pedra: document.getElementById('pedra').value,
+                elan: document.getElementById('elan').value,
+                esta: document.getElementById('esta').value,
+                p13: document.getElementById('p13').value,
+                p5: document.getElementById('p5').value,
+                p20: document.getElementById('p20').value,
+                p45: document.getElementById('p45').value,
+                cascoAgua: document.getElementById('casco_agua').checked,
+                cascoP13: document.getElementById('casco_p13').checked,
+                obs: document.getElementById('obs').value.trim()
+            };
+
+            const registros = JSON.parse(localStorage.getItem(CHAVE_STORAGE)) || [];
+            registros.push(novoRegistro);
+            localStorage.setItem(CHAVE_STORAGE, JSON.stringify(registros));
+
+            form.reset();
+            document.getElementById('entregador').focus(); // Volta o cursor para o início
+            carregarRegistros();
+        });
+
+        // Função para apagar um registro específico caso tenha errado
+        function deletarRegistro(timestamp) {
+            if(confirm("Tem certeza que deseja apagar este registro?")) {
+                let registros = JSON.parse(localStorage.getItem(CHAVE_STORAGE)) || [];
+                registros = registros.filter(reg => reg.timestamp !== timestamp);
+                localStorage.setItem(CHAVE_STORAGE, JSON.stringify(registros));
+                carregarRegistros();
+            }
+        }
+
+        // Função para exportar um backup em Excel (CSV)
+        function exportarCSV() {
+            const registros = JSON.parse(localStorage.getItem(CHAVE_STORAGE)) || [];
+            if (registros.length === 0) {
+                alert("Não há dados para exportar.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Data/Hora,Entregador,Carro,PEDRA,ELAN,ESTA,P13,P5,P20,P45,CASCO_Agua,CASCO_P13,OBSS\n";
+
+            registros.forEach(reg => {
+                // Tratamento para não quebrar a formatação do CSV
+                const dataFormatada = new Date(reg.timestamp).toLocaleString('pt-BR').replace(',', '');
+                const obsTratada = reg.obs ? reg.obs.replace(/,/g, ' -') : '';
+                
+                const row = [
+                    dataFormatada,
+                    reg.entregador,
+                    reg.carro,
+                    reg.pedra || 0,
+                    reg.elan || 0,
+                    reg.esta || 0,
+                    reg.p13 || 0,
+                    reg.p5 || 0,
+                    reg.p20 || 0,
+                    reg.p45 || 0,
+                    reg.cascoAgua ? 'Sim' : 'Nao',
+                    reg.cascoP13 ? 'Sim' : 'Nao',
+                    obsTratada
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "controle_cargas_historico.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Inicializa lendo e validando os registros atuais
+        carregarRegistros();
+    </script>
+</body>
+</html>
+O que o código tem de especial:
+Lógica dos 10 Dias: A função carregarRegistros() calcula em milissegundos exatamente quanto tempo se passou. Tudo com mais de 10 dias de idade some da tela e do sistema invisivelmente na hora em que a página atualiza.
+
+Datalist de Motoristas: Na tag <datalist id="listaMotoristas"> dentro do HTML, você pode adicionar o nome dos seus 10 motoristas nas opções. Assim, quando você for digitar, ele já te dá o autocompletar automático, mas ainda deixa você escrever o nome de uma pessoa nova se for um "freela" ou motorista substituto.
+
+Backup de Segurança: Adicionei um botão verde que, a qualquer momento, baixa a tabela inteira do jeito que está para o seu computador no formato .csv, o que é ideal para abrir no Excel ou mandar para o financeiro.
+
+Se quiser colocar isso online para que a entrada seja feita pelo celular diretamente no pátio ou por outro funcionário de forma remota, você pode usar uma plataforma em nuvem como a Vercel para hospedar (é só subir o arquivo index.html). O sistema continuará rápido e responsivo.
+
+pode deixar mais intuitivo e cada entregador carrega em media 8vexes por dia
+
+Com essa frequência de 8 carregamentos por dia por motorista, a interface não pode depender de digitação. O ideal é que o sistema funcione quase como um caixa de supermercado (PDV): focado em toques rápidos e com o mínimo de texto possível.
+
+Reescrevi o código com foco total em agilidade e produtividade para o dia a dia no pátio.
+
+O que mudou nesta versão "Turbo":
+Botões de Acesso Rápido: Criei um painel com os 10 motoristas. Você dá um toque no nome e ele já seleciona o entregador instantaneamente.
+
+Contador Diário em Tempo Real: Cada botão de motorista mostra uma etiqueta verde avisando quantas viagens aquele motorista já fez hoje. Isso ajuda a bater o olho e ver quem está rodando mais.
+
+Teclado Numérico Direto (inputmode="numeric"): Se alguém estiver usando pelo celular, ao tocar no campo do gás, o teclado numérico já abre direto, pulando o teclado de letras.
+
+Design em Blocos (Cards): Separei a identificação das cargas (Gás e Retorno de Casco) em blocos visuais para evitar erros na pressa.
+
+Copie o código abaixo e substitua no seu arquivo index.html.
+
+HTML
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Pátio e Cargas - Ágil</title>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --success: #28a745;
+            --danger: #dc3545;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #333;
+            --border: #ced4da;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            background-color: var(--bg); 
+            color: var(--text);
+        }
+        .container { 
+            max-width: 900px; 
+            margin: auto; 
+        }
+        h1, h2 { text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
+        
+        /* Cards para separar as seções */
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        /* Grid de Motoristas (Acesso Rápido) */
+        .motoristas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .btn-motorista {
+            background: #f8f9fa;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 15px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .btn-motorista:hover { border-color: var(--primary); }
+        .btn-motorista.selecionado {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .badge-viagens {
+            margin-top: 5px;
+            font-size: 0.75rem;
+            background: #e9ecef;
+            color: #495057;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: normal;
+        }
+        .btn-motorista.selecionado .badge-viagens {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* Inputs e Formulário */
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+        label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            background: #fafafa;
+        }
+        input[type="number"] { text-align: center; font-weight: bold; }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
+        
+        .full-width { grid-column: 1 / -1; }
+        
+        /* Botões de Ação */
+        .btn-salvar {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+        }
+        .btn-salvar:hover { background: #218838; }
+        
+        .checkbox-group { display: flex; gap: 20px; align-items: center; padding: 10px 0; }
+        .checkbox-group label { display: flex; align-items: center; gap: 8px; font-size: 1.1rem; cursor: pointer; }
+        .checkbox-group input { width: 22px; height: 22px; }
+
+        /* Tabela Simplificada */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; background: white; font-size: 0.9rem; }
+        th, td { border-bottom: 1px solid var(--border); padding: 12px 8px; text-align: center; }
+        th { background: #f8f9fa; font-weight: 600; color: #495057; }
+        .btn-excluir { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle Ágil de Cargas</h1>
+        
+        <form id="registroForm">
+            <!-- SEÇÃO 1: Escolha Rápida -->
+            <div class="card">
+                <h3 class="card-title">1. Motorista (Toque para selecionar)</h3>
+                <div class="motoristas-grid" id="gridMotoristas">
+                    <!-- Os botões serão gerados via JavaScript -->
+                </div>
+                <input type="hidden" id="entregador" required>
+                
+                <div style="margin-top: 15px;">
+                    <label for="carro">Carro (Placa/Modelo):</label>
+                    <input type="text" id="carro" placeholder="Digite o carro" required autocomplete="off">
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2: Quantidades -->
+            <div class="card">
+                <h3 class="card-title">2. Quantidades Carregadas</h3>
+                <div class="grid-inputs">
+                    <div><label>PEDRA</label><input type="number" id="pedra" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="elan" inputmode="numeric" min="0"></div>
+                    <div><label>ESTA</label><input type="number" id="esta" inputmode="numeric" min="0"></div>
+                    <div><label>P13</label><input type="number" id="p13" inputmode="numeric" min="0"></div>
+                    <div><label>P5</label><input type="number" id="p5" inputmode="numeric" min="0"></div>
+                    <div><label>P20</label><input type="number" id="p20" inputmode="numeric" min="0"></div>
+                    <div><label>P45</label><input type="number" id="p45" inputmode="numeric" min="0"></div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 3: Retornos e Obs -->
+            <div class="card">
+                <h3 class="card-title">3. Retornos e Observações</h3>
+                <div class="checkbox-group">
+                    <span style="font-weight: 600; font-size: 0.9rem;">CASCO:</span>
+                    <label><input type="checkbox" id="casco_agua"> Água</label>
+                    <label><input type="checkbox" id="casco_p13"> P13</label>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label>Observações:</label>
+                    <input type="text" id="obs" placeholder="Faltou algo? Alguma avaria?">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-salvar">Gravar Saída</button>
+        </form>
+
+        <!-- Histórico -->
+        <div class="card" style="margin-top: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 class="card-title" style="margin: 0; border: none;">Histórico (Últimos 10 Dias)</h3>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Entregador</th>
+                            <th>Carro</th>
+                            <th>PEDRA</th>
+                            <th>ELAN</th>
+                            <th>ESTA</th>
+                            <th>P13</th>
+                            <th>P5</th>
+                            <th>P20</th>
+                            <th>P45</th>
+                            <th>CASCO</th>
+                            <th>OBS</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaCorpo"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lista fixa dos seus motoristas (pode alterar os nomes aqui)
+        const NOME_MOTORISTAS = [
+            "Motorista 1", "Motorista 2", "Motorista 3", "Motorista 4", 
+            "Motorista 5", "Motorista 6", "Motorista 7", "Motorista 8", 
+            "Motorista 9", "Motorista 10"
+        ];
+        
+        const form = document.getElementById('registroForm');
+        const tabelaCorpo = document.getElementById('tabelaCorpo');
+        const gridMotoristas = document.getElementById('gridMotoristas');
+        const inputEntregador = document.getElementById('entregador');
+        const CHAVE_STORAGE = 'controleCargasJLH';
+        const DIAS_LIMITE = 10;
+
+        function carregarRegistros() {
+            let registros = JSON.parse(localStorage.getItem(CHAVE_STORAGE)) || [];
+            const agora = new Date().getTime();
+            const limiteMilisegundos = DIAS_LIMITE * 24 * 60 * 60 * 1000;
+
+            const registrosValidos = registros.filter(reg => (agora - reg.timestamp) <= limiteMilisegundos);
+            if (registros.length !== registrosValidos.length) {
+                localStorage.setItem(CHAVE_STORAGE, JSON.stringify(registrosValidos));
+            }
+
+            renderizarPainelMotoristas(registrosValidos);
+            renderizarTabela(registrosValidos);
+        }
+
+        // Gera os botões de motoristas e calcula quantas viagens fizeram hoje
+        function renderizarPainelMotoristas(registros) {
+            gridMotoristas.innerHTML = '';
+            const hoje = new Date().toDateString();
+
+            NOME_MOTORISTAS.forEach(nome => {
+                // Conta quantas viagens esse motorista fez HOJE
+                const viagensHoje = registros.filter(reg => 
+                    reg.entregador === nome && 
+                    new Date(reg.timestamp).toDateString() === hoje
+                ).length;
+
+                const btn = document.createElement('div');
+                btn.className = 'btn-motorista';
+                if(inputEntregador.value === nome) btn.classList.add('selecionado');
+                
+                btn.innerHTML = `
+                    ${nome}
+                    <span class="badge-viagens">${viagensHoje} hoje</span>
+                `;
+
+                btn.onclick = () => {
+                    // Remove seleção dos outros
+                    document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
+                    btn.classList.add('selecionado');
+                    inputEntregador.value = nome;
+                    
+                    // Foca direto no carro para agilizar
+                    document.getElementById('carro').focus();
+                };
+
+                gridMotoristas.appendChild(btn);
+            });
+        }
+
+        function renderizarTabela(registros) {
+            tabelaCorpo.innerHTML = '';
+            
+            registros.sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
+                const dataObj = new Date(reg.timestamp);
+                const horaFormatada = dataObj.toLocaleDateString('pt-BR') + ' às ' + dataObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                const tr = document.createElement('tr');
+                
+                let cascos = [];
+                if(reg.cascoAgua) cascos.push('Água');
+                if(reg.cascoP13) cascos.push('P13');
+
+                tr.innerHTML = `
+                    <td>${horaFormatada}</td>
+                    <td><strong>${reg.entregador}</strong></td>
+                    <td>${reg.carro}</td>
+                    <td>${reg.pedra || '-'}</td>
+                    <td>${reg.elan || '-'}</td>
+                    <td>${reg.esta || '-'}</td>
+                    <td>${reg.p13 || '-'}</td>
+                    <td>${reg.p5 || '-'}</td>
+                    <td>${reg.p20 || '-'}</td>
+                    <td>${reg.p45 || '-'}</td>
+                    <td>${cascos.join(', ') || '-'}</td>
+                    <td>${reg.obs || '-'}</td>
+                    <td><button class="btn-excluir" onclick="deletarRegistro(${reg.timestamp})">X</button></td>
+                `;
+                tabelaCorpo.appendChild(tr);
+            });
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if(!inputEntregador.value) {
+                alert("Por favor, selecione um motorista no painel!");
+                return;
+            }
+
+            const novoRegistro = {
+                timestamp: new Date().getTime(),
+                entregador: inputEntregador.value,
+                carro: document.getElementById('carro').value.trim(),
+                pedra: document.getElementById('pedra').value,
+                elan: document.getElementById('elan').value,
+                esta: document.getElementById('esta').value,
+                p13: document.getElementById('p13').value,
+                p5: document.getElementById('p5').value,
+                p20: document.getElementById('p20').value,
+                p45: document.getElementById('p45').value,
+                cascoAgua: document.getElementById('casco_agua').checked,
+                cascoP13: document.getElementById('casco_p13').checked,
+                obs: document.getElementById('obs').value.trim()
+            };
+
+            const registros = JSON.parse(localStorage.getItem(CHAVE_STORAGE)) || [];
+            registros.push(novoRegistro);
+            localStorage.setItem(CHAVE_STORAGE, JSON.stringify(registros));
+
+            // Limpa apenas os campos de quantidade e obs, mantendo o carro para facilitar se for o mesmo
+            document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+            document.getElementById('casco_agua').checked = false;
+            document.getElementById('casco_p13').checked = false;
+            document.getElementById('obs').value = '';
+            
+            // Remove a seleção visual do motorista
+            inputEntregador.value = '';
+            document.getElementById('carro').value = '';
+            
+            carregarRegistros();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function deletarRegistro(timestamp) {
+            if(confirm("Apagar este registro?")) {
+                let registros = JSON.parse(localStorage.getItem(CHAVE_STORAGE)) || [];
+                registros = registros.filter(reg => reg.timestamp !== timestamp);
+                localStorage.setItem(CHAVE_STORAGE, JSON.stringify(registros));
+                carregarRegistros();
+            }
+        }
+
+        carregarRegistros();
+    </script>
+</body>
+</html>
+Um detalhe que facilita bastante: no código acima, dentro da tag <script>, há uma lista chamada NOME_MOTORISTAS onde coloquei "Motorista 1", "Motorista 2", etc.
+
+Você quer que eu explique como colocar essa aplicação online de forma gratuita para que você possa acessá-la de qualquer dispositivo, ou prefere primeiro ajustar esses 10 nomes diretamente no código?
+
+pode acrescentar um estoque inicial de cada produto no topo e a cada carregamento deve diminuiir dao estoque e criar e somasr em vasilhame vasio
+
+Com certeza, Marcílio! Para que o sistema consiga somar a quantidade exata de vasilhames vazios (cascos) que os motoristas trazem de volta, mudei aquela parte que tinha apenas "caixinhas de marcar" para campos de quantidade. Assim, o motorista diz exatamente quantos cascos de água, P13, etc., ele está retornando.
+
+Também adicionei um Painel de Estoque no topo. Ele funciona assim:
+
+Você clica em "Ajustar Estoque" e coloca a quantidade inicial que você tem no pátio (tanto de cheios quanto de vazios).
+
+Toda vez que você salvar uma saída, o sistema diminui automaticamente os produtos cheios e soma os cascos vazios retornados.
+
+Se você apagar um registro por engano no histórico, ele devolve os cheios para o estoque e retira os vazios, consertando a contagem.
+
+Copie o código abaixo e substitua no seu arquivo index.html:
+
+gere Copie o código abaixo e substitua no seu arquivo index.html:
+
+Aqui está o código completo e atualizado, Marcílio.
+
+Adicionei o Painel de Estoque no topo e troquei a marcação de cascos por campos numéricos, para que o motorista informe exatamente a quantidade de vazios que está devolvendo.
+
+Como funciona o estoque agora:
+No topo da tela, clique em "Ajustar Estoque Inicial" para colocar quantas unidades cheias e vazias você tem no pátio.
+
+Quando você gravar uma saída, o sistema tira os cheios do estoque e soma os cascos vazios que voltaram.
+
+Se você apagar um lançamento no histórico (caso tenha errado), o sistema devolve automaticamente os cheios para o estoque e retira os vazios, consertando a contagem.
+
+Copie o código abaixo e substitua tudo no seu arquivo index.html:
+
+HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -438,3 +1226,978 @@
     </script>
 </body>
 </html>
+https://marciliorsflores.github.io/sistema-bingo-mc/
+
+Muito bacana ver o projeto no ar! Pelo link, trata-se do sistema-bingo-mc, o seu sistema web de créditos. É excelente ver como os seus estudos em programação e desenvolvimento web estão ganhando forma e se transformando em ferramentas práticas e publicadas.
+
+O que você gostaria de fazer no sistema hoje? Quer ajuda para criar uma nova funcionalidade, revisar alguma parte específica do código, ou fazer algum ajuste no visual?
+
+olha so quando seleciono o motorista teria que puchar a placa tambem e
+
+Ótima ideia! Isso vai agilizar ainda mais o processo, porque você não vai precisar digitar a placa do carro toda vez.
+
+Para fazer isso, nós mudamos a lista de motoristas. Em vez de ser apenas os nomes, agora cada motorista é cadastrado com o nome e a placa padrão dele. Quando você clicar no botão do motorista, o sistema já preenche o campo "Carro" automaticamente.
+
+Se por acaso um dia o motorista vier com um carro reserva, não tem problema: o sistema vai preencher a placa padrão, mas você pode apagar e digitar a nova placa só para aquela viagem.
+
+Copie o código abaixo e substitua no seu index.html.
+
+(Atenção: No final do código, procure pela lista MOTORISTAS para você colocar o nome real da sua equipe e as placas verdadeiras dos caminhões/carros deles).
+
+HTML
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Pátio e Cargas - JLH</title>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #333;
+            --border: #ced4da;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            background-color: var(--bg); 
+            color: var(--text);
+        }
+        .container { max-width: 1000px; margin: auto; }
+        h1, h2, h3 { text-align: center; margin-bottom: 20px; }
+        
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* --- PAINEL DE ESTOQUE --- */
+        .estoque-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .estoque-box {
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .estoque-box h4 { margin: 0 0 10px 0; text-align: center; font-size: 1rem; }
+        .estoque-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 10px;
+            text-align: center;
+        }
+        .item-val { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+        .item-label { font-size: 0.8rem; color: #666; }
+        
+        .btn-ajuste {
+            background: var(--warning);
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn-ajuste:hover { background: #e0a800; }
+        
+        /* Modal Ajuste de Estoque */
+        #painelAjusteEstoque {
+            display: none;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+            margin-bottom: 20px;
+        }
+        
+        /* --- MOTORISTAS --- */
+        .motoristas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+        .btn-motorista {
+            background: #f8f9fa;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-motorista:hover { border-color: var(--primary); }
+        .btn-motorista.selecionado { background: var(--primary); color: white; border-color: var(--primary); }
+        .badge-viagens { display: block; margin-top: 5px; font-size: 0.75rem; font-weight: normal; }
+
+        /* --- INPUTS --- */
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; text-align: center; }
+        input[type="text"], input[type="number"] {
+            width: 100%; padding: 10px; font-size: 1.1rem;
+            border: 1px solid var(--border); border-radius: 6px;
+            box-sizing: border-box; text-align: center;
+        }
+        input[type="text"] { text-align: left; }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
+
+        .btn-salvar {
+            background: var(--success); color: white; border: none; padding: 15px;
+            font-size: 1.2rem; font-weight: bold; border-radius: 8px; width: 100%;
+            cursor: pointer; text-transform: uppercase; margin-top: 10px;
+        }
+        .btn-salvar:hover { background: #218838; }
+
+        /* --- TABELA --- */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 0.85rem; background: white;}
+        th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
+        th { background: #f8f9fa; }
+        .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Pátio e Cargas</h1>
+        
+        <!-- PAINEL DE ESTOQUE -->
+        <div class="card">
+            <h3 class="card-title">Estoque Atual</h3>
+            <button class="btn-ajuste" onclick="toggleAjusteEstoque()">⚙️ Ajustar Estoque Inicial</button>
+            
+            <div id="painelAjusteEstoque">
+                <p><strong>CHEIOS (Saída)</strong></p>
+                <div class="grid-inputs" style="margin-bottom:15px;">
+                    <div><label>PEDRA</label><input type="number" id="est_c_pedra" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="est_c_elan" min="0"></div>
+                    <div><label>ESTA</label><input type="number" id="est_c_esta" min="0"></div>
+                    <div><label>P13</label><input type="number" id="est_c_p13" min="0"></div>
+                    <div><label>P5</label><input type="number" id="est_c_p5" min="0"></div>
+                    <div><label>P20</label><input type="number" id="est_c_p20" min="0"></div>
+                    <div><label>P45</label><input type="number" id="est_c_p45" min="0"></div>
+                </div>
+                <p><strong>VAZIOS (Cascos)</strong></p>
+                <div class="grid-inputs">
+                    <div><label>ÁGUA (Geral)</label><input type="number" id="est_v_agua" min="0"></div>
+                    <div><label>P13</label><input type="number" id="est_v_p13" min="0"></div>
+                    <div><label>P5</label><input type="number" id="est_v_p5" min="0"></div>
+                    <div><label>P20</label><input type="number" id="est_v_p20" min="0"></div>
+                    <div><label>P45</label><input type="number" id="est_v_p45" min="0"></div>
+                </div>
+                <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Estoque Manual</button>
+            </div>
+
+            <div class="estoque-grid">
+                <div class="estoque-box">
+                    <h4>🟩 CHEIOS (Para Enviar)</h4>
+                    <div class="estoque-items" id="displayCheios"></div>
+                </div>
+                <div class="estoque-box">
+                    <h4>🟧 VAZIOS (Cascos no Pátio)</h4>
+                    <div class="estoque-items" id="displayVazios"></div>
+                </div>
+            </div>
+        </div>
+
+        <form id="registroForm">
+            <!-- MOTORISTA -->
+            <div class="card">
+                <h3 class="card-title">1. Selecionar Motorista</h3>
+                <div class="motoristas-grid" id="gridMotoristas"></div>
+                <input type="hidden" id="entregador" required>
+                <div style="margin-top: 15px;">
+                    <label style="text-align: left;">Carro (Placa/Modelo):</label>
+                    <input type="text" id="carro" required autocomplete="off" placeholder="Placa do carro">
+                </div>
+            </div>
+
+            <!-- SAÍDA (CHEIOS) -->
+            <div class="card">
+                <h3 class="card-title">2. Produtos Saindo (Cheios)</h3>
+                <div class="grid-inputs">
+                    <div><label>PEDRA</label><input type="number" id="s_pedra" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="s_elan" inputmode="numeric" min="0"></div>
+                    <div><label>ESTA</label><input type="number" id="s_esta" inputmode="numeric" min="0"></div>
+                    <div><label>P13</label><input type="number" id="s_p13" inputmode="numeric" min="0"></div>
+                    <div><label>P5</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
+                    <div><label>P20</label><input type="number" id="s_p20" inputmode="numeric" min="0"></div>
+                    <div><label>P45</label><input type="number" id="s_p45" inputmode="numeric" min="0"></div>
+                </div>
+            </div>
+
+            <!-- RETORNO (VAZIOS) -->
+            <div class="card">
+                <h3 class="card-title">3. Cascos Retornando (Vazios)</h3>
+                <div class="grid-inputs">
+                    <div><label>ÁGUA (Geral)</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
+                    <div><label>P13</label><input type="number" id="r_p13" inputmode="numeric" min="0"></div>
+                    <div><label>P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
+                    <div><label>P20</label><input type="number" id="r_p20" inputmode="numeric" min="0"></div>
+                    <div><label>P45</label><input type="number" id="r_p45" inputmode="numeric" min="0"></div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label style="text-align: left;">Observações:</label>
+                    <input type="text" id="obs" placeholder="Alguma avaria ou anotação?">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-salvar">Gravar Movimentação</button>
+        </form>
+
+        <!-- HISTÓRICO -->
+        <div class="card" style="margin-top: 20px;">
+            <h3 class="card-title">Histórico (Últimos 10 Dias)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Entregador</th>
+                            <th>Saídas (Cheios)</th>
+                            <th>Retornos (Cascos)</th>
+                            <th>OBS</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaCorpo"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CADASTRO DE MOTORISTAS E PLACAS
+        // Altere os nomes e as placas aqui!
+        // ==========================================
+        const MOTORISTAS = [
+            { nome: "João Silva", placa: "IXE-1234" },
+            { nome: "Pedro Gomes", placa: "IXX-9876" },
+            { nome: "Carlos", placa: "IQA-5544" },
+            { nome: "Motorista 4", placa: "AAA-0000" },
+            { nome: "Motorista 5", placa: "" },
+            { nome: "Motorista 6", placa: "" },
+            { nome: "Motorista 7", placa: "" },
+            { nome: "Motorista 8", placa: "" },
+            { nome: "Motorista 9", placa: "" },
+            { nome: "Motorista 10", placa: "" }
+        ];
+        // ==========================================
+        
+        const CHAVE_MOV = 'controleCargasJLH';
+        const CHAVE_ESTOQUE = 'estoqueJLH';
+        
+        let estoque = {
+            cheios: { pedra: 0, elan: 0, esta: 0, p13: 0, p5: 0, p20: 0, p45: 0 },
+            vazios: { agua: 0, p13: 0, p5: 0, p20: 0, p45: 0 }
+        };
+
+        // --- SISTEMA DE ESTOQUE ---
+        function carregarEstoque() {
+            const estSalvo = localStorage.getItem(CHAVE_ESTOQUE);
+            if(estSalvo) estoque = JSON.parse(estSalvo);
+            renderizarEstoque();
+        }
+
+        function renderizarEstoque() {
+            const htmlCheios = Object.keys(estoque.cheios).map(k => 
+                `<div><div class="item-val">${estoque.cheios[k]}</div><div class="item-label">${k.toUpperCase()}</div></div>`
+            ).join('');
+            document.getElementById('displayCheios').innerHTML = htmlCheios;
+
+            const htmlVazios = Object.keys(estoque.vazios).map(k => 
+                `<div><div class="item-val">${estoque.vazios[k]}</div><div class="item-label">${k.toUpperCase()}</div></div>`
+            ).join('');
+            document.getElementById('displayVazios').innerHTML = htmlVazios;
+        }
+
+        function toggleAjusteEstoque() {
+            const painel = document.getElementById('painelAjusteEstoque');
+            if (painel.style.display === 'block') {
+                painel.style.display = 'none';
+            } else {
+                painel.style.display = 'block';
+                Object.keys(estoque.cheios).forEach(k => document.getElementById(`est_c_${k}`).value = estoque.cheios[k]);
+                Object.keys(estoque.vazios).forEach(k => document.getElementById(`est_v_${k}`).value = estoque.vazios[k]);
+            }
+        }
+
+        function salvarEstoqueManual() {
+            Object.keys(estoque.cheios).forEach(k => estoque.cheios[k] = parseInt(document.getElementById(`est_c_${k}`).value) || 0);
+            Object.keys(estoque.vazios).forEach(k => estoque.vazios[k] = parseInt(document.getElementById(`est_v_${k}`).value) || 0);
+            
+            localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
+            renderizarEstoque();
+            toggleAjusteEstoque();
+            alert("Estoque inicial ajustado com sucesso!");
+        }
+
+        // --- SISTEMA DE MOVIMENTAÇÃO ---
+        function carregarRegistros() {
+            let registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
+            const agora = new Date().getTime();
+            const limite = 10 * 24 * 60 * 60 * 1000;
+            const validos = registros.filter(reg => (agora - reg.timestamp) <= limite);
+            
+            if (registros.length !== validos.length) localStorage.setItem(CHAVE_MOV, JSON.stringify(validos));
+            
+            renderizarPainelMotoristas(validos);
+            renderizarTabela(validos);
+        }
+
+        function renderizarPainelMotoristas(registros) {
+            const grid = document.getElementById('gridMotoristas');
+            grid.innerHTML = '';
+            const hoje = new Date().toDateString();
+
+            // Agora percorremos o array de objetos MOTORISTAS
+            MOTORISTAS.forEach(motorista => {
+                const viagensHoje = registros.filter(reg => reg.entregador === motorista.nome && new Date(reg.timestamp).toDateString() === hoje).length;
+                const btn = document.createElement('div');
+                btn.className = 'btn-motorista';
+                if(document.getElementById('entregador').value === motorista.nome) btn.classList.add('selecionado');
+                
+                btn.innerHTML = `${motorista.nome} <span class="badge-viagens">(${viagensHoje} hoje)</span>`;
+                
+                btn.onclick = () => {
+                    document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
+                    btn.classList.add('selecionado');
+                    
+                    document.getElementById('entregador').value = motorista.nome;
+                    
+                    // PUXANDO A PLACA AUTOMATICAMENTE
+                    document.getElementById('carro').value = motorista.placa;
+                    
+                    // Pula direto para o primeiro campo de gás (Pedra) para agilizar a digitação
+                    document.getElementById('s_pedra').focus(); 
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function renderizarTabela(registros) {
+            const tbody = document.getElementById('tabelaCorpo');
+            tbody.innerHTML = '';
+            
+            registros.sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
+                const tr = document.createElement('tr');
+                const hora = new Date(reg.timestamp).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+                
+                let strSaida = Object.keys(reg.saidas).filter(k => reg.saidas[k] > 0).map(k => `${reg.saidas[k]} ${k.toUpperCase()}`).join(', ') || '-';
+                let strRetorno = Object.keys(reg.retornos).filter(k => reg.retornos[k] > 0).map(k => `${reg.retornos[k]} ${k.toUpperCase()}`).join(', ') || '-';
+
+                tr.innerHTML = `
+                    <td>${hora}</td>
+                    <td><strong>${reg.entregador}</strong><br><small>${reg.carro}</small></td>
+                    <td>${strSaida}</td>
+                    <td>${strRetorno}</td>
+                    <td>${reg.obs || '-'}</td>
+                    <td><button class="btn-excluir" onclick="deletarRegistro(${reg.timestamp})">X</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('registroForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const entregador = document.getElementById('entregador').value;
+            if(!entregador) { alert("Selecione um motorista!"); return; }
+
+            const novoRegistro = {
+                timestamp: new Date().getTime(),
+                entregador: entregador,
+                carro: document.getElementById('carro').value.trim(),
+                obs: document.getElementById('obs').value.trim(),
+                saidas: {
+                    pedra: parseInt(document.getElementById('s_pedra').value) || 0,
+                    elan: parseInt(document.getElementById('s_elan').value) || 0,
+                    esta: parseInt(document.getElementById('s_esta').value) || 0,
+                    p13: parseInt(document.getElementById('s_p13').value) || 0,
+                    p5: parseInt(document.getElementById('s_p5').value) || 0,
+                    p20: parseInt(document.getElementById('s_p20').value) || 0,
+                    p45: parseInt(document.getElementById('s_p45').value) || 0
+                },
+                retornos: {
+                    agua: parseInt(document.getElementById('r_agua').value) || 0,
+                    p13: parseInt(document.getElementById('r_p13').value) || 0,
+                    p5: parseInt(document.getElementById('r_p5').value) || 0,
+                    p20: parseInt(document.getElementById('r_p20').value) || 0,
+                    p45: parseInt(document.getElementById('r_p45').value) || 0
+                }
+            };
+
+            // Atualiza Estoque (Diminui cheios, Aumenta vazios)
+            Object.keys(novoRegistro.saidas).forEach(k => estoque.cheios[k] -= novoRegistro.saidas[k]);
+            Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
+            localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
+
+            // Salva Registro
+            const registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
+            registros.push(novoRegistro);
+            localStorage.setItem(CHAVE_MOV, JSON.stringify(registros));
+
+            // Limpa form numérico
+            document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
+            document.getElementById('obs').value = '';
+            document.getElementById('entregador').value = '';
+            document.getElementById('carro').value = '';
+            document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
+            
+            carregarEstoque();
+            carregarRegistros();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function deletarRegistro(timestamp) {
+            if(confirm("Apagar este registro? O estoque será corrigido automaticamente.")) {
+                let registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
+                const index = registros.findIndex(reg => reg.timestamp === timestamp);
+                
+                if (index > -1) {
+                    const regDeletado = registros[index];
+                    
+                    // Reverte o Estoque (Aumenta cheios, Diminui vazios)
+                    Object.keys(regDeletado.saidas).forEach(k => estoque.cheios[k] += regDeletado.saidas[k]);
+                    Object.keys(regDeletado.retornos).forEach(k => estoque.vazios[k] -= regDeletado.retornos[k]);
+                    localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
+
+                    registros.splice(index, 1);
+                    localStorage.setItem(CHAVE_MOV, JSON.stringify(registros));
+                    
+                    carregarEstoque();
+                    carregarRegistros();
+                }
+            }
+        }
+
+        // Inicialização
+        carregarEstoque();
+        carregarRegistros();
+    </script>
+</body>
+</html>
+O que você precisa fazer agora:
+Se você rolar o código até perto do final (antes do sistema de estoque), vai achar essa parte:
+
+JavaScript
+        const MOTORISTAS = [
+            { nome: "João Silva", placa: "IXE-1234" },
+            { nome: "Pedro Gomes", placa: "IXX-9876" },
+            ...
+Aí é só você trocar os nomes e as placas que coloquei de exemplo pelos nomes dos seus motoristas de verdade e as placas dos caminhões deles.
+
+Outro detalhe: programei para que, quando você tocar no botão do motorista, ele puxe a placa e já jogue o cursor piscando no primeiro campo de gás (Pedra), pulando o campo do carro pra você não perder tempo clicando na tela.
+
+tem que gerar o cod completo num so arquivo junto html css e ja num cod so
+
+Vou gerar um arquivo pronto para você baixar, com todo o código HTML, CSS e JavaScript juntos em um só lugar. Assim, você só precisa baixar e dar dois cliques para abrir no navegador!
+
+Vou preparar o arquivo agora mesmo.
+
+gere o cod completo
+
+Seu arquivo HTML com o código completo está pronto!
+
+Ícone do app HTML
+Controle_de_Patio_e_Cargas
+ HTML 
+Aberto
+Para usar:
+
+Baixe o arquivo acima (ele vai se chamar Controle_de_Patio_e_Cargas.html).
+
+Se quiser alterar os nomes dos motoristas e as placas, basta clicar com o botão direito no arquivo baixado, escolher "Abrir com" e selecionar o Bloco de Notas. Role até o final, na linha que tem const MOTORISTAS = [, digite os nomes e as placas corretas, e salve.
+
+Para usar o sistema, basta dar dois cliques no arquivo e ele vai abrir direto no seu navegador de internet, pronto para uso!
+
+
+
+
+O Gemini é uma IA e pode cometer erros.
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Pátio e Cargas - JLH</title>
+    <style>
+        :root {
+            --primary: #0056b3;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #333;
+            --border: #ced4da;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            background-color: var(--bg); 
+            color: var(--text);
+        }
+        .container { max-width: 1000px; margin: auto; }
+        h1, h2, h3 { text-align: center; margin-bottom: 20px; }
+        
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* --- PAINEL DE ESTOQUE --- */
+        .estoque-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .estoque-box {
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .estoque-box h4 { margin: 0 0 10px 0; text-align: center; font-size: 1rem; }
+        .estoque-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 10px;
+            text-align: center;
+        }
+        .item-val { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+        .item-label { font-size: 0.8rem; color: #666; }
+        
+        .btn-ajuste {
+            background: var(--warning);
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn-ajuste:hover { background: #e0a800; }
+        
+        /* Modal Ajuste de Estoque */
+        #painelAjusteEstoque {
+            display: none;
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+            margin-bottom: 20px;
+        }
+        
+        /* --- MOTORISTAS --- */
+        .motoristas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+        .btn-motorista {
+            background: #f8f9fa;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-motorista:hover { border-color: var(--primary); }
+        .btn-motorista.selecionado { background: var(--primary); color: white; border-color: var(--primary); }
+        .badge-viagens { display: block; margin-top: 5px; font-size: 0.75rem; font-weight: normal; }
+
+        /* --- INPUTS --- */
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; text-align: center; }
+        input[type="text"], input[type="number"] {
+            width: 100%; padding: 10px; font-size: 1.1rem;
+            border: 1px solid var(--border); border-radius: 6px;
+            box-sizing: border-box; text-align: center;
+        }
+        input[type="text"] { text-align: left; }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
+
+        .btn-salvar {
+            background: var(--success); color: white; border: none; padding: 15px;
+            font-size: 1.2rem; font-weight: bold; border-radius: 8px; width: 100%;
+            cursor: pointer; text-transform: uppercase; margin-top: 10px;
+        }
+        .btn-salvar:hover { background: #218838; }
+
+        /* --- TABELA --- */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 0.85rem; background: white;}
+        th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
+        th { background: #f8f9fa; }
+        .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Pátio e Cargas</h1>
+        
+        <!-- PAINEL DE ESTOQUE -->
+        <div class="card">
+            <h3 class="card-title">Estoque Atual</h3>
+            <button class="btn-ajuste" onclick="toggleAjusteEstoque()">⚙️ Ajustar Estoque Inicial</button>
+            
+            <div id="painelAjusteEstoque">
+                <p><strong>CHEIOS (Saída)</strong></p>
+                <div class="grid-inputs" style="margin-bottom:15px;">
+                    <div><label>PEDRA</label><input type="number" id="est_c_pedra" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="est_c_elan" min="0"></div>
+                    <div><label>ESTA</label><input type="number" id="est_c_esta" min="0"></div>
+                    <div><label>P13</label><input type="number" id="est_c_p13" min="0"></div>
+                    <div><label>P5</label><input type="number" id="est_c_p5" min="0"></div>
+                    <div><label>P20</label><input type="number" id="est_c_p20" min="0"></div>
+                    <div><label>P45</label><input type="number" id="est_c_p45" min="0"></div>
+                </div>
+                <p><strong>VAZIOS (Cascos)</strong></p>
+                <div class="grid-inputs">
+                    <div><label>ÁGUA (Geral)</label><input type="number" id="est_v_agua" min="0"></div>
+                    <div><label>P13</label><input type="number" id="est_v_p13" min="0"></div>
+                    <div><label>P5</label><input type="number" id="est_v_p5" min="0"></div>
+                    <div><label>P20</label><input type="number" id="est_v_p20" min="0"></div>
+                    <div><label>P45</label><input type="number" id="est_v_p45" min="0"></div>
+                </div>
+                <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Estoque Manual</button>
+            </div>
+
+            <div class="estoque-grid">
+                <div class="estoque-box">
+                    <h4>🟩 CHEIOS (Para Enviar)</h4>
+                    <div class="estoque-items" id="displayCheios"></div>
+                </div>
+                <div class="estoque-box">
+                    <h4>🟧 VAZIOS (Cascos no Pátio)</h4>
+                    <div class="estoque-items" id="displayVazios"></div>
+                </div>
+            </div>
+        </div>
+
+        <form id="registroForm">
+            <!-- MOTORISTA -->
+            <div class="card">
+                <h3 class="card-title">1. Selecionar Motorista</h3>
+                <div class="motoristas-grid" id="gridMotoristas"></div>
+                <input type="hidden" id="entregador" required>
+                <div style="margin-top: 15px;">
+                    <label style="text-align: left;">Carro (Placa/Modelo):</label>
+                    <input type="text" id="carro" required autocomplete="off" placeholder="Placa do carro">
+                </div>
+            </div>
+
+            <!-- SAÍDA (CHEIOS) -->
+            <div class="card">
+                <h3 class="card-title">2. Produtos Saindo (Cheios)</h3>
+                <div class="grid-inputs">
+                    <div><label>PEDRA</label><input type="number" id="s_pedra" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="s_elan" inputmode="numeric" min="0"></div>
+                    <div><label>ESTA</label><input type="number" id="s_esta" inputmode="numeric" min="0"></div>
+                    <div><label>P13</label><input type="number" id="s_p13" inputmode="numeric" min="0"></div>
+                    <div><label>P5</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
+                    <div><label>P20</label><input type="number" id="s_p20" inputmode="numeric" min="0"></div>
+                    <div><label>P45</label><input type="number" id="s_p45" inputmode="numeric" min="0"></div>
+                </div>
+            </div>
+
+            <!-- RETORNO (VAZIOS) -->
+            <div class="card">
+                <h3 class="card-title">3. Cascos Retornando (Vazios)</h3>
+                <div class="grid-inputs">
+                    <div><label>ÁGUA (Geral)</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
+                    <div><label>P13</label><input type="number" id="r_p13" inputmode="numeric" min="0"></div>
+                    <div><label>P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
+                    <div><label>P20</label><input type="number" id="r_p20" inputmode="numeric" min="0"></div>
+                    <div><label>P45</label><input type="number" id="r_p45" inputmode="numeric" min="0"></div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label style="text-align: left;">Observações:</label>
+                    <input type="text" id="obs" placeholder="Alguma avaria ou anotação?">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-salvar">Gravar Movimentação</button>
+        </form>
+
+        <!-- HISTÓRICO -->
+        <div class="card" style="margin-top: 20px;">
+            <h3 class="card-title">Histórico (Últimos 10 Dias)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Entregador</th>
+                            <th>Saídas (Cheios)</th>
+                            <th>Retornos (Cascos)</th>
+                            <th>OBS</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaCorpo"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CADASTRO DE MOTORISTAS E PLACAS
+        // Altere os nomes e as placas aqui!
+        // ==========================================
+        const MOTORISTAS = [
+            { nome: "João Silva", placa: "IXE-1234" },
+            { nome: "Pedro Gomes", placa: "IXX-9876" },
+            { nome: "Carlos", placa: "IQA-5544" },
+            { nome: "Motorista 4", placa: "AAA-0000" },
+            { nome: "Motorista 5", placa: "" },
+            { nome: "Motorista 6", placa: "" },
+            { nome: "Motorista 7", placa: "" },
+            { nome: "Motorista 8", placa: "" },
+            { nome: "Motorista 9", placa: "" },
+            { nome: "Motorista 10", placa: "" }
+        ];
+        // ==========================================
+        
+        const CHAVE_MOV = 'controleCargasJLH';
+        const CHAVE_ESTOQUE = 'estoqueJLH';
+        
+        let estoque = {
+            cheios: { pedra: 0, elan: 0, esta: 0, p13: 0, p5: 0, p20: 0, p45: 0 },
+            vazios: { agua: 0, p13: 0, p5: 0, p20: 0, p45: 0 }
+        };
+
+        // --- SISTEMA DE ESTOQUE ---
+        function carregarEstoque() {
+            const estSalvo = localStorage.getItem(CHAVE_ESTOQUE);
+            if(estSalvo) estoque = JSON.parse(estSalvo);
+            renderizarEstoque();
+        }
+
+        function renderizarEstoque() {
+            const htmlCheios = Object.keys(estoque.cheios).map(k => 
+                `<div><div class="item-val">${estoque.cheios[k]}</div><div class="item-label">${k.toUpperCase()}</div></div>`
+            ).join('');
+            document.getElementById('displayCheios').innerHTML = htmlCheios;
+
+            const htmlVazios = Object.keys(estoque.vazios).map(k => 
+                `<div><div class="item-val">${estoque.vazios[k]}</div><div class="item-label">${k.toUpperCase()}</div></div>`
+            ).join('');
+            document.getElementById('displayVazios').innerHTML = htmlVazios;
+        }
+
+        function toggleAjusteEstoque() {
+            const painel = document.getElementById('painelAjusteEstoque');
+            if (painel.style.display === 'block') {
+                painel.style.display = 'none';
+            } else {
+                painel.style.display = 'block';
+                Object.keys(estoque.cheios).forEach(k => document.getElementById(`est_c_${k}`).value = estoque.cheios[k]);
+                Object.keys(estoque.vazios).forEach(k => document.getElementById(`est_v_${k}`).value = estoque.vazios[k]);
+            }
+        }
+
+        function salvarEstoqueManual() {
+            Object.keys(estoque.cheios).forEach(k => estoque.cheios[k] = parseInt(document.getElementById(`est_c_${k}`).value) || 0);
+            Object.keys(estoque.vazios).forEach(k => estoque.vazios[k] = parseInt(document.getElementById(`est_v_${k}`).value) || 0);
+            
+            localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
+            renderizarEstoque();
+            toggleAjusteEstoque();
+            alert("Estoque inicial ajustado com sucesso!");
+        }
+
+        // --- SISTEMA DE MOVIMENTAÇÃO ---
+        function carregarRegistros() {
+            let registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
+            const agora = new Date().getTime();
+            const limite = 10 * 24 * 60 * 60 * 1000;
+            const validos = registros.filter(reg => (agora - reg.timestamp) <= limite);
+            
+            if (registros.length !== validos.length) localStorage.setItem(CHAVE_MOV, JSON.stringify(validos));
+            
+            renderizarPainelMotoristas(validos);
+            renderizarTabela(validos);
+        }
+
+        function renderizarPainelMotoristas(registros) {
+            const grid = document.getElementById('gridMotoristas');
+            grid.innerHTML = '';
+            const hoje = new Date().toDateString();
+
+            MOTORISTAS.forEach(motorista => {
+                const viagensHoje = registros.filter(reg => reg.entregador === motorista.nome && new Date(reg.timestamp).toDateString() === hoje).length;
+                const btn = document.createElement('div');
+                btn.className = 'btn-motorista';
+                if(document.getElementById('entregador').value === motorista.nome) btn.classList.add('selecionado');
+                
+                btn.innerHTML = `${motorista.nome} <span class="badge-viagens">(${viagensHoje} hoje)</span>`;
+                
+                btn.onclick = () => {
+                    document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
+                    btn.classList.add('selecionado');
+                    
+                    document.getElementById('entregador').value = motorista.nome;
+                    document.getElementById('carro').value = motorista.placa;
+                    document.getElementById('s_pedra').focus(); 
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function renderizarTabela(registros) {
+            const tbody = document.getElementById('tabelaCorpo');
+            tbody.innerHTML = '';
+            
+            registros.sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
+                const tr = document.createElement('tr');
+                const hora = new Date(reg.timestamp).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+                
+                let strSaida = Object.keys(reg.saidas).filter(k => reg.saidas[k] > 0).map(k => `${reg.saidas[k]} ${k.toUpperCase()}`).join(', ') || '-';
+                let strRetorno = Object.keys(reg.retornos).filter(k => reg.retornos[k] > 0).map(k => `${reg.retornos[k]} ${k.toUpperCase()}`).join(', ') || '-';
+
+                tr.innerHTML = `
+                    <td>${hora}</td>
+                    <td><strong>${reg.entregador}</strong><br><small>${reg.carro}</small></td>
+                    <td>${strSaida}</td>
+                    <td>${strRetorno}</td>
+                    <td>${reg.obs || '-'}</td>
+                    <td><button class="btn-excluir" onclick="deletarRegistro(${reg.timestamp})">X</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('registroForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const entregador = document.getElementById('entregador').value;
+            if(!entregador) { alert("Selecione um motorista!"); return; }
+
+            const novoRegistro = {
+                timestamp: new Date().getTime(),
+                entregador: entregador,
+                carro: document.getElementById('carro').value.trim(),
+                obs: document.getElementById('obs').value.trim(),
+                saidas: {
+                    pedra: parseInt(document.getElementById('s_pedra').value) || 0,
+                    elan: parseInt(document.getElementById('s_elan').value) || 0,
+                    esta: parseInt(document.getElementById('s_esta').value) || 0,
+                    p13: parseInt(document.getElementById('s_p13').value) || 0,
+                    p5: parseInt(document.getElementById('s_p5').value) || 0,
+                    p20: parseInt(document.getElementById('s_p20').value) || 0,
+                    p45: parseInt(document.getElementById('s_p45').value) || 0
+                },
+                retornos: {
+                    agua: parseInt(document.getElementById('r_agua').value) || 0,
+                    p13: parseInt(document.getElementById('r_p13').value) || 0,
+                    p5: parseInt(document.getElementById('r_p5').value) || 0,
+                    p20: parseInt(document.getElementById('r_p20').value) || 0,
+                    p45: parseInt(document.getElementById('r_p45').value) || 0
+                }
+            };
+
+            // Atualiza Estoque
+            Object.keys(novoRegistro.saidas).forEach(k => estoque.cheios[k] -= novoRegistro.saidas[k]);
+            Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
+            localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
+
+            // Salva Registro
+            const registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
+            registros.push(novoRegistro);
+            localStorage.setItem(CHAVE_MOV, JSON.stringify(registros));
+
+            // Limpa form
+            document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
+            document.getElementById('obs').value = '';
+            document.getElementById('entregador').value = '';
+            document.getElementById('carro').value = '';
+            document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
+            
+            carregarEstoque();
+            carregarRegistros();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function deletarRegistro(timestamp) {
+            if(confirm("Apagar este registro? O estoque será corrigido automaticamente.")) {
+                let registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
+                const index = registros.findIndex(reg => reg.timestamp === timestamp);
+                
+                if (index > -1) {
+                    const regDeletado = registros[index];
+                    
+                    // Reverte o Estoque
+                    Object.keys(regDeletado.saidas).forEach(k => estoque.cheios[k] += regDeletado.saidas[k]);
+                    Object.keys(regDeletado.retornos).forEach(k => estoque.vazios[k] -= regDeletado.retornos[k]);
+                    localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
+
+                    registros.splice(index, 1);
+                    localStorage.setItem(CHAVE_MOV, JSON.stringify(registros));
+                    
+                    carregarEstoque();
+                    carregarRegistros();
+                }
+            }
+        }
+
+        // Inicialização
+        carregarEstoque();
+        carregarRegistros();
+    </script>
+</body>
+</html>
+Controle_de_Patio_e_Cargas.html
+Exibindo Controle_de_Patio_e_Cargas.html.
