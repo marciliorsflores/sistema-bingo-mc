@@ -1,4 +1,3 @@
-```python
 html_content = """<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -24,7 +23,7 @@ html_content = """<!DOCTYPE html>
             background-color: var(--bg); 
             color: var(--text);
         }
-        .container { max-width: 1000px; margin: auto; }
+        .container { max-width: 1200px; margin: auto; }
         h1, h2, h3 { text-align: center; margin-bottom: 20px; }
         
         .card {
@@ -50,7 +49,7 @@ html_content = """<!DOCTYPE html>
             gap: 20px;
             margin-bottom: 15px;
         }
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .estoque-grid { grid-template-columns: 1fr; }
         }
         .estoque-box {
@@ -62,12 +61,12 @@ html_content = """<!DOCTYPE html>
         .estoque-box h4 { margin: 0 0 15px 0; text-align: center; font-size: 1.1rem; }
         .estoque-items {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
             gap: 12px;
             text-align: center;
         }
         .item-val { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
-        .item-label { font-size: 0.75rem; color: #555; font-weight: bold; text-transform: uppercase;}
+        .item-label { font-size: 0.7rem; color: #555; font-weight: bold; text-transform: uppercase;}
         
         .peso-total {
             text-align: center;
@@ -122,7 +121,7 @@ html_content = """<!DOCTYPE html>
         .grid-inputs {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;
         }
-        label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 5px; text-align: center; white-space: nowrap; text-transform: uppercase;}
+        label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-align: center; white-space: nowrap; text-transform: uppercase;}
         input[type="text"], input[type="number"] {
             width: 100%; padding: 10px; font-size: 1.1rem; border: 1px solid var(--border);
             border-radius: 6px; box-sizing: border-box; text-align: center;
@@ -148,6 +147,10 @@ html_content = """<!DOCTYPE html>
         th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
         th { background: #f8f9fa; }
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        
+        .sec-divisor {
+            width: 100%; height: 1px; background: var(--border); margin: 15px 0; grid-column: 1 / -1;
+        }
     </style>
 </head>
 <body>
@@ -168,26 +171,49 @@ html_content = """<!DOCTYPE html>
             <div id="painelAjusteEstoque">
                 <p><strong>🟩 CHEIOS (No Pátio)</strong></p>
                 <div class="grid-inputs" style="margin-bottom:15px;">
-                    <div><label>LIQUIGÁS</label><input type="number" id="est_c_liq" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="est_c_sup" min="0"></div>
-                    <div><label>NACIONAL GÁS</label><input type="number" id="est_c_nac" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="est_c_out" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="est_c_p13" min="0"></div>
+                    <div><label>P13 LIQ</label><input type="number" id="est_c_liq" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="est_c_sup" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="est_c_nac" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="est_c_out" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="est_c_p13" min="0"></div>
+                    
+                    <div class="sec-divisor"></div>
+                    
                     <div><label>P5</label><input type="number" id="est_c_p5" min="0"></div>
                     <div><label>P20</label><input type="number" id="est_c_p20" min="0"></div>
-                    <div><label>P45</label><input type="number" id="est_c_p45" min="0"></div>
+                    
+                    <div class="sec-divisor"></div>
+
+                    <div><label>P45 LIQ</label><input type="number" id="est_c_p45_liq" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="est_c_p45_sup" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="est_c_p45_nac" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="est_c_p45_out" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="est_c_p45" min="0"></div>
                 </div>
+                
                 <p><strong>🟧 VAZIOS (Cascos no Pátio)</strong></p>
                 <div class="grid-inputs">
                     <div><label>ÁGUA</label><input type="number" id="est_v_agua" min="0"></div>
-                    <div><label>LIQUIGÁS</label><input type="number" id="est_v_liq" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="est_v_sup" min="0"></div>
-                    <div><label>NACIONAL GÁS</label><input type="number" id="est_v_nac" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="est_v_out" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="est_v_p13" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    
+                    <div><label>P13 LIQ</label><input type="number" id="est_v_liq" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="est_v_sup" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="est_v_nac" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="est_v_out" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="est_v_p13" min="0"></div>
+                    
+                    <div class="sec-divisor"></div>
+
                     <div><label>P5</label><input type="number" id="est_v_p5" min="0"></div>
                     <div><label>P20</label><input type="number" id="est_v_p20" min="0"></div>
-                    <div><label>P45</label><input type="number" id="est_v_p45" min="0"></div>
+                    
+                    <div class="sec-divisor"></div>
+
+                    <div><label>P45 LIQ</label><input type="number" id="est_v_p45_liq" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="est_v_p45_sup" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="est_v_p45_nac" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="est_v_p45_out" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="est_v_p45" min="0"></div>
                 </div>
                 <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste de Estoque</button>
             </div>
@@ -224,30 +250,42 @@ html_content = """<!DOCTYPE html>
                 <h3 class="card-title" style="color: var(--danger);">2. SAÍDA DE CHEIOS (Saindo do Pátio)</h3>
                 <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Diminui a quantidade de cheios no pátio e reduz o peso.</p>
                 <div class="grid-inputs">
-                    <div><label>LIQUIGÁS</label><input type="number" id="s_liq" inputmode="numeric" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="s_sup" inputmode="numeric" min="0"></div>
-                    <div><label>NACIONAL</label><input type="number" id="s_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="s_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="s_p13" inputmode="numeric" min="0"></div>
+                    <div><label>P13 LIQ</label><input type="number" id="s_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="s_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="s_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="s_out" inputmode="numeric" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="s_p13" inputmode="numeric" min="0"></div>
+                    
                     <div><label>P5</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
                     <div><label>P20</label><input type="number" id="s_p20" inputmode="numeric" min="0"></div>
-                    <div><label>P45</label><input type="number" id="s_p45" inputmode="numeric" min="0"></div>
+                    
+                    <div><label>P45 LIQ</label><input type="number" id="s_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="s_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="s_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="s_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="s_p45" inputmode="numeric" min="0"></div>
                 </div>
             </div>
 
-            <!-- 3. ENTRADA (CHEIOS) - NOVO! -->
+            <!-- 3. ENTRADA (CHEIOS) -->
             <div class="card" style="border-left: 4px solid var(--info);">
                 <h3 class="card-title" style="color: var(--info);">3. ENTRADA DE CHEIOS (Retorno ou Carga da Cia)</h3>
                 <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Aumenta a quantidade de cheios no pátio e sobe o peso.</p>
                 <div class="grid-inputs">
-                    <div><label>LIQUIGÁS</label><input type="number" id="e_liq" inputmode="numeric" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="e_sup" inputmode="numeric" min="0"></div>
-                    <div><label>NACIONAL</label><input type="number" id="e_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="e_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="e_p13" inputmode="numeric" min="0"></div>
+                    <div><label>P13 LIQ</label><input type="number" id="e_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="e_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="e_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="e_out" inputmode="numeric" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="e_p13" inputmode="numeric" min="0"></div>
+                    
                     <div><label>P5</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
                     <div><label>P20</label><input type="number" id="e_p20" inputmode="numeric" min="0"></div>
-                    <div><label>P45</label><input type="number" id="e_p45" inputmode="numeric" min="0"></div>
+                    
+                    <div><label>P45 LIQ</label><input type="number" id="e_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="e_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="e_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="e_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="e_p45" inputmode="numeric" min="0"></div>
                 </div>
             </div>
 
@@ -257,14 +295,22 @@ html_content = """<!DOCTYPE html>
                 <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Aumenta a quantidade de cascos, mas NÃO altera o peso.</p>
                 <div class="grid-inputs">
                     <div><label>ÁGUA</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
-                    <div><label>LIQUIGÁS</label><input type="number" id="r_liq" inputmode="numeric" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="r_sup" inputmode="numeric" min="0"></div>
-                    <div><label>NACIONAL</label><input type="number" id="r_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="r_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="r_p13" inputmode="numeric" min="0"></div>
+                    <div style="grid-column: span 10;"></div> <!-- spacer -->
+
+                    <div><label>P13 LIQ</label><input type="number" id="r_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="r_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="r_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="r_out" inputmode="numeric" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="r_p13" inputmode="numeric" min="0"></div>
+                    
                     <div><label>P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
                     <div><label>P20</label><input type="number" id="r_p20" inputmode="numeric" min="0"></div>
-                    <div><label>P45</label><input type="number" id="r_p45" inputmode="numeric" min="0"></div>
+                    
+                    <div><label>P45 LIQ</label><input type="number" id="r_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="r_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="r_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="r_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="r_p45" inputmode="numeric" min="0"></div>
                 </div>
                 <div style="margin-top: 15px;">
                     <label style="text-align: left; font-size: 0.9rem;">Observações:</label>
@@ -313,17 +359,16 @@ html_content = """<!DOCTYPE html>
         ];
         
         const PESO_MAXIMO = 6240;
-        const CHAVE_MOV = 'controleCargasJLH_v2'; // Nova chave para evitar conflito com versão antiga
-        const CHAVE_ESTOQUE = 'estoqueJLH_v2';
+        const CHAVE_MOV = 'controleCargasJLH_v3'; // Nova versão para suportar as chaves P45
+        const CHAVE_ESTOQUE = 'estoqueJLH_v3';
         const CHAVE_NOME_MARCA = 'nomeOutraMarcaJLH';
         
-        // Estrutura atualizada com as marcas
+        // Estrutura atualizada
         let estoque = {
-            cheios: { liq: 0, sup: 0, nac: 0, out: 0, p13: 0, p5: 0, p20: 0, p45: 0 },
-            vazios: { agua: 0, liq: 0, sup: 0, nac: 0, out: 0, p13: 0, p5: 0, p20: 0, p45: 0 }
+            cheios: { liq: 0, sup: 0, nac: 0, out: 0, p13: 0, p5: 0, p20: 0, p45_liq: 0, p45_sup: 0, p45_nac: 0, p45_out: 0, p45: 0 },
+            vazios: { agua: 0, liq: 0, sup: 0, nac: 0, out: 0, p13: 0, p5: 0, p20: 0, p45_liq: 0, p45_sup: 0, p45_nac: 0, p45_out: 0, p45: 0 }
         };
 
-        // Funções para nome dinâmico da marca
         function carregarNomeMarca() {
             const nomeSalvo = localStorage.getItem(CHAVE_NOME_MARCA) || "OUTRA MARCA";
             document.getElementById('configNomeMarca').value = nomeSalvo;
@@ -334,21 +379,23 @@ html_content = """<!DOCTYPE html>
             const nomeFormatado = novoNome.trim() === "" ? "OUTRA MARCA" : novoNome.trim().toUpperCase();
             localStorage.setItem(CHAVE_NOME_MARCA, nomeFormatado);
             atualizarTextosMarca(nomeFormatado);
-            renderizarEstoque(); // Atualiza painel visual
-            carregarRegistros(); // Atualiza tabela
+            renderizarEstoque(); 
+            carregarRegistros(); 
         }
 
         function atualizarTextosMarca(nome) {
-            document.querySelectorAll('.lbl-out').forEach(el => {
-                el.innerText = nome;
-            });
+            let nomeCurto = nome.length > 8 ? nome.substring(0, 8) + '.' : nome;
+            document.querySelectorAll('.lbl-out-13').forEach(el => el.innerText = `P13 ${nomeCurto}`);
+            document.querySelectorAll('.lbl-out-45').forEach(el => el.innerText = `P45 ${nomeCurto}`);
         }
 
         function getNomeFormatado(k) {
+            const nomeOut = localStorage.getItem(CHAVE_NOME_MARCA) || 'OUTRA';
+            const nomeCurto = nomeOut.length > 8 ? nomeOut.substring(0, 8) + '.' : nomeOut;
             const nomes = {
-                liq: 'LIQUIGÁS', sup: 'SUPERGASBRAS', nac: 'NACIONAL GÁS',
-                out: localStorage.getItem(CHAVE_NOME_MARCA) || 'OUTRA MARCA',
-                p13: 'P13', p5: 'P5', p20: 'P20', p45: 'P45', agua: 'ÁGUA'
+                liq: 'P13 LIQ', sup: 'P13 SUP', nac: 'P13 NAC', out: `P13 ${nomeCurto}`, p13: 'P13 GERAL',
+                p45_liq: 'P45 LIQ', p45_sup: 'P45 SUP', p45_nac: 'P45 NAC', p45_out: `P45 ${nomeCurto}`, p45: 'P45 GERAL',
+                p5: 'P5', p20: 'P20', agua: 'ÁGUA'
             };
             return nomes[k] || k.toUpperCase();
         }
@@ -356,7 +403,6 @@ html_content = """<!DOCTYPE html>
         function carregarEstoque() {
             const estSalvo = localStorage.getItem(CHAVE_ESTOQUE);
             if(estSalvo) {
-                // Mescla para garantir que novas chaves existam se carregar de estado antigo
                 const parsed = JSON.parse(estSalvo);
                 estoque.cheios = { ...estoque.cheios, ...parsed.cheios };
                 estoque.vazios = { ...estoque.vazios, ...parsed.vazios };
@@ -368,18 +414,23 @@ html_content = """<!DOCTYPE html>
         function calcularPesoTotalAtual() {
             let pesoTotal = 0;
             
-            // PESO DOS CHEIOS NO PÁTIO (As 4 marcas de 13kg + P13 genérico = 13kg)
+            // P13
             pesoTotal += (estoque.cheios.liq || 0) * 13;
             pesoTotal += (estoque.cheios.sup || 0) * 13;
             pesoTotal += (estoque.cheios.nac || 0) * 13;
             pesoTotal += (estoque.cheios.out || 0) * 13;
             pesoTotal += (estoque.cheios.p13 || 0) * 13;
             
-            pesoTotal += (estoque.cheios.p5 || 0) * 5;
-            pesoTotal += (estoque.cheios.p20 || 0) * 20;
+            // P45
+            pesoTotal += (estoque.cheios.p45_liq || 0) * 45;
+            pesoTotal += (estoque.cheios.p45_sup || 0) * 45;
+            pesoTotal += (estoque.cheios.p45_nac || 0) * 45;
+            pesoTotal += (estoque.cheios.p45_out || 0) * 45;
             pesoTotal += (estoque.cheios.p45 || 0) * 45;
 
-            // VAZIOS NÃO ENTRAM NO CÁLCULO!
+            // Outros
+            pesoTotal += (estoque.cheios.p5 || 0) * 5;
+            pesoTotal += (estoque.cheios.p20 || 0) * 20;
 
             const display = document.getElementById('displayPesoTotal');
             const displaySugestao = document.getElementById('displaySugestao');
@@ -400,7 +451,7 @@ html_content = """<!DOCTYPE html>
                     
                     if (restante >= 45) sugestoes.push(`${Math.floor(restante/45)} un. de P45`);
                     if (restante >= 20) sugestoes.push(`${Math.floor(restante/20)} un. de P20`);
-                    if (restante >= 13) sugestoes.push(`${Math.floor(restante/13)} un. de 13kg (Marcas/P13)`);
+                    if (restante >= 13) sugestoes.push(`${Math.floor(restante/13)} un. de P13`);
                     if (restante >= 5) sugestoes.push(`${Math.floor(restante/5)} un. de P5`);
                     
                     displaySugestao.innerHTML = `Ainda há limite de peso! Você pode acrescentar:<br><br>${sugestoes.join(' <b>OU</b> ')}`;
@@ -428,14 +479,26 @@ html_content = """<!DOCTYPE html>
                 painel.style.display = 'none';
             } else {
                 painel.style.display = 'block';
-                Object.keys(estoque.cheios).forEach(k => document.getElementById(`est_c_${k}`).value = estoque.cheios[k]);
-                Object.keys(estoque.vazios).forEach(k => document.getElementById(`est_v_${k}`).value = estoque.vazios[k]);
+                Object.keys(estoque.cheios).forEach(k => {
+                    const el = document.getElementById(`est_c_${k}`);
+                    if(el) el.value = estoque.cheios[k];
+                });
+                Object.keys(estoque.vazios).forEach(k => {
+                    const el = document.getElementById(`est_v_${k}`);
+                    if(el) el.value = estoque.vazios[k];
+                });
             }
         }
 
         function salvarEstoqueManual() {
-            Object.keys(estoque.cheios).forEach(k => estoque.cheios[k] = parseInt(document.getElementById(`est_c_${k}`).value) || 0);
-            Object.keys(estoque.vazios).forEach(k => estoque.vazios[k] = parseInt(document.getElementById(`est_v_${k}`).value) || 0);
+            Object.keys(estoque.cheios).forEach(k => {
+                const el = document.getElementById(`est_c_${k}`);
+                if(el) estoque.cheios[k] = parseInt(el.value) || 0;
+            });
+            Object.keys(estoque.vazios).forEach(k => {
+                const el = document.getElementById(`est_v_${k}`);
+                if(el) estoque.vazios[k] = parseInt(el.value) || 0;
+            });
             
             localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
             renderizarEstoque();
@@ -508,6 +571,23 @@ html_content = """<!DOCTYPE html>
             });
         }
 
+        function extrairValores(prefixo) {
+            return {
+                liq: parseInt(document.getElementById(`${prefixo}_liq`).value) || 0,
+                sup: parseInt(document.getElementById(`${prefixo}_sup`).value) || 0,
+                nac: parseInt(document.getElementById(`${prefixo}_nac`).value) || 0,
+                out: parseInt(document.getElementById(`${prefixo}_out`).value) || 0,
+                p13: parseInt(document.getElementById(`${prefixo}_p13`).value) || 0,
+                p5: parseInt(document.getElementById(`${prefixo}_p5`).value) || 0,
+                p20: parseInt(document.getElementById(`${prefixo}_p20`).value) || 0,
+                p45_liq: parseInt(document.getElementById(`${prefixo}_p45_liq`).value) || 0,
+                p45_sup: parseInt(document.getElementById(`${prefixo}_p45_sup`).value) || 0,
+                p45_nac: parseInt(document.getElementById(`${prefixo}_p45_nac`).value) || 0,
+                p45_out: parseInt(document.getElementById(`${prefixo}_p45_out`).value) || 0,
+                p45: parseInt(document.getElementById(`${prefixo}_p45`).value) || 0
+            };
+        }
+
         document.getElementById('registroForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const entregador = document.getElementById('entregador').value;
@@ -518,43 +598,16 @@ html_content = """<!DOCTYPE html>
                 entregador: entregador,
                 carro: document.getElementById('carro').value.trim(),
                 obs: document.getElementById('obs').value.trim(),
-                saidas: { // Saída de Cheios
-                    liq: parseInt(document.getElementById('s_liq').value) || 0,
-                    sup: parseInt(document.getElementById('s_sup').value) || 0,
-                    nac: parseInt(document.getElementById('s_nac').value) || 0,
-                    out: parseInt(document.getElementById('s_out').value) || 0,
-                    p13: parseInt(document.getElementById('s_p13').value) || 0,
-                    p5: parseInt(document.getElementById('s_p5').value) || 0,
-                    p20: parseInt(document.getElementById('s_p20').value) || 0,
-                    p45: parseInt(document.getElementById('s_p45').value) || 0
-                },
-                entradas: { // Entrada de Cheios
-                    liq: parseInt(document.getElementById('e_liq').value) || 0,
-                    sup: parseInt(document.getElementById('e_sup').value) || 0,
-                    nac: parseInt(document.getElementById('e_nac').value) || 0,
-                    out: parseInt(document.getElementById('e_out').value) || 0,
-                    p13: parseInt(document.getElementById('e_p13').value) || 0,
-                    p5: parseInt(document.getElementById('e_p5').value) || 0,
-                    p20: parseInt(document.getElementById('e_p20').value) || 0,
-                    p45: parseInt(document.getElementById('e_p45').value) || 0
-                },
-                retornos: { // Entrada de Vazios
-                    agua: parseInt(document.getElementById('r_agua').value) || 0,
-                    liq: parseInt(document.getElementById('r_liq').value) || 0,
-                    sup: parseInt(document.getElementById('r_sup').value) || 0,
-                    nac: parseInt(document.getElementById('r_nac').value) || 0,
-                    out: parseInt(document.getElementById('r_out').value) || 0,
-                    p13: parseInt(document.getElementById('r_p13').value) || 0,
-                    p5: parseInt(document.getElementById('r_p5').value) || 0,
-                    p20: parseInt(document.getElementById('r_p20').value) || 0,
-                    p45: parseInt(document.getElementById('r_p45').value) || 0
-                }
+                saidas: extrairValores('s'),
+                entradas: extrairValores('e'),
+                retornos: extrairValores('r')
             };
+            novoRegistro.retornos.agua = parseInt(document.getElementById('r_agua').value) || 0;
             
             // Atualiza o Estoque do Pátio
             Object.keys(novoRegistro.saidas).forEach(k => estoque.cheios[k] -= novoRegistro.saidas[k]);
-            Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]); // Soma os cheios que chegaram
-            Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]); // Soma os vazios que chegaram
+            Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]);
+            Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
             
             localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
 
@@ -614,648 +667,4 @@ html_content = """<!DOCTYPE html>
 """
 with open('Controle_de_Patio_e_Cargas.html', 'w', encoding='utf-8') as f:
     f.write(html_content)
-print("File updated with brands and full cylinder entries.")
-
-```
-
-```text
-File updated with brands and full cylinder entries.
-
-```
-
-Pronto! Fiz todos os ajustes exatamente como você pediu:
-
-1. **Marcas de Botijões:** Agora o sistema separa tudo por **Liquigás, Supergasbras, Nacional Gás** e tem um campo editável (**Outra Marca**) onde você pode digitar o nome que quiser (como Consigaz, Ultragaz, etc), e ele atualiza automaticamente em todo o sistema.
-2. **Nova Entrada de Botijões Cheios:** Adicionei uma nova etapa no registro (etapa 3: "Entrada de Cheios"). Quando o Nei ou qualquer caminhão da companhia chegar com botijões cheios para descarregar, basta você preencher ali. **Isso vai somar no estoque e aumentar o peso do pátio.**
-3. **Cálculo de Peso 100% Correto:**
-* As **Saídas (Cheios)** diminuem o peso do pátio na hora.
-* As **Entradas (Cheios)** aumentam o peso do pátio na hora.
-* Os **Vazios não entram de jeito nenhum** no limite de peso dos 6.240 kg, ficam contabilizados só para você ter o controle de cascos.
-
-
-
-Como você preferia ter o código direto também, segue abaixo o arquivo para você baixar direto, e também o código completo se quiser copiar e colar num bloco de notas!
-
-[file-tag: code-generated-file-33923ab5-dafc-4a30-bb02-c941a5f6e6cd]
-
----
-
-### Código Completo Atualizado:
-
-*(Basta copiar tudo abaixo e salvar como `index.html` ou usar o arquivo para baixar acima)*
-
-```html
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Pátio e Cargas - JLH</title>
-    <style>
-        :root {
-            --primary: #0056b3;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --text: #333;
-            --border: #ced4da;
-        }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            margin: 0; 
-            padding: 15px; 
-            background-color: var(--bg); 
-            color: var(--text);
-        }
-        .container { max-width: 1000px; margin: auto; }
-        h1, h2, h3 { text-align: center; margin-bottom: 20px; }
-        
-        .card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
-        .card-title {
-            font-size: 1.1rem;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 10px;
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .estoque-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-        @media (max-width: 600px) {
-            .estoque-grid { grid-template-columns: 1fr; }
-        }
-        .estoque-box {
-            background: #f8f9fa;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-        }
-        .estoque-box h4 { margin: 0 0 15px 0; text-align: center; font-size: 1.1rem; }
-        .estoque-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
-            gap: 12px;
-            text-align: center;
-        }
-        .item-val { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
-        .item-label { font-size: 0.75rem; color: #555; font-weight: bold; text-transform: uppercase;}
-        
-        .peso-total {
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid transparent;
-        }
-        .peso-normal { 
-            background: #d4edda; color: #155724; border-color: #c3e6cb;
-        }
-        .peso-excedido { 
-            background: #f8d7da; color: #721c24; border-color: #f5c6cb;
-            animation: piscar 2s infinite;
-        }
-        
-        .sugestao-carga {
-            background: #e2e3e5; color: #383d41; padding: 12px; border-radius: 8px;
-            margin-top: 15px; font-weight: bold; border: 1px solid #d6d8db;
-            display: none; text-align: center;
-        }
-        
-        @keyframes piscar {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; background: #f5c6cb; }
-            100% { opacity: 1; }
-        }
-
-        .btn-ajuste {
-            background: var(--warning); color: #000; border: none; padding: 10px 15px;
-            border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
-        }
-        .btn-ajuste:hover { background: #e0a800; }
-        
-        #painelAjusteEstoque {
-            display: none; background: #fff3cd; padding: 15px; border-radius: 8px;
-            border: 1px solid #ffeeba; margin-bottom: 20px;
-        }
-        
-        .motoristas-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;
-        }
-        .btn-motorista {
-            background: #f8f9fa; border: 2px solid var(--border); border-radius: 8px;
-            padding: 12px 5px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;
-        }
-        .btn-motorista.selecionado { background: var(--primary); color: white; border-color: var(--primary); }
-        .badge-viagens { display: block; margin-top: 5px; font-size: 0.75rem; font-weight: normal; }
-
-        .grid-inputs {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;
-        }
-        label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 5px; text-align: center; white-space: nowrap; text-transform: uppercase;}
-        input[type="text"], input[type="number"] {
-            width: 100%; padding: 10px; font-size: 1.1rem; border: 1px solid var(--border);
-            border-radius: 6px; box-sizing: border-box; text-align: center;
-        }
-        input[type="text"] { text-align: left; }
-        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
-
-        .btn-salvar {
-            background: var(--success); color: white; border: none; padding: 15px;
-            font-size: 1.2rem; font-weight: bold; border-radius: 8px; width: 100%;
-            cursor: pointer; text-transform: uppercase; margin-top: 10px;
-        }
-        .btn-salvar:hover { background: #218838; }
-
-        .config-marca {
-            display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;
-            background: #e9ecef; padding: 10px; border-radius: 8px; border: 1px dashed #6c757d;
-        }
-        .config-marca input { width: 180px; font-size: 0.9rem; padding: 6px; text-align: center;}
-
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 0.85rem; background: white;}
-        th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
-        th { background: #f8f9fa; }
-        .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Controle de Pátio e Cargas</h1>
-        
-        <!-- ESTOQUE E PESO -->
-        <div class="card">
-            <h3 class="card-title">Estoque Atual & Peso do Pátio</h3>
-            
-            <div class="config-marca">
-                <label style="margin:0; font-size:0.9rem;">Nome da 4ª Marca (Editável):</label>
-                <input type="text" id="configNomeMarca" value="OUTRA MARCA" oninput="atualizarNomeMarca(this.value)" placeholder="Ex: Consigaz">
-            </div>
-
-            <button class="btn-ajuste" onclick="toggleAjusteEstoque()">⚙️ Ajustar Estoque Inicial Manualmente</button>
-            
-            <div id="painelAjusteEstoque">
-                <p><strong>🟩 CHEIOS (No Pátio)</strong></p>
-                <div class="grid-inputs" style="margin-bottom:15px;">
-                    <div><label>LIQUIGÁS</label><input type="number" id="est_c_liq" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="est_c_sup" min="0"></div>
-                    <div><label>NACIONAL GÁS</label><input type="number" id="est_c_nac" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="est_c_out" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="est_c_p13" min="0"></div>
-                    <div><label>P5</label><input type="number" id="est_c_p5" min="0"></div>
-                    <div><label>P20</label><input type="number" id="est_c_p20" min="0"></div>
-                    <div><label>P45</label><input type="number" id="est_c_p45" min="0"></div>
-                </div>
-                <p><strong>🟧 VAZIOS (Cascos no Pátio)</strong></p>
-                <div class="grid-inputs">
-                    <div><label>ÁGUA</label><input type="number" id="est_v_agua" min="0"></div>
-                    <div><label>LIQUIGÁS</label><input type="number" id="est_v_liq" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="est_v_sup" min="0"></div>
-                    <div><label>NACIONAL GÁS</label><input type="number" id="est_v_nac" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="est_v_out" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="est_v_p13" min="0"></div>
-                    <div><label>P5</label><input type="number" id="est_v_p5" min="0"></div>
-                    <div><label>P20</label><input type="number" id="est_v_p20" min="0"></div>
-                    <div><label>P45</label><input type="number" id="est_v_p45" min="0"></div>
-                </div>
-                <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste de Estoque</button>
-            </div>
-
-            <div class="estoque-grid">
-                <div class="estoque-box" style="border-top: 4px solid var(--success);">
-                    <h4>🟩 BOTIJÕES CHEIOS NO PÁTIO</h4>
-                    <div class="estoque-items" id="displayCheios"></div>
-                </div>
-                <div class="estoque-box" style="border-top: 4px solid var(--warning);">
-                    <h4>🟧 CASCOS VAZIOS NO PÁTIO</h4>
-                    <div class="estoque-items" id="displayVazios"></div>
-                </div>
-            </div>
-            
-            <div id="displayPesoTotal" class="peso-total"></div>
-            <div id="displaySugestao" class="sugestao-carga"></div>
-        </div>
-
-        <form id="registroForm">
-            <!-- 1. MOTORISTA -->
-            <div class="card">
-                <h3 class="card-title">1. Selecionar Motorista</h3>
-                <div class="motoristas-grid" id="gridMotoristas"></div>
-                <input type="hidden" id="entregador" required>
-                <div style="margin-top: 15px;">
-                    <label style="text-align: left; font-size: 0.9rem;">Carro (Placa/Modelo):</label>
-                    <input type="text" id="carro" required autocomplete="off" placeholder="Placa do carro">
-                </div>
-            </div>
-
-            <!-- 2. SAÍDA (CHEIOS) -->
-            <div class="card" style="border-left: 4px solid var(--danger);">
-                <h3 class="card-title" style="color: var(--danger);">2. SAÍDA DE CHEIOS (Saindo do Pátio)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Diminui a quantidade de cheios no pátio e reduz o peso.</p>
-                <div class="grid-inputs">
-                    <div><label>LIQUIGÁS</label><input type="number" id="s_liq" inputmode="numeric" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="s_sup" inputmode="numeric" min="0"></div>
-                    <div><label>NACIONAL</label><input type="number" id="s_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="s_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="s_p13" inputmode="numeric" min="0"></div>
-                    <div><label>P5</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
-                    <div><label>P20</label><input type="number" id="s_p20" inputmode="numeric" min="0"></div>
-                    <div><label>P45</label><input type="number" id="s_p45" inputmode="numeric" min="0"></div>
-                </div>
-            </div>
-
-            <!-- 3. ENTRADA (CHEIOS) - NOVO! -->
-            <div class="card" style="border-left: 4px solid var(--info);">
-                <h3 class="card-title" style="color: var(--info);">3. ENTRADA DE CHEIOS (Retorno ou Carga da Cia)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Aumenta a quantidade de cheios no pátio e sobe o peso.</p>
-                <div class="grid-inputs">
-                    <div><label>LIQUIGÁS</label><input type="number" id="e_liq" inputmode="numeric" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="e_sup" inputmode="numeric" min="0"></div>
-                    <div><label>NACIONAL</label><input type="number" id="e_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="e_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="e_p13" inputmode="numeric" min="0"></div>
-                    <div><label>P5</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
-                    <div><label>P20</label><input type="number" id="e_p20" inputmode="numeric" min="0"></div>
-                    <div><label>P45</label><input type="number" id="e_p45" inputmode="numeric" min="0"></div>
-                </div>
-            </div>
-
-            <!-- 4. RETORNO (VAZIOS) -->
-            <div class="card" style="border-left: 4px solid var(--warning);">
-                <h3 class="card-title" style="color: #d39e00;">4. ENTRADA DE VAZIOS (Cascos Retornando)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Aumenta a quantidade de cascos, mas NÃO altera o peso.</p>
-                <div class="grid-inputs">
-                    <div><label>ÁGUA</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
-                    <div><label>LIQUIGÁS</label><input type="number" id="r_liq" inputmode="numeric" min="0"></div>
-                    <div><label>SUPERGASBRAS</label><input type="number" id="r_sup" inputmode="numeric" min="0"></div>
-                    <div><label>NACIONAL</label><input type="number" id="r_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out">OUTRA MARCA</label><input type="number" id="r_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 (Geral)</label><input type="number" id="r_p13" inputmode="numeric" min="0"></div>
-                    <div><label>P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
-                    <div><label>P20</label><input type="number" id="r_p20" inputmode="numeric" min="0"></div>
-                    <div><label>P45</label><input type="number" id="r_p45" inputmode="numeric" min="0"></div>
-                </div>
-                <div style="margin-top: 15px;">
-                    <label style="text-align: left; font-size: 0.9rem;">Observações:</label>
-                    <input type="text" id="obs" placeholder="Alguma avaria ou anotação?">
-                </div>
-            </div>
-
-            <button type="submit" class="btn-salvar">Gravar Movimentação no Pátio</button>
-        </form>
-
-        <!-- HISTÓRICO -->
-        <div class="card" style="margin-top: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px;">
-                <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico (Últimos 10 Dias)</h3>
-                <button onclick="limparTodoHistorico()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">🗑️ Limpar Tudo</button>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data/Hora</th>
-                            <th>Entregador</th>
-                            <th>Saídas (Cheios)</th>
-                            <th>Entradas (Cheios)</th>
-                            <th>Entradas (Vazios)</th>
-                            <th>OBS</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaCorpo"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const MOTORISTAS = [
-            { nome: "Aécio", placa: "" }, { nome: "Yuri", placa: "" }, { nome: "Nicolas", placa: "" },
-            { nome: "Anderson", placa: "" }, { nome: "Soares", placa: "" }, { nome: "Lucas", placa: "" },
-            { nome: "Rafa", placa: "" }, { nome: "Evandro", placa: "" }, { nome: "Alexandre", placa: "" },
-            { nome: "Nei", placa: "" }, { nome: "Edgar", placa: "" }, { nome: "Marcílio", placa: "" },
-            { nome: "Anderson Alemão", placa: "" }, { nome: "Soveral", placa: "" },
-            { nome: "Lucas Telefone", placa: "" }, { nome: "Pedro", placa: "" },
-            { nome: "Kleber", placa: "" }, { nome: "Jackson", placa: "" },
-            { nome: "Everton", placa: "" }, { nome: "Ayrton", placa: "" }
-        ];
-        
-        const PESO_MAXIMO = 6240;
-        const CHAVE_MOV = 'controleCargasJLH_v2'; // Nova chave para evitar conflito com versão antiga
-        const CHAVE_ESTOQUE = 'estoqueJLH_v2';
-        const CHAVE_NOME_MARCA = 'nomeOutraMarcaJLH';
-        
-        // Estrutura atualizada com as marcas
-        let estoque = {
-            cheios: { liq: 0, sup: 0, nac: 0, out: 0, p13: 0, p5: 0, p20: 0, p45: 0 },
-            vazios: { agua: 0, liq: 0, sup: 0, nac: 0, out: 0, p13: 0, p5: 0, p20: 0, p45: 0 }
-        };
-
-        // Funções para nome dinâmico da marca
-        function carregarNomeMarca() {
-            const nomeSalvo = localStorage.getItem(CHAVE_NOME_MARCA) || "OUTRA MARCA";
-            document.getElementById('configNomeMarca').value = nomeSalvo;
-            atualizarTextosMarca(nomeSalvo);
-        }
-
-        function atualizarNomeMarca(novoNome) {
-            const nomeFormatado = novoNome.trim() === "" ? "OUTRA MARCA" : novoNome.trim().toUpperCase();
-            localStorage.setItem(CHAVE_NOME_MARCA, nomeFormatado);
-            atualizarTextosMarca(nomeFormatado);
-            renderizarEstoque(); // Atualiza painel visual
-            carregarRegistros(); // Atualiza tabela
-        }
-
-        function atualizarTextosMarca(nome) {
-            document.querySelectorAll('.lbl-out').forEach(el => {
-                el.innerText = nome;
-            });
-        }
-
-        function getNomeFormatado(k) {
-            const nomes = {
-                liq: 'LIQUIGÁS', sup: 'SUPERGASBRAS', nac: 'NACIONAL GÁS',
-                out: localStorage.getItem(CHAVE_NOME_MARCA) || 'OUTRA MARCA',
-                p13: 'P13', p5: 'P5', p20: 'P20', p45: 'P45', agua: 'ÁGUA'
-            };
-            return nomes[k] || k.toUpperCase();
-        }
-
-        function carregarEstoque() {
-            const estSalvo = localStorage.getItem(CHAVE_ESTOQUE);
-            if(estSalvo) {
-                // Mescla para garantir que novas chaves existam se carregar de estado antigo
-                const parsed = JSON.parse(estSalvo);
-                estoque.cheios = { ...estoque.cheios, ...parsed.cheios };
-                estoque.vazios = { ...estoque.vazios, ...parsed.vazios };
-            }
-            renderizarEstoque();
-            calcularPesoTotalAtual();
-        }
-
-        function calcularPesoTotalAtual() {
-            let pesoTotal = 0;
-            
-            // PESO DOS CHEIOS NO PÁTIO (As 4 marcas de 13kg + P13 genérico = 13kg)
-            pesoTotal += (estoque.cheios.liq || 0) * 13;
-            pesoTotal += (estoque.cheios.sup || 0) * 13;
-            pesoTotal += (estoque.cheios.nac || 0) * 13;
-            pesoTotal += (estoque.cheios.out || 0) * 13;
-            pesoTotal += (estoque.cheios.p13 || 0) * 13;
-            
-            pesoTotal += (estoque.cheios.p5 || 0) * 5;
-            pesoTotal += (estoque.cheios.p20 || 0) * 20;
-            pesoTotal += (estoque.cheios.p45 || 0) * 45;
-
-            // VAZIOS NÃO ENTRAM NO CÁLCULO!
-
-            const display = document.getElementById('displayPesoTotal');
-            const displaySugestao = document.getElementById('displaySugestao');
-            
-            if (pesoTotal > PESO_MAXIMO) {
-                const excesso = pesoTotal - PESO_MAXIMO;
-                display.className = 'peso-total peso-excedido';
-                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Total de Cheios no Pátio: ${pesoTotal} kg<br>(Excedeu ${excesso} kg do limite de ${PESO_MAXIMO} kg).`;
-                displaySugestao.style.display = 'none';
-            } else {
-                display.className = 'peso-total peso-normal';
-                display.innerHTML = `✅ Peso Seguro no Pátio: ${pesoTotal} kg / Limite: ${PESO_MAXIMO} kg<br><small>*Calculado apenas com botijões cheios</small>`;
-                
-                const restante = PESO_MAXIMO - pesoTotal;
-                if (restante > 0) {
-                    displaySugestao.style.display = 'block';
-                    let sugestoes = [];
-                    
-                    if (restante >= 45) sugestoes.push(`${Math.floor(restante/45)} un. de P45`);
-                    if (restante >= 20) sugestoes.push(`${Math.floor(restante/20)} un. de P20`);
-                    if (restante >= 13) sugestoes.push(`${Math.floor(restante/13)} un. de 13kg (Marcas/P13)`);
-                    if (restante >= 5) sugestoes.push(`${Math.floor(restante/5)} un. de P5`);
-                    
-                    displaySugestao.innerHTML = `Ainda há limite de peso! Você pode acrescentar:<br><br>${sugestoes.join(' <b>OU</b> ')}`;
-                } else {
-                    displaySugestao.style.display = 'none';
-                }
-            }
-        }
-
-        function renderizarEstoque() {
-            const htmlCheios = Object.keys(estoque.cheios).map(k => 
-                `<div><div class="item-val">${estoque.cheios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`
-            ).join('');
-            document.getElementById('displayCheios').innerHTML = htmlCheios;
-
-            const htmlVazios = Object.keys(estoque.vazios).map(k => 
-                `<div><div class="item-val">${estoque.vazios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`
-            ).join('');
-            document.getElementById('displayVazios').innerHTML = htmlVazios;
-        }
-
-        function toggleAjusteEstoque() {
-            const painel = document.getElementById('painelAjusteEstoque');
-            if (painel.style.display === 'block') {
-                painel.style.display = 'none';
-            } else {
-                painel.style.display = 'block';
-                Object.keys(estoque.cheios).forEach(k => document.getElementById(`est_c_${k}`).value = estoque.cheios[k]);
-                Object.keys(estoque.vazios).forEach(k => document.getElementById(`est_v_${k}`).value = estoque.vazios[k]);
-            }
-        }
-
-        function salvarEstoqueManual() {
-            Object.keys(estoque.cheios).forEach(k => estoque.cheios[k] = parseInt(document.getElementById(`est_c_${k}`).value) || 0);
-            Object.keys(estoque.vazios).forEach(k => estoque.vazios[k] = parseInt(document.getElementById(`est_v_${k}`).value) || 0);
-            
-            localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
-            renderizarEstoque();
-            calcularPesoTotalAtual();
-            toggleAjusteEstoque();
-            alert("Estoque do pátio ajustado!");
-        }
-
-        function carregarRegistros() {
-            let registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
-            const agora = new Date().getTime();
-            const limite = 10 * 24 * 60 * 60 * 1000;
-            const validos = registros.filter(reg => (agora - reg.timestamp) <= limite);
-            
-            if (registros.length !== validos.length) localStorage.setItem(CHAVE_MOV, JSON.stringify(validos));
-            
-            renderizarPainelMotoristas(validos);
-            renderizarTabela(validos);
-        }
-
-        function renderizarPainelMotoristas(registros) {
-            const grid = document.getElementById('gridMotoristas');
-            grid.innerHTML = '';
-            const hoje = new Date().toDateString();
-
-            MOTORISTAS.forEach(motorista => {
-                const viagensHoje = registros.filter(reg => reg.entregador === motorista.nome && new Date(reg.timestamp).toDateString() === hoje).length;
-                const btn = document.createElement('div');
-                btn.className = 'btn-motorista';
-                if(document.getElementById('entregador').value === motorista.nome) btn.classList.add('selecionado');
-                
-                btn.innerHTML = `${motorista.nome} <span class="badge-viagens">(${viagensHoje} hoje)</span>`;
-                
-                btn.onclick = () => {
-                    document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
-                    btn.classList.add('selecionado');
-                    
-                    document.getElementById('entregador').value = motorista.nome;
-                    document.getElementById('carro').value = motorista.placa;
-                    document.getElementById('s_liq').focus(); 
-                };
-                grid.appendChild(btn);
-            });
-        }
-
-        function formatarItens(obj) {
-            if(!obj) return '-';
-            const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `<b>${obj[k]}</b> ${getNomeFormatado(k)}`);
-            return itens.length > 0 ? itens.join('<br>') : '-';
-        }
-
-        function renderizarTabela(registros) {
-            const tbody = document.getElementById('tabelaCorpo');
-            tbody.innerHTML = '';
-            
-            registros.sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
-                const tr = document.createElement('tr');
-                const hora = new Date(reg.timestamp).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
-                
-                tr.innerHTML = `
-                    <td>${hora}</td>
-                    <td><strong>${reg.entregador}</strong><br><small>${reg.carro}</small></td>
-                    <td style="color:var(--danger)">${formatarItens(reg.saidas)}</td>
-                    <td style="color:var(--info)">${formatarItens(reg.entradas)}</td>
-                    <td style="color:#d39e00">${formatarItens(reg.retornos)}</td>
-                    <td>${reg.obs || '-'}</td>
-                    <td><button class="btn-excluir" onclick="deletarRegistro(${reg.timestamp})">X</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        document.getElementById('registroForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const entregador = document.getElementById('entregador').value;
-            if(!entregador) { alert("Selecione um motorista!"); return; }
-
-            const novoRegistro = {
-                timestamp: new Date().getTime(),
-                entregador: entregador,
-                carro: document.getElementById('carro').value.trim(),
-                obs: document.getElementById('obs').value.trim(),
-                saidas: { // Saída de Cheios
-                    liq: parseInt(document.getElementById('s_liq').value) || 0,
-                    sup: parseInt(document.getElementById('s_sup').value) || 0,
-                    nac: parseInt(document.getElementById('s_nac').value) || 0,
-                    out: parseInt(document.getElementById('s_out').value) || 0,
-                    p13: parseInt(document.getElementById('s_p13').value) || 0,
-                    p5: parseInt(document.getElementById('s_p5').value) || 0,
-                    p20: parseInt(document.getElementById('s_p20').value) || 0,
-                    p45: parseInt(document.getElementById('s_p45').value) || 0
-                },
-                entradas: { // Entrada de Cheios
-                    liq: parseInt(document.getElementById('e_liq').value) || 0,
-                    sup: parseInt(document.getElementById('e_sup').value) || 0,
-                    nac: parseInt(document.getElementById('e_nac').value) || 0,
-                    out: parseInt(document.getElementById('e_out').value) || 0,
-                    p13: parseInt(document.getElementById('e_p13').value) || 0,
-                    p5: parseInt(document.getElementById('e_p5').value) || 0,
-                    p20: parseInt(document.getElementById('e_p20').value) || 0,
-                    p45: parseInt(document.getElementById('e_p45').value) || 0
-                },
-                retornos: { // Entrada de Vazios
-                    agua: parseInt(document.getElementById('r_agua').value) || 0,
-                    liq: parseInt(document.getElementById('r_liq').value) || 0,
-                    sup: parseInt(document.getElementById('r_sup').value) || 0,
-                    nac: parseInt(document.getElementById('r_nac').value) || 0,
-                    out: parseInt(document.getElementById('r_out').value) || 0,
-                    p13: parseInt(document.getElementById('r_p13').value) || 0,
-                    p5: parseInt(document.getElementById('r_p5').value) || 0,
-                    p20: parseInt(document.getElementById('r_p20').value) || 0,
-                    p45: parseInt(document.getElementById('r_p45').value) || 0
-                }
-            };
-            
-            // Atualiza o Estoque do Pátio
-            Object.keys(novoRegistro.saidas).forEach(k => estoque.cheios[k] -= novoRegistro.saidas[k]);
-            Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]); // Soma os cheios que chegaram
-            Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]); // Soma os vazios que chegaram
-            
-            localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
-
-            const registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
-            registros.push(novoRegistro);
-            localStorage.setItem(CHAVE_MOV, JSON.stringify(registros));
-
-            // Limpeza
-            document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
-            document.getElementById('obs').value = '';
-            document.getElementById('entregador').value = '';
-            document.getElementById('carro').value = '';
-            document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
-            
-            carregarEstoque();
-            carregarRegistros();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        function deletarRegistro(timestamp) {
-            if(confirm("Apagar este registro individual? O estoque será corrigido automaticamente.")) {
-                let registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
-                const index = registros.findIndex(reg => reg.timestamp === timestamp);
-                if (index > -1) {
-                    const reg = registros[index];
-                    
-                    // Reverte o Estoque
-                    Object.keys(reg.saidas).forEach(k => estoque.cheios[k] += reg.saidas[k]);
-                    if(reg.entradas) Object.keys(reg.entradas).forEach(k => estoque.cheios[k] -= reg.entradas[k]);
-                    Object.keys(reg.retornos).forEach(k => estoque.vazios[k] -= reg.retornos[k]);
-                    
-                    localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
-                    registros.splice(index, 1);
-                    localStorage.setItem(CHAVE_MOV, JSON.stringify(registros));
-                    
-                    carregarEstoque();
-                    carregarRegistros();
-                }
-            }
-        }
-
-        function limparTodoHistorico() {
-            if(confirm("TEM CERTEZA que deseja apagar TODO o histórico? Isso NÃO apaga o estoque atual do pátio.")) {
-                localStorage.removeItem(CHAVE_MOV);
-                carregarRegistros();
-                carregarEstoque(); 
-            }
-        }
-        
-        // Inicialização
-        carregarNomeMarca();
-        carregarEstoque();
-        carregarRegistros();
-    </script>
-</body>
-</html>
-
-```
+print("File successfully updated with P45 brands.")
