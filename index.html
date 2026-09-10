@@ -1,4 +1,12 @@
-html_content = """<!DOCTYPE html>
+Que maravilha que gostou! Para colocar no GitHub e até usar de forma online e gratuita (pelo GitHub Pages), siga os passos abaixo.
+Como hospedar no GitHub:
+ * Passo 1: No seu GitHub, crie um novo repositório (ex: controle-de-patio).
+ * Passo 2: Clique em Add file > Create new file.
+ * Passo 3: Nomeie o arquivo obrigatoriamente como index.html.
+ * Passo 4: Copie todo o código abaixo e cole dentro desse arquivo, depois clique em Commit changes.
+ * Dica Extra: Para acessar o sistema de qualquer celular sem baixar arquivo, vá na aba Settings do seu repositório, clique em Pages (no menu lateral esquerdo), selecione a branch main e salve. Em alguns minutos, o GitHub vai te dar um link para acessar o seu site de graça!
+Aqui está o código completo para você copiar:
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -19,7 +27,7 @@ html_content = """<!DOCTYPE html>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             margin: 0; 
-            padding: 15px; 
+            padding: 10px; 
             background-color: var(--bg); 
             color: var(--text);
         }
@@ -28,7 +36,7 @@ html_content = """<!DOCTYPE html>
         
         .card {
             background: var(--card-bg);
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             margin-bottom: 20px;
@@ -46,7 +54,7 @@ html_content = """<!DOCTYPE html>
         .estoque-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 15px;
         }
         @media (max-width: 768px) {
@@ -56,16 +64,16 @@ html_content = """<!DOCTYPE html>
             background: #f8f9fa;
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 15px;
+            padding: 12px;
         }
-        .estoque-box h4 { margin: 0 0 15px 0; text-align: center; font-size: 1.1rem; }
+        .estoque-box h4 { margin: 0 0 15px 0; text-align: center; font-size: 1rem; }
         .estoque-items {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-            gap: 12px;
+            gap: 10px;
             text-align: center;
         }
-        .item-val { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
+        .item-val { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
         .item-label { font-size: 0.7rem; color: #555; font-weight: bold; text-transform: uppercase;}
         
         .peso-total {
@@ -77,9 +85,7 @@ html_content = """<!DOCTYPE html>
             border-radius: 8px;
             border: 2px solid transparent;
         }
-        .peso-normal { 
-            background: #d4edda; color: #155724; border-color: #c3e6cb;
-        }
+        .peso-normal { background: #d4edda; color: #155724; border-color: #c3e6cb; }
         .peso-excedido { 
             background: #f8d7da; color: #721c24; border-color: #f5c6cb;
             animation: piscar 2s infinite;
@@ -109,21 +115,22 @@ html_content = """<!DOCTYPE html>
         }
         
         .motoristas-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px;
         }
         .btn-motorista {
             background: #f8f9fa; border: 2px solid var(--border); border-radius: 8px;
-            padding: 12px 5px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;
+            padding: 10px 5px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;
+            font-size: 0.9rem;
         }
         .btn-motorista.selecionado { background: var(--primary); color: white; border-color: var(--primary); }
-        .badge-viagens { display: block; margin-top: 5px; font-size: 0.75rem; font-weight: normal; }
+        .badge-viagens { display: block; margin-top: 5px; font-size: 0.7rem; font-weight: normal; }
 
         .grid-inputs {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px;
         }
         label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-align: center; white-space: nowrap; text-transform: uppercase;}
         input[type="text"], input[type="number"] {
-            width: 100%; padding: 10px; font-size: 1.1rem; border: 1px solid var(--border);
+            width: 100%; padding: 8px; font-size: 1rem; border: 1px solid var(--border);
             border-radius: 6px; box-sizing: border-box; text-align: center;
         }
         input[type="text"] { text-align: left; }
@@ -131,25 +138,25 @@ html_content = """<!DOCTYPE html>
 
         .btn-salvar {
             background: var(--success); color: white; border: none; padding: 15px;
-            font-size: 1.2rem; font-weight: bold; border-radius: 8px; width: 100%;
-            cursor: pointer; text-transform: uppercase; margin-top: 10px;
+            font-size: 1.1rem; font-weight: bold; border-radius: 8px; width: 100%;
+            cursor: pointer; text-transform: uppercase; margin-top: 15px;
         }
         .btn-salvar:hover { background: #218838; }
 
         .config-marca {
-            display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;
-            background: #e9ecef; padding: 10px; border-radius: 8px; border: 1px dashed #6c757d;
+            display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; 
+            margin-bottom: 20px; background: #e9ecef; padding: 10px; border-radius: 8px; border: 1px dashed #6c757d;
         }
         .config-marca input { width: 180px; font-size: 0.9rem; padding: 6px; text-align: center;}
 
         .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 0.85rem; background: white;}
+        table { width: 100%; border-collapse: collapse; min-width: 800px; font-size: 0.8rem; background: white;}
         th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
         th { background: #f8f9fa; }
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         
         .sec-divisor {
-            width: 100%; height: 1px; background: var(--border); margin: 15px 0; grid-column: 1 / -1;
+            grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0;
         }
     </style>
 </head>
@@ -162,7 +169,7 @@ html_content = """<!DOCTYPE html>
             <h3 class="card-title">Estoque Atual & Peso do Pátio</h3>
             
             <div class="config-marca">
-                <label style="margin:0; font-size:0.9rem;">Nome da 4ª Marca (Editável):</label>
+                <label style="margin:0; font-size:0.9rem;">Nome da 4ª Marca:</label>
                 <input type="text" id="configNomeMarca" value="OUTRA MARCA" oninput="atualizarNomeMarca(this.value)" placeholder="Ex: Consigaz">
             </div>
 
@@ -179,9 +186,12 @@ html_content = """<!DOCTYPE html>
                     
                     <div class="sec-divisor"></div>
                     
-                    <div><label>P5</label><input type="number" id="est_c_p5" min="0"></div>
-                    <div><label>P20</label><input type="number" id="est_c_p20" min="0"></div>
-                    
+                    <div><label>P20 LIQ</label><input type="number" id="est_c_p20_liq" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="est_c_p20_sup" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="est_c_p20_nac" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="est_c_p20_out" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="est_c_p20" min="0"></div>
+
                     <div class="sec-divisor"></div>
 
                     <div><label>P45 LIQ</label><input type="number" id="est_c_p45_liq" min="0"></div>
@@ -189,6 +199,10 @@ html_content = """<!DOCTYPE html>
                     <div><label>P45 NAC</label><input type="number" id="est_c_p45_nac" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="est_c_p45_out" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="est_c_p45" min="0"></div>
+
+                    <div class="sec-divisor"></div>
+                    
+                    <div><label>P5 GERAL</label><input type="number" id="est_c_p5" min="0"></div>
                 </div>
                 
                 <p><strong>🟧 VAZIOS (Cascos no Pátio)</strong></p>
@@ -204,8 +218,11 @@ html_content = """<!DOCTYPE html>
                     
                     <div class="sec-divisor"></div>
 
-                    <div><label>P5</label><input type="number" id="est_v_p5" min="0"></div>
-                    <div><label>P20</label><input type="number" id="est_v_p20" min="0"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="est_v_p20_liq" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="est_v_p20_sup" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="est_v_p20_nac" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="est_v_p20_out" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="est_v_p20" min="0"></div>
                     
                     <div class="sec-divisor"></div>
 
@@ -214,6 +231,10 @@ html_content = """<!DOCTYPE html>
                     <div><label>P45 NAC</label><input type="number" id="est_v_p45_nac" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="est_v_p45_out" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="est_v_p45" min="0"></div>
+
+                    <div class="sec-divisor"></div>
+                    
+                    <div><label>P5 GERAL</label><input type="number" id="est_v_p5" min="0"></div>
                 </div>
                 <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste de Estoque</button>
             </div>
@@ -248,7 +269,7 @@ html_content = """<!DOCTYPE html>
             <!-- 2. SAÍDA (CHEIOS) -->
             <div class="card" style="border-left: 4px solid var(--danger);">
                 <h3 class="card-title" style="color: var(--danger);">2. SAÍDA DE CHEIOS (Saindo do Pátio)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Diminui a quantidade de cheios no pátio e reduz o peso.</p>
+                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Diminui os cheios, reduz o peso e <b>ADICIONA automaticamente a mesma qtd em VAZIOS</b>.</p>
                 <div class="grid-inputs">
                     <div><label>P13 LIQ</label><input type="number" id="s_liq" inputmode="numeric" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="s_sup" inputmode="numeric" min="0"></div>
@@ -256,21 +277,31 @@ html_content = """<!DOCTYPE html>
                     <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="s_out" inputmode="numeric" min="0"></div>
                     <div><label>P13 GERAL</label><input type="number" id="s_p13" inputmode="numeric" min="0"></div>
                     
-                    <div><label>P5</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
-                    <div><label>P20</label><input type="number" id="s_p20" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+
+                    <div><label>P20 LIQ</label><input type="number" id="s_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="s_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="s_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="s_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="s_p20" inputmode="numeric" min="0"></div>
                     
+                    <div class="sec-divisor"></div>
+
                     <div><label>P45 LIQ</label><input type="number" id="s_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="s_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="s_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="s_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="s_p45" inputmode="numeric" min="0"></div>
+
+                    <div class="sec-divisor"></div>
+                    <div><label>P5 GERAL</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
                 </div>
             </div>
 
             <!-- 3. ENTRADA (CHEIOS) -->
             <div class="card" style="border-left: 4px solid var(--info);">
-                <h3 class="card-title" style="color: var(--info);">3. ENTRADA DE CHEIOS (Retorno ou Carga da Cia)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Aumenta a quantidade de cheios no pátio e sobe o peso.</p>
+                <h3 class="card-title" style="color: var(--info);">3. ENTRADA DE CHEIOS (Retorno ou Carga)</h3>
+                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Aumenta a quantidade de cheios no pátio e sobe o peso.</p>
                 <div class="grid-inputs">
                     <div><label>P13 LIQ</label><input type="number" id="e_liq" inputmode="numeric" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="e_sup" inputmode="numeric" min="0"></div>
@@ -278,24 +309,34 @@ html_content = """<!DOCTYPE html>
                     <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="e_out" inputmode="numeric" min="0"></div>
                     <div><label>P13 GERAL</label><input type="number" id="e_p13" inputmode="numeric" min="0"></div>
                     
-                    <div><label>P5</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
-                    <div><label>P20</label><input type="number" id="e_p20" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+
+                    <div><label>P20 LIQ</label><input type="number" id="e_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="e_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="e_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="e_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="e_p20" inputmode="numeric" min="0"></div>
                     
+                    <div class="sec-divisor"></div>
+
                     <div><label>P45 LIQ</label><input type="number" id="e_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="e_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="e_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="e_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="e_p45" inputmode="numeric" min="0"></div>
+
+                    <div class="sec-divisor"></div>
+                    <div><label>P5 GERAL</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
                 </div>
             </div>
 
             <!-- 4. RETORNO (VAZIOS) -->
             <div class="card" style="border-left: 4px solid var(--warning);">
-                <h3 class="card-title" style="color: #d39e00;">4. ENTRADA DE VAZIOS (Cascos Retornando)</h3>
-                <p style="font-size: 0.85rem; color: #666; margin-top: -10px;">* Aumenta a quantidade de cascos, mas NÃO altera o peso.</p>
+                <h3 class="card-title" style="color: #d39e00;">4. ENTRADA DE VAZIOS (Cascos Extras)</h3>
+                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Use <b>APENAS</b> para vazios EXTRAS que chegarem.</p>
                 <div class="grid-inputs">
                     <div><label>ÁGUA</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
-                    <div style="grid-column: span 10;"></div> <!-- spacer -->
+                    <div class="sec-divisor"></div>
 
                     <div><label>P13 LIQ</label><input type="number" id="r_liq" inputmode="numeric" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="r_sup" inputmode="numeric" min="0"></div>
@@ -303,14 +344,24 @@ html_content = """<!DOCTYPE html>
                     <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="r_out" inputmode="numeric" min="0"></div>
                     <div><label>P13 GERAL</label><input type="number" id="r_p13" inputmode="numeric" min="0"></div>
                     
-                    <div><label>P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
-                    <div><label>P20</label><input type="number" id="r_p20" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+
+                    <div><label>P20 LIQ</label><input type="number" id="r_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="r_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="r_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="r_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="r_p20" inputmode="numeric" min="0"></div>
                     
+                    <div class="sec-divisor"></div>
+
                     <div><label>P45 LIQ</label><input type="number" id="r_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="r_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="r_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="r_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="r_p45" inputmode="numeric" min="0"></div>
+
+                    <div class="sec-divisor"></div>
+                    <div><label>P5 GERAL</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
                 </div>
                 <div style="margin-top: 15px;">
                     <label style="text-align: left; font-size: 0.9rem;">Observações:</label>
@@ -318,7 +369,7 @@ html_content = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <button type="submit" class="btn-salvar">Gravar Movimentação no Pátio</button>
+            <button type="submit" class="btn-salvar">Gravar Movimentação</button>
         </form>
 
         <!-- HISTÓRICO -->
@@ -335,7 +386,7 @@ html_content = """<!DOCTYPE html>
                             <th>Entregador</th>
                             <th>Saídas (Cheios)</th>
                             <th>Entradas (Cheios)</th>
-                            <th>Entradas (Vazios)</th>
+                            <th>Entradas (Vazios Extras)</th>
                             <th>OBS</th>
                             <th>Ação</th>
                         </tr>
@@ -359,14 +410,24 @@ html_content = """<!DOCTYPE html>
         ];
         
         const PESO_MAXIMO = 6240;
-        const CHAVE_MOV = 'controleCargasJLH_v3'; // Nova versão para suportar as chaves P45
-        const CHAVE_ESTOQUE = 'estoqueJLH_v3';
+        const CHAVE_MOV = 'controleCargasJLH_v4'; 
+        const CHAVE_ESTOQUE = 'estoqueJLH_v4';
         const CHAVE_NOME_MARCA = 'nomeOutraMarcaJLH';
         
-        // Estrutura atualizada
         let estoque = {
-            cheios: { liq: 0, sup: 0, nac: 0, out: 0, p13: 0, p5: 0, p20: 0, p45_liq: 0, p45_sup: 0, p45_nac: 0, p45_out: 0, p45: 0 },
-            vazios: { agua: 0, liq: 0, sup: 0, nac: 0, out: 0, p13: 0, p5: 0, p20: 0, p45_liq: 0, p45_sup: 0, p45_nac: 0, p45_out: 0, p45: 0 }
+            cheios: { 
+                liq: 0, sup: 0, nac: 0, out: 0, p13: 0, 
+                p20_liq: 0, p20_sup: 0, p20_nac: 0, p20_out: 0, p20: 0,
+                p45_liq: 0, p45_sup: 0, p45_nac: 0, p45_out: 0, p45: 0,
+                p5: 0 
+            },
+            vazios: { 
+                agua: 0, 
+                liq: 0, sup: 0, nac: 0, out: 0, p13: 0, 
+                p20_liq: 0, p20_sup: 0, p20_nac: 0, p20_out: 0, p20: 0,
+                p45_liq: 0, p45_sup: 0, p45_nac: 0, p45_out: 0, p45: 0,
+                p5: 0 
+            }
         };
 
         function carregarNomeMarca() {
@@ -386,6 +447,7 @@ html_content = """<!DOCTYPE html>
         function atualizarTextosMarca(nome) {
             let nomeCurto = nome.length > 8 ? nome.substring(0, 8) + '.' : nome;
             document.querySelectorAll('.lbl-out-13').forEach(el => el.innerText = `P13 ${nomeCurto}`);
+            document.querySelectorAll('.lbl-out-20').forEach(el => el.innerText = `P20 ${nomeCurto}`);
             document.querySelectorAll('.lbl-out-45').forEach(el => el.innerText = `P45 ${nomeCurto}`);
         }
 
@@ -394,8 +456,9 @@ html_content = """<!DOCTYPE html>
             const nomeCurto = nomeOut.length > 8 ? nomeOut.substring(0, 8) + '.' : nomeOut;
             const nomes = {
                 liq: 'P13 LIQ', sup: 'P13 SUP', nac: 'P13 NAC', out: `P13 ${nomeCurto}`, p13: 'P13 GERAL',
+                p20_liq: 'P20 LIQ', p20_sup: 'P20 SUP', p20_nac: 'P20 NAC', p20_out: `P20 ${nomeCurto}`, p20: 'P20 GERAL',
                 p45_liq: 'P45 LIQ', p45_sup: 'P45 SUP', p45_nac: 'P45 NAC', p45_out: `P45 ${nomeCurto}`, p45: 'P45 GERAL',
-                p5: 'P5', p20: 'P20', agua: 'ÁGUA'
+                p5: 'P5 GERAL', agua: 'ÁGUA'
             };
             return nomes[k] || k.toUpperCase();
         }
@@ -421,6 +484,13 @@ html_content = """<!DOCTYPE html>
             pesoTotal += (estoque.cheios.out || 0) * 13;
             pesoTotal += (estoque.cheios.p13 || 0) * 13;
             
+            // P20
+            pesoTotal += (estoque.cheios.p20_liq || 0) * 20;
+            pesoTotal += (estoque.cheios.p20_sup || 0) * 20;
+            pesoTotal += (estoque.cheios.p20_nac || 0) * 20;
+            pesoTotal += (estoque.cheios.p20_out || 0) * 20;
+            pesoTotal += (estoque.cheios.p20 || 0) * 20;
+
             // P45
             pesoTotal += (estoque.cheios.p45_liq || 0) * 45;
             pesoTotal += (estoque.cheios.p45_sup || 0) * 45;
@@ -428,9 +498,8 @@ html_content = """<!DOCTYPE html>
             pesoTotal += (estoque.cheios.p45_out || 0) * 45;
             pesoTotal += (estoque.cheios.p45 || 0) * 45;
 
-            // Outros
+            // P5
             pesoTotal += (estoque.cheios.p5 || 0) * 5;
-            pesoTotal += (estoque.cheios.p20 || 0) * 20;
 
             const display = document.getElementById('displayPesoTotal');
             const displaySugestao = document.getElementById('displaySugestao');
@@ -578,13 +647,20 @@ html_content = """<!DOCTYPE html>
                 nac: parseInt(document.getElementById(`${prefixo}_nac`).value) || 0,
                 out: parseInt(document.getElementById(`${prefixo}_out`).value) || 0,
                 p13: parseInt(document.getElementById(`${prefixo}_p13`).value) || 0,
-                p5: parseInt(document.getElementById(`${prefixo}_p5`).value) || 0,
+                
+                p20_liq: parseInt(document.getElementById(`${prefixo}_p20_liq`).value) || 0,
+                p20_sup: parseInt(document.getElementById(`${prefixo}_p20_sup`).value) || 0,
+                p20_nac: parseInt(document.getElementById(`${prefixo}_p20_nac`).value) || 0,
+                p20_out: parseInt(document.getElementById(`${prefixo}_p20_out`).value) || 0,
                 p20: parseInt(document.getElementById(`${prefixo}_p20`).value) || 0,
+                
                 p45_liq: parseInt(document.getElementById(`${prefixo}_p45_liq`).value) || 0,
                 p45_sup: parseInt(document.getElementById(`${prefixo}_p45_sup`).value) || 0,
                 p45_nac: parseInt(document.getElementById(`${prefixo}_p45_nac`).value) || 0,
                 p45_out: parseInt(document.getElementById(`${prefixo}_p45_out`).value) || 0,
-                p45: parseInt(document.getElementById(`${prefixo}_p45`).value) || 0
+                p45: parseInt(document.getElementById(`${prefixo}_p45`).value) || 0,
+                
+                p5: parseInt(document.getElementById(`${prefixo}_p5`).value) || 0
             };
         }
 
@@ -604,8 +680,15 @@ html_content = """<!DOCTYPE html>
             };
             novoRegistro.retornos.agua = parseInt(document.getElementById('r_agua').value) || 0;
             
-            // Atualiza o Estoque do Pátio
-            Object.keys(novoRegistro.saidas).forEach(k => estoque.cheios[k] -= novoRegistro.saidas[k]);
+            // --- LÓGICA DE TROCA DE CHEIOS POR VAZIOS ---
+            Object.keys(novoRegistro.saidas).forEach(k => {
+                let qtdSaida = novoRegistro.saidas[k];
+                if (qtdSaida > 0) {
+                    estoque.cheios[k] -= qtdSaida; // Diminui o cheio
+                    estoque.vazios[k] += qtdSaida; // Soma a mesma qtd no vazio
+                }
+            });
+            
             Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]);
             Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
             
@@ -634,8 +717,15 @@ html_content = """<!DOCTYPE html>
                 if (index > -1) {
                     const reg = registros[index];
                     
-                    // Reverte o Estoque
-                    Object.keys(reg.saidas).forEach(k => estoque.cheios[k] += reg.saidas[k]);
+                    // Reverte o Estoque com a regra de troca
+                    Object.keys(reg.saidas).forEach(k => {
+                        let qtdSaida = reg.saidas[k];
+                        if(qtdSaida > 0) {
+                            estoque.cheios[k] += qtdSaida;
+                            estoque.vazios[k] -= qtdSaida;
+                        }
+                    });
+                    
                     if(reg.entradas) Object.keys(reg.entradas).forEach(k => estoque.cheios[k] -= reg.entradas[k]);
                     Object.keys(reg.retornos).forEach(k => estoque.vazios[k] -= reg.retornos[k]);
                     
@@ -657,14 +747,10 @@ html_content = """<!DOCTYPE html>
             }
         }
         
-        // Inicialização
         carregarNomeMarca();
         carregarEstoque();
         carregarRegistros();
     </script>
 </body>
 </html>
-"""
-with open('Controle_de_Patio_e_Cargas.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-print("File successfully updated with P45 brands.")
+
