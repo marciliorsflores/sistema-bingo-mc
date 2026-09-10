@@ -1,17 +1,10 @@
-Que maravilha que gostou! Para colocar no GitHub e até usar de forma online e gratuita (pelo GitHub Pages), siga os passos abaixo.
-Como hospedar no GitHub:
- * Passo 1: No seu GitHub, crie um novo repositório (ex: controle-de-patio).
- * Passo 2: Clique em Add file > Create new file.
- * Passo 3: Nomeie o arquivo obrigatoriamente como index.html.
- * Passo 4: Copie todo o código abaixo e cole dentro desse arquivo, depois clique em Commit changes.
- * Dica Extra: Para acessar o sistema de qualquer celular sem baixar arquivo, vá na aba Settings do seu repositório, clique em Pages (no menu lateral esquerdo), selecione a branch main e salve. Em alguns minutos, o GitHub vai te dar um link para acessar o seu site de graça!
-Aqui está o código completo para você copiar:
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Pátio e Cargas - JLH</title>
+    <title>Controle de Pátio - Nuvem (JLH)</title>
     <style>
         :root {
             --primary: #0056b3;
@@ -33,6 +26,23 @@ Aqui está o código completo para você copiar:
         }
         .container { max-width: 1200px; margin: auto; }
         h1, h2, h3 { text-align: center; margin-bottom: 20px; }
+        
+        /* Indicador de Nuvem */
+        .status-nuvem {
+            text-align: center;
+            background: #d4edda;
+            color: #155724;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
         
         .card {
             background: var(--card-bg);
@@ -159,10 +169,18 @@ Aqui está o código completo para você copiar:
             grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0;
         }
     </style>
+    
+    <!-- FIREBASE SDK COMPAT -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Controle de Pátio e Cargas</h1>
+        
+        <div class="status-nuvem">
+            🟢 Conectado ao banco de dados em Nuvem (Firebase)
+        </div>
         
         <!-- ESTOQUE E PESO -->
         <div class="card">
@@ -170,7 +188,8 @@ Aqui está o código completo para você copiar:
             
             <div class="config-marca">
                 <label style="margin:0; font-size:0.9rem;">Nome da 4ª Marca:</label>
-                <input type="text" id="configNomeMarca" value="OUTRA MARCA" oninput="atualizarNomeMarca(this.value)" placeholder="Ex: Consigaz">
+                <!-- Alterado de oninput para onchange para salvar apenas quando sair do campo -->
+                <input type="text" id="configNomeMarca" onchange="salvarNomeMarca(this.value)" placeholder="Ex: Consigaz">
             </div>
 
             <button class="btn-ajuste" onclick="toggleAjusteEstoque()">⚙️ Ajustar Estoque Inicial Manualmente</button>
@@ -236,17 +255,17 @@ Aqui está o código completo para você copiar:
                     
                     <div><label>P5 GERAL</label><input type="number" id="est_v_p5" min="0"></div>
                 </div>
-                <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste de Estoque</button>
+                <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste na Nuvem</button>
             </div>
 
             <div class="estoque-grid">
                 <div class="estoque-box" style="border-top: 4px solid var(--success);">
                     <h4>🟩 BOTIJÕES CHEIOS NO PÁTIO</h4>
-                    <div class="estoque-items" id="displayCheios"></div>
+                    <div class="estoque-items" id="displayCheios">Carregando...</div>
                 </div>
                 <div class="estoque-box" style="border-top: 4px solid var(--warning);">
                     <h4>🟧 CASCOS VAZIOS NO PÁTIO</h4>
-                    <div class="estoque-items" id="displayVazios"></div>
+                    <div class="estoque-items" id="displayVazios">Carregando...</div>
                 </div>
             </div>
             
@@ -398,6 +417,26 @@ Aqui está o código completo para você copiar:
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE FORNECIDA PELO USUÁRIO
+        const firebaseConfig = {
+            apiKey: "AIzaSyAy5d-MNdsiX-snU7ThHbu0MXpHTuKz_AI",
+            authDomain: "controledepatiogasvila-nova.firebaseapp.com",
+            databaseURL: "https://controledepatiogasvila-nova-default-rtdb.firebaseio.com", // Adicionado automaticamente para garantir compatibilidade Realtime Database
+            projectId: "controledepatiogasvila-nova",
+            storageBucket: "controledepatiogasvila-nova.firebasestorage.app",
+            messagingSenderId: "910814111886",
+            appId: "1:910814111886:web:0e1c1f8fcac22b6cab01df",
+            measurementId: "G-Z25FN6PHVW"
+        };
+
+        // Inicializa o app e conecta ao Database
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Variáveis globais
+        window.NOME_MARCA_ATUAL = "OUTRA MARCA";
+        
+        // --- COLOQUE AS PLACAS DOS CARROS AQUI ---
         const MOTORISTAS = [
             { nome: "Aécio", placa: "" }, { nome: "Yuri", placa: "" }, { nome: "Nicolas", placa: "" },
             { nome: "Anderson", placa: "" }, { nome: "Soares", placa: "" }, { nome: "Lucas", placa: "" },
@@ -410,9 +449,6 @@ Aqui está o código completo para você copiar:
         ];
         
         const PESO_MAXIMO = 6240;
-        const CHAVE_MOV = 'controleCargasJLH_v4'; 
-        const CHAVE_ESTOQUE = 'estoqueJLH_v4';
-        const CHAVE_NOME_MARCA = 'nomeOutraMarcaJLH';
         
         let estoque = {
             cheios: { 
@@ -430,29 +466,65 @@ Aqui está o código completo para você copiar:
             }
         };
 
-        function carregarNomeMarca() {
-            const nomeSalvo = localStorage.getItem(CHAVE_NOME_MARCA) || "OUTRA MARCA";
+        let registrosApp = [];
+
+        // --- SINCRONIZAÇÃO EM TEMPO REAL (NUVEM) ---
+        
+        // 1. Ouvir nome da marca
+        db.ref('config/nomeMarca').on('value', (snapshot) => {
+            const nomeSalvo = snapshot.val() || "OUTRA MARCA";
             document.getElementById('configNomeMarca').value = nomeSalvo;
-            atualizarTextosMarca(nomeSalvo);
-        }
-
-        function atualizarNomeMarca(novoNome) {
-            const nomeFormatado = novoNome.trim() === "" ? "OUTRA MARCA" : novoNome.trim().toUpperCase();
-            localStorage.setItem(CHAVE_NOME_MARCA, nomeFormatado);
-            atualizarTextosMarca(nomeFormatado);
-            renderizarEstoque(); 
-            carregarRegistros(); 
-        }
-
-        function atualizarTextosMarca(nome) {
-            let nomeCurto = nome.length > 8 ? nome.substring(0, 8) + '.' : nome;
+            window.NOME_MARCA_ATUAL = nomeSalvo;
+            
+            let nomeCurto = nomeSalvo.length > 8 ? nomeSalvo.substring(0, 8) + '.' : nomeSalvo;
             document.querySelectorAll('.lbl-out-13').forEach(el => el.innerText = `P13 ${nomeCurto}`);
             document.querySelectorAll('.lbl-out-20').forEach(el => el.innerText = `P20 ${nomeCurto}`);
             document.querySelectorAll('.lbl-out-45').forEach(el => el.innerText = `P45 ${nomeCurto}`);
+            
+            renderizarEstoque();
+            renderizarTabela(registrosApp);
+        });
+
+        // 2. Ouvir estoque
+        db.ref('estoque').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if(val) {
+                estoque.cheios = { ...estoque.cheios, ...val.cheios };
+                estoque.vazios = { ...estoque.vazios, ...val.vazios };
+            }
+            renderizarEstoque();
+            calcularPesoTotalAtual();
+        });
+
+        // 3. Ouvir registros (Histórico)
+        db.ref('registros').on('value', (snapshot) => {
+            const val = snapshot.val();
+            let lista = val || [];
+            
+            // Limpa automaticamente registros mais antigos que 10 dias
+            const agora = new Date().getTime();
+            const limite = 10 * 24 * 60 * 60 * 1000;
+            const validos = lista.filter(reg => (agora - reg.timestamp) <= limite);
+            
+            if (lista.length !== validos.length) {
+                // Atualiza a nuvem se removeu os antigos
+                db.ref('registros').set(validos);
+                lista = validos;
+            }
+            
+            registrosApp = lista;
+            renderizarPainelMotoristas(registrosApp);
+            renderizarTabela(registrosApp);
+        });
+
+        // Gravar nome da marca na nuvem
+        function salvarNomeMarca(novoNome) {
+            const nomeFormatado = novoNome.trim() === "" ? "OUTRA MARCA" : novoNome.trim().toUpperCase();
+            db.ref('config/nomeMarca').set(nomeFormatado);
         }
 
         function getNomeFormatado(k) {
-            const nomeOut = localStorage.getItem(CHAVE_NOME_MARCA) || 'OUTRA';
+            const nomeOut = window.NOME_MARCA_ATUAL;
             const nomeCurto = nomeOut.length > 8 ? nomeOut.substring(0, 8) + '.' : nomeOut;
             const nomes = {
                 liq: 'P13 LIQ', sup: 'P13 SUP', nac: 'P13 NAC', out: `P13 ${nomeCurto}`, p13: 'P13 GERAL',
@@ -461,17 +533,6 @@ Aqui está o código completo para você copiar:
                 p5: 'P5 GERAL', agua: 'ÁGUA'
             };
             return nomes[k] || k.toUpperCase();
-        }
-
-        function carregarEstoque() {
-            const estSalvo = localStorage.getItem(CHAVE_ESTOQUE);
-            if(estSalvo) {
-                const parsed = JSON.parse(estSalvo);
-                estoque.cheios = { ...estoque.cheios, ...parsed.cheios };
-                estoque.vazios = { ...estoque.vazios, ...parsed.vazios };
-            }
-            renderizarEstoque();
-            calcularPesoTotalAtual();
         }
 
         function calcularPesoTotalAtual() {
@@ -569,23 +630,13 @@ Aqui está o código completo para você copiar:
                 if(el) estoque.vazios[k] = parseInt(el.value) || 0;
             });
             
-            localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
-            renderizarEstoque();
-            calcularPesoTotalAtual();
-            toggleAjusteEstoque();
-            alert("Estoque do pátio ajustado!");
-        }
-
-        function carregarRegistros() {
-            let registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
-            const agora = new Date().getTime();
-            const limite = 10 * 24 * 60 * 60 * 1000;
-            const validos = registros.filter(reg => (agora - reg.timestamp) <= limite);
-            
-            if (registros.length !== validos.length) localStorage.setItem(CHAVE_MOV, JSON.stringify(validos));
-            
-            renderizarPainelMotoristas(validos);
-            renderizarTabela(validos);
+            // Gravar direto no Firebase
+            db.ref('estoque').set(estoque).then(() => {
+                toggleAjusteEstoque();
+                alert("Estoque do pátio atualizado na nuvem com sucesso!");
+            }).catch(error => {
+                alert("Erro ao salvar: " + error.message);
+            });
         }
 
         function renderizarPainelMotoristas(registros) {
@@ -623,7 +674,7 @@ Aqui está o código completo para você copiar:
             const tbody = document.getElementById('tabelaCorpo');
             tbody.innerHTML = '';
             
-            registros.sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
+            [...registros].sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
                 const tr = document.createElement('tr');
                 const hora = new Date(reg.timestamp).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
                 
@@ -684,19 +735,19 @@ Aqui está o código completo para você copiar:
             Object.keys(novoRegistro.saidas).forEach(k => {
                 let qtdSaida = novoRegistro.saidas[k];
                 if (qtdSaida > 0) {
-                    estoque.cheios[k] -= qtdSaida; // Diminui o cheio
-                    estoque.vazios[k] += qtdSaida; // Soma a mesma qtd no vazio
+                    estoque.cheios[k] -= qtdSaida; 
+                    estoque.vazios[k] += qtdSaida; 
                 }
             });
             
             Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]);
             Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
             
-            localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
-
-            const registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
-            registros.push(novoRegistro);
-            localStorage.setItem(CHAVE_MOV, JSON.stringify(registros));
+            // Salvar no Firebase
+            db.ref('estoque').set(estoque);
+            
+            registrosApp.push(novoRegistro);
+            db.ref('registros').set(registrosApp);
 
             // Limpeza
             document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
@@ -705,19 +756,15 @@ Aqui está o código completo para você copiar:
             document.getElementById('carro').value = '';
             document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
             
-            carregarEstoque();
-            carregarRegistros();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
         function deletarRegistro(timestamp) {
-            if(confirm("Apagar este registro individual? O estoque será corrigido automaticamente.")) {
-                let registros = JSON.parse(localStorage.getItem(CHAVE_MOV)) || [];
-                const index = registros.findIndex(reg => reg.timestamp === timestamp);
+            if(confirm("Apagar este registro individual? O estoque será corrigido automaticamente na nuvem.")) {
+                const index = registrosApp.findIndex(reg => reg.timestamp === timestamp);
                 if (index > -1) {
-                    const reg = registros[index];
+                    const reg = registrosApp[index];
                     
-                    // Reverte o Estoque com a regra de troca
                     Object.keys(reg.saidas).forEach(k => {
                         let qtdSaida = reg.saidas[k];
                         if(qtdSaida > 0) {
@@ -729,27 +776,19 @@ Aqui está o código completo para você copiar:
                     if(reg.entradas) Object.keys(reg.entradas).forEach(k => estoque.cheios[k] -= reg.entradas[k]);
                     Object.keys(reg.retornos).forEach(k => estoque.vazios[k] -= reg.retornos[k]);
                     
-                    localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque));
-                    registros.splice(index, 1);
-                    localStorage.setItem(CHAVE_MOV, JSON.stringify(registros));
+                    db.ref('estoque').set(estoque);
                     
-                    carregarEstoque();
-                    carregarRegistros();
+                    registrosApp.splice(index, 1);
+                    db.ref('registros').set(registrosApp);
                 }
             }
         }
 
         function limparTodoHistorico() {
-            if(confirm("TEM CERTEZA que deseja apagar TODO o histórico? Isso NÃO apaga o estoque atual do pátio.")) {
-                localStorage.removeItem(CHAVE_MOV);
-                carregarRegistros();
-                carregarEstoque(); 
+            if(confirm("TEM CERTEZA que deseja apagar TODO o histórico? Isso apagará para todos os usuários.")) {
+                db.ref('registros').set([]);
             }
         }
-        
-        carregarNomeMarca();
-        carregarEstoque();
-        carregarRegistros();
     </script>
 </body>
 </html>
