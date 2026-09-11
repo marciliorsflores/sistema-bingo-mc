@@ -1,11 +1,10 @@
-<!DOCTYPE html>
+OCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Pátio - Nuvem (JLH)</title>
     
-    <!-- Biblioteca Geradora de PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
@@ -94,6 +93,8 @@
         }
         input[type="text"] { text-align: left; }
         input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
+        
+        .input-total { background-color: #e2e3e5 !important; font-weight: bold !important; color: #000 !important; cursor: not-allowed; }
 
         .btn-salvar {
             background: var(--success); color: white; border: none; padding: 15px;
@@ -132,9 +133,6 @@
         body.modo-pdf .estoque-box { background: transparent; border: 1px solid #000; }
         body.modo-pdf .item-val { color: black; }
     </style>
-    
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -169,27 +167,30 @@
             <button class="btn-ajuste" onclick="toggleAjusteEstoque()">⚙️ Ajustar Estoque Inicial Manualmente</button>
             
             <div id="painelAjusteEstoque">
+                <p style="font-size:0.8rem; color:#dc3545; font-weight:bold; text-align:center;">
+                    ATENÇÃO: Os campos "GERAL (L)" são valores antigos. Zere eles e adicione a quantia na marca correta.
+                </p>
                 <p><strong>🟩 CHEIOS (No Pátio)</strong></p>
                 <div class="grid-inputs" style="margin-bottom:15px;">
                     <div><label>P13 LIQ</label><input type="number" id="est_c_liq" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="est_c_sup" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="est_c_nac" min="0"></div>
                     <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="est_c_out" min="0"></div>
-                    <div><label>P13 GERAL</label><input type="number" id="est_c_p13" min="0"></div>
+                    <div><label style="color:red">P13 GERAL(L)</label><input type="number" id="est_c_p13" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P20 LIQ</label><input type="number" id="est_c_p20_liq" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="est_c_p20_sup" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="est_c_p20_nac" min="0"></div>
                     <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="est_c_p20_out" min="0"></div>
-                    <div><label>P20 GERAL</label><input type="number" id="est_c_p20" min="0"></div>
+                    <div><label style="color:red">P20 GERAL(L)</label><input type="number" id="est_c_p20" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P45 LIQ</label><input type="number" id="est_c_p45_liq" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="est_c_p45_sup" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="est_c_p45_nac" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_c_p45_out" min="0"></div>
-                    <div><label>P45 GERAL</label><input type="number" id="est_c_p45" min="0"></div>
+                    <div><label style="color:red">P45 GERAL(L)</label><input type="number" id="est_c_p45" min="0"></div>
                     <div class="sec-divisor"></div>
-                    <div><label>P5 GERAL</label><input type="number" id="est_c_p5" min="0"></div>
+                    <div><label>P5 TOTAL</label><input type="number" id="est_c_p5" min="0"></div>
                 </div>
                 
                 <p><strong>🟧 VAZIOS (Cascos no Pátio)</strong></p>
@@ -200,21 +201,21 @@
                     <div><label>P13 SUP</label><input type="number" id="est_v_sup" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="est_v_nac" min="0"></div>
                     <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="est_v_out" min="0"></div>
-                    <div><label>P13 GERAL</label><input type="number" id="est_v_p13" min="0"></div>
+                    <div><label style="color:red">P13 GERAL(L)</label><input type="number" id="est_v_p13" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P20 LIQ</label><input type="number" id="est_v_p20_liq" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="est_v_p20_sup" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="est_v_p20_nac" min="0"></div>
                     <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="est_v_p20_out" min="0"></div>
-                    <div><label>P20 GERAL</label><input type="number" id="est_v_p20" min="0"></div>
+                    <div><label style="color:red">P20 GERAL(L)</label><input type="number" id="est_v_p20" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P45 LIQ</label><input type="number" id="est_v_p45_liq" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="est_v_p45_sup" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="est_v_p45_nac" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_v_p45_out" min="0"></div>
-                    <div><label>P45 GERAL</label><input type="number" id="est_v_p45" min="0"></div>
+                    <div><label style="color:red">P45 GERAL(L)</label><input type="number" id="est_v_p45" min="0"></div>
                     <div class="sec-divisor"></div>
-                    <div><label>P5 GERAL</label><input type="number" id="est_v_p5" min="0"></div>
+                    <div><label>P5 TOTAL</label><input type="number" id="est_v_p5" min="0"></div>
                 </div>
 
                 <p><strong>🟪 TROCAS (Defeitos no Pátio)</strong></p>
@@ -223,21 +224,21 @@
                     <div><label>P13 SUP</label><input type="number" id="est_t_sup" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="est_t_nac" min="0"></div>
                     <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="est_t_out" min="0"></div>
-                    <div><label>P13 GERAL</label><input type="number" id="est_t_p13" min="0"></div>
+                    <div><label style="color:red">P13 GERAL(L)</label><input type="number" id="est_t_p13" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P20 LIQ</label><input type="number" id="est_t_p20_liq" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="est_t_p20_sup" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="est_t_p20_nac" min="0"></div>
                     <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="est_t_p20_out" min="0"></div>
-                    <div><label>P20 GERAL</label><input type="number" id="est_t_p20" min="0"></div>
+                    <div><label style="color:red">P20 GERAL(L)</label><input type="number" id="est_t_p20" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P45 LIQ</label><input type="number" id="est_t_p45_liq" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="est_t_p45_sup" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="est_t_p45_nac" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_t_p45_out" min="0"></div>
-                    <div><label>P45 GERAL</label><input type="number" id="est_t_p45" min="0"></div>
+                    <div><label style="color:red">P45 GERAL(L)</label><input type="number" id="est_t_p45" min="0"></div>
                     <div class="sec-divisor"></div>
-                    <div><label>P5 GERAL</label><input type="number" id="est_t_p5" min="0"></div>
+                    <div><label>P5 TOTAL</label><input type="number" id="est_t_p5" min="0"></div>
                 </div>
                 
                 <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste na Nuvem</button>
@@ -282,21 +283,21 @@
                     <div><label>P13 SUP</label><input type="number" id="s_sup" inputmode="numeric" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="s_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="s_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 GERAL</label><input type="number" id="s_p13" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P13</label><input type="text" id="s_tot_p13" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P20 LIQ</label><input type="number" id="s_p20_liq" inputmode="numeric" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="s_p20_sup" inputmode="numeric" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="s_p20_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="s_p20_out" inputmode="numeric" min="0"></div>
-                    <div><label>P20 GERAL</label><input type="number" id="s_p20" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P20</label><input type="text" id="s_tot_p20" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P45 LIQ</label><input type="number" id="s_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="s_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="s_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="s_p45_out" inputmode="numeric" min="0"></div>
-                    <div><label>P45 GERAL</label><input type="number" id="s_p45" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P45</label><input type="text" id="s_tot_p45" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
-                    <div><label>P5 GERAL</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P5</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
                 </div>
             </div>
 
@@ -308,21 +309,21 @@
                     <div><label>P13 SUP</label><input type="number" id="e_sup" inputmode="numeric" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="e_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="e_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 GERAL</label><input type="number" id="e_p13" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P13</label><input type="text" id="e_tot_p13" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P20 LIQ</label><input type="number" id="e_p20_liq" inputmode="numeric" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="e_p20_sup" inputmode="numeric" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="e_p20_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="e_p20_out" inputmode="numeric" min="0"></div>
-                    <div><label>P20 GERAL</label><input type="number" id="e_p20" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P20</label><input type="text" id="e_tot_p20" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P45 LIQ</label><input type="number" id="e_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="e_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="e_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="e_p45_out" inputmode="numeric" min="0"></div>
-                    <div><label>P45 GERAL</label><input type="number" id="e_p45" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P45</label><input type="text" id="e_tot_p45" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
-                    <div><label>P5 GERAL</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P5</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
                 </div>
             </div>
 
@@ -336,21 +337,21 @@
                     <div><label>P13 SUP</label><input type="number" id="r_sup" inputmode="numeric" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="r_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="r_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 GERAL</label><input type="number" id="r_p13" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P13</label><input type="text" id="r_tot_p13" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P20 LIQ</label><input type="number" id="r_p20_liq" inputmode="numeric" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="r_p20_sup" inputmode="numeric" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="r_p20_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="r_p20_out" inputmode="numeric" min="0"></div>
-                    <div><label>P20 GERAL</label><input type="number" id="r_p20" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P20</label><input type="text" id="r_tot_p20" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P45 LIQ</label><input type="number" id="r_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="r_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="r_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="r_p45_out" inputmode="numeric" min="0"></div>
-                    <div><label>P45 GERAL</label><input type="number" id="r_p45" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P45</label><input type="text" id="r_tot_p45" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
-                    <div><label>P5 GERAL</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
                 </div>
             </div>
 
@@ -363,21 +364,21 @@
                     <div><label>P13 SUP</label><input type="number" id="t_sup" inputmode="numeric" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="t_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="t_out" inputmode="numeric" min="0"></div>
-                    <div><label>P13 GERAL</label><input type="number" id="t_p13" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P13</label><input type="text" id="t_tot_p13" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P20 LIQ</label><input type="number" id="t_p20_liq" inputmode="numeric" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="t_p20_sup" inputmode="numeric" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="t_p20_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="t_p20_out" inputmode="numeric" min="0"></div>
-                    <div><label>P20 GERAL</label><input type="number" id="t_p20" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P20</label><input type="text" id="t_tot_p20" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P45 LIQ</label><input type="number" id="t_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="t_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="t_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="t_p45_out" inputmode="numeric" min="0"></div>
-                    <div><label>P45 GERAL</label><input type="number" id="t_p45" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P45</label><input type="text" id="t_tot_p45" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
-                    <div><label>P5 GERAL</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P5</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
                 </div>
                 
                 <div style="margin-top: 15px;">
@@ -511,6 +512,35 @@
             renderizarTabela(registrosApp);
         });
 
+        // --- CÁLCULO AO VIVO NOS FORMULÁRIOS ---
+        document.addEventListener('input', (e) => {
+            if(e.target.type === 'number') {
+                const prefixos = ['s', 'e', 'r', 't'];
+                prefixos.forEach(p => {
+                    const liq = parseInt(document.getElementById(`${p}_liq`)?.value) || 0;
+                    const sup = parseInt(document.getElementById(`${p}_sup`)?.value) || 0;
+                    const nac = parseInt(document.getElementById(`${p}_nac`)?.value) || 0;
+                    const out = parseInt(document.getElementById(`${p}_out`)?.value) || 0;
+                    const tot13 = document.getElementById(`${p}_tot_p13`);
+                    if(tot13) tot13.value = (liq + sup + nac + out) > 0 ? (liq + sup + nac + out) : '';
+
+                    const p20_liq = parseInt(document.getElementById(`${p}_p20_liq`)?.value) || 0;
+                    const p20_sup = parseInt(document.getElementById(`${p}_p20_sup`)?.value) || 0;
+                    const p20_nac = parseInt(document.getElementById(`${p}_p20_nac`)?.value) || 0;
+                    const p20_out = parseInt(document.getElementById(`${p}_p20_out`)?.value) || 0;
+                    const tot20 = document.getElementById(`${p}_tot_p20`);
+                    if(tot20) tot20.value = (p20_liq + p20_sup + p20_nac + p20_out) > 0 ? (p20_liq + p20_sup + p20_nac + p20_out) : '';
+
+                    const p45_liq = parseInt(document.getElementById(`${p}_p45_liq`)?.value) || 0;
+                    const p45_sup = parseInt(document.getElementById(`${p}_p45_sup`)?.value) || 0;
+                    const p45_nac = parseInt(document.getElementById(`${p}_p45_nac`)?.value) || 0;
+                    const p45_out = parseInt(document.getElementById(`${p}_p45_out`)?.value) || 0;
+                    const tot45 = document.getElementById(`${p}_tot_p45`);
+                    if(tot45) tot45.value = (p45_liq + p45_sup + p45_nac + p45_out) > 0 ? (p45_liq + p45_sup + p45_nac + p45_out) : '';
+                });
+            }
+        });
+
         function salvarNomeMarca(novoNome) {
             const nomeFormatado = novoNome.trim() === "" ? "OUTRA MARCA" : novoNome.trim().toUpperCase();
             db.ref('config/nomeMarca').set(nomeFormatado);
@@ -520,10 +550,10 @@
             const nomeOut = window.NOME_MARCA_ATUAL;
             const nomeCurto = nomeOut.length > 8 ? nomeOut.substring(0, 8) + '.' : nomeOut;
             const nomes = {
-                liq: 'P13 LIQ', sup: 'P13 SUP', nac: 'P13 NAC', out: `P13 ${nomeCurto}`, p13: 'P13 GERAL',
-                p20_liq: 'P20 LIQ', p20_sup: 'P20 SUP', p20_nac: 'P20 NAC', p20_out: `P20 ${nomeCurto}`, p20: 'P20 GERAL',
-                p45_liq: 'P45 LIQ', p45_sup: 'P45 SUP', p45_nac: 'P45 NAC', p45_out: `P45 ${nomeCurto}`, p45: 'P45 GERAL',
-                p5: 'P5 GERAL', agua: 'ÁGUA'
+                liq: 'P13 LIQ', sup: 'P13 SUP', nac: 'P13 NAC', out: `P13 ${nomeCurto}`, p13: 'P13 GERAL(L)',
+                p20_liq: 'P20 LIQ', p20_sup: 'P20 SUP', p20_nac: 'P20 NAC', p20_out: `P20 ${nomeCurto}`, p20: 'P20 GERAL(L)',
+                p45_liq: 'P45 LIQ', p45_sup: 'P45 SUP', p45_nac: 'P45 NAC', p45_out: `P45 ${nomeCurto}`, p45: 'P45 GERAL(L)',
+                p5: 'P5 TOTAL', agua: 'ÁGUA'
             };
             return nomes[k] || k.toUpperCase();
         }
@@ -533,13 +563,13 @@
             const c = estoque.cheios;
             const t = estoque.trocas;
             
-            // Soma peso dos CHEIOS
+            // Soma APENAS as marcas específicas (ignora os LEGADOS p13, p20, p45 para evitar duplicidade futuramente)
             pesoTotal += ((c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0)) * 13;
             pesoTotal += ((c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0)) * 20;
             pesoTotal += ((c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0)) * 45;
             pesoTotal += (c.p5||0) * 5;
 
-            // Soma peso das TROCAS
+            // Trocas
             pesoTotal += ((t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0)) * 13;
             pesoTotal += ((t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0)) * 20;
             pesoTotal += ((t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0)) * 45;
@@ -569,13 +599,50 @@
             }
         }
 
+        function renderizarGrupo(tipoEstoque, obj) {
+            let outName = window.NOME_MARCA_ATUAL;
+            let nomeCurto = outName.length > 8 ? outName.substring(0, 8) + '.' : outName;
+            let html = '';
+
+            const grupos = [
+                { titulo: 'P13', keys: ['liq', 'sup', 'nac', 'out'] },
+                { titulo: 'P20', keys: ['p20_liq', 'p20_sup', 'p20_nac', 'p20_out'] },
+                { titulo: 'P45', keys: ['p45_liq', 'p45_sup', 'p45_nac', 'p45_out'] }
+            ];
+
+            if (tipoEstoque === 'vazios') {
+                html += `<div><div class="item-val">${obj.agua||0}</div><div class="item-label">ÁGUA</div></div>`;
+                html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
+            }
+
+            grupos.forEach(g => {
+                let total = 0;
+                g.keys.forEach(k => {
+                    let val = obj[k] || 0;
+                    total += val;
+                    let lbl = (k === 'out' || k === 'p20_out' || k === 'p45_out') ? `${g.titulo} ${nomeCurto}` : getNomeFormatado(k);
+                    html += `<div><div class="item-val">${val}</div><div class="item-label">${lbl}</div></div>`;
+                });
+                
+                // Pega valor legado caso ainda exista para não sumir do visor
+                let legacyVal = 0;
+                if(g.titulo === 'P13') { legacyVal = obj.p13 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
+                if(g.titulo === 'P20') { legacyVal = obj.p20 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
+                if(g.titulo === 'P45') { legacyVal = obj.p45 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
+                total += legacyVal;
+
+                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;"><div class="item-val" style="color:#000;">${total}</div><div class="item-label">TOTAL ${g.titulo}</div></div>`;
+                html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
+            });
+
+            html += `<div><div class="item-val">${obj.p5||0}</div><div class="item-label">TOTAL P5</div></div>`;
+            return html;
+        }
+
         function renderizarEstoque() {
-            document.getElementById('displayCheios').innerHTML = Object.keys(estoque.cheios).map(k => 
-                `<div><div class="item-val">${estoque.cheios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
-            document.getElementById('displayVazios').innerHTML = Object.keys(estoque.vazios).map(k => 
-                `<div><div class="item-val">${estoque.vazios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
-            document.getElementById('displayTrocas').innerHTML = Object.keys(estoque.trocas).map(k => 
-                `<div><div class="item-val">${estoque.trocas[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
+            document.getElementById('displayCheios').innerHTML = renderizarGrupo('cheios', estoque.cheios);
+            document.getElementById('displayVazios').innerHTML = renderizarGrupo('vazios', estoque.vazios);
+            document.getElementById('displayTrocas').innerHTML = renderizarGrupo('trocas', estoque.trocas);
         }
 
         function toggleAjusteEstoque() {
@@ -646,11 +713,12 @@
         }
 
         function extrairValores(prefixo) {
+            // Não extraímos p13, p20 e p45 pois agora são apenas os Totais Dinâmicos
             return {
-                liq: parseInt(document.getElementById(`${prefixo}_liq`).value)||0, sup: parseInt(document.getElementById(`${prefixo}_sup`).value)||0, nac: parseInt(document.getElementById(`${prefixo}_nac`).value)||0, out: parseInt(document.getElementById(`${prefixo}_out`).value)||0, p13: parseInt(document.getElementById(`${prefixo}_p13`).value)||0,
-                p20_liq: parseInt(document.getElementById(`${prefixo}_p20_liq`).value)||0, p20_sup: parseInt(document.getElementById(`${prefixo}_p20_sup`).value)||0, p20_nac: parseInt(document.getElementById(`${prefixo}_p20_nac`).value)||0, p20_out: parseInt(document.getElementById(`${prefixo}_p20_out`).value)||0, p20: parseInt(document.getElementById(`${prefixo}_p20`).value)||0,
-                p45_liq: parseInt(document.getElementById(`${prefixo}_p45_liq`).value)||0, p45_sup: parseInt(document.getElementById(`${prefixo}_p45_sup`).value)||0, p45_nac: parseInt(document.getElementById(`${prefixo}_p45_nac`).value)||0, p45_out: parseInt(document.getElementById(`${prefixo}_p45_out`).value)||0, p45: parseInt(document.getElementById(`${prefixo}_p45`).value)||0,
-                p5: parseInt(document.getElementById(`${prefixo}_p5`).value)||0
+                liq: parseInt(document.getElementById(`${prefixo}_liq`)?.value)||0, sup: parseInt(document.getElementById(`${prefixo}_sup`)?.value)||0, nac: parseInt(document.getElementById(`${prefixo}_nac`)?.value)||0, out: parseInt(document.getElementById(`${prefixo}_out`)?.value)||0, 
+                p20_liq: parseInt(document.getElementById(`${prefixo}_p20_liq`)?.value)||0, p20_sup: parseInt(document.getElementById(`${prefixo}_p20_sup`)?.value)||0, p20_nac: parseInt(document.getElementById(`${prefixo}_p20_nac`)?.value)||0, p20_out: parseInt(document.getElementById(`${prefixo}_p20_out`)?.value)||0, 
+                p45_liq: parseInt(document.getElementById(`${prefixo}_p45_liq`)?.value)||0, p45_sup: parseInt(document.getElementById(`${prefixo}_p45_sup`)?.value)||0, p45_nac: parseInt(document.getElementById(`${prefixo}_p45_nac`)?.value)||0, p45_out: parseInt(document.getElementById(`${prefixo}_p45_out`)?.value)||0, 
+                p5: parseInt(document.getElementById(`${prefixo}_p5`)?.value)||0
             };
         }
 
@@ -692,7 +760,7 @@
             registrosApp.push(novoRegistro);
             db.ref('registros').set(registrosApp);
 
-            document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
+            document.querySelectorAll('input[type="number"], input[type="text"]').forEach(inp => inp.value = '');
             document.getElementById('obs').value = '';
             document.getElementById('entregador').value = '';
             document.getElementById('carro').value = '';
@@ -739,13 +807,9 @@
             const btn = document.querySelector('.btn-pdf');
             btn.innerHTML = "⏳ Gerando Arquivo...";
             
-            // 1. Esconde os elementos de edição
             document.body.classList.add('modo-pdf');
-            
-            // 2. Prepara o conteúdo (Estoque + Histórico)
             const elemento = document.getElementById('conteudoSistema');
             
-            // 3. Configura a qualidade da página
             const opt = {
                 margin:       0.3,
                 filename:     'Relatorio_Patio_JLH.pdf',
@@ -755,18 +819,15 @@
             };
 
             try {
-                // 4. Cria o PDF em formato 'Blob' (Arquivo na memória)
                 const pdfBlob = await html2pdf().set(opt).from(elemento).output('blob');
                 const file = new File([pdfBlob], 'Relatorio_Patio_JLH.pdf', { type: 'application/pdf' });
                 
-                // 5. Tenta abrir a tela nativa de compartilhamento do celular (WhatsApp, Email, etc)
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         title: 'Relatório de Pátio JLH',
                         files: [file]
                     });
                 } else {
-                    // Fallback: Se não conseguir compartilhar direto, faz o download automático (Abre no app PDF)
                     const fileURL = URL.createObjectURL(pdfBlob);
                     const a = document.createElement('a');
                     a.href = fileURL;
@@ -776,7 +837,6 @@
             } catch (err) {
                 alert("Erro ao gerar o arquivo PDF: " + err);
             } finally {
-                // 6. Restaura a página ao normal
                 document.body.classList.remove('modo-pdf');
                 btn.innerHTML = "📲 Compartilhar PDF";
             }
@@ -784,3 +844,4 @@
     </script>
 </body>
 </html>
+
