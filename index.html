@@ -1,4 +1,5 @@
-
+A lógica foi ajustada para que a entrada de uma Troca faça automaticamente duas coisas ao mesmo tempo: adiciona o casco defeituoso no pátio (🟪) e retira um botijão cheio (🟩) do estoque geral correspondente para repor o carro.
+Copie todo o código abaixo e substitua no seu arquivo. O botão do PDF e o login continuam intactos.
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -12,6 +13,7 @@
             --danger: #dc3545;
             --warning: #ffc107;
             --info: #17a2b8;
+            --purple: #6f42c1;
             --bg: #f0f2f5;
             --card-bg: #ffffff;
             --text: #333;
@@ -27,117 +29,72 @@
         .container { max-width: 1200px; margin: auto; }
         h1, h2, h3 { text-align: center; margin-bottom: 20px; }
         
-        /* Indicador de Nuvem */
         .status-nuvem {
-            text-align: center;
-            background: #d4edda;
-            color: #155724;
-            padding: 8px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            border: 1px solid #c3e6cb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            text-align: center; background: #d4edda; color: #155724; padding: 8px;
+            border-radius: 8px; font-weight: bold; font-size: 0.9rem; margin-bottom: 20px;
+            border: 1px solid #c3e6cb; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         
         .card {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
+            background: var(--card-bg); padding: 15px; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 20px;
         }
         .card-title {
-            font-size: 1.1rem;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 10px;
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: var(--primary);
+            font-size: 1.1rem; border-bottom: 2px solid var(--primary); padding-bottom: 10px;
+            margin-top: 0; margin-bottom: 15px; font-weight: bold; color: var(--primary);
         }
 
         .estoque-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;
         }
-        @media (max-width: 768px) {
-            .estoque-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .estoque-grid { grid-template-columns: 1fr; } }
+        
         .estoque-box {
-            background: #f8f9fa;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
+            background: #f8f9fa; border: 1px solid var(--border); border-radius: 8px; padding: 12px;
         }
         .estoque-box h4 { margin: 0 0 15px 0; text-align: center; font-size: 1rem; }
         .estoque-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-            gap: 10px;
-            text-align: center;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 10px; text-align: center;
         }
         .item-val { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
         .item-label { font-size: 0.7rem; color: #555; font-weight: bold; text-transform: uppercase;}
         
         .peso-total {
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid transparent;
+            text-align: center; font-size: 1.1rem; font-weight: bold; margin-top: 15px;
+            padding: 15px; border-radius: 8px; border: 2px solid transparent;
         }
         .peso-normal { background: #d4edda; color: #155724; border-color: #c3e6cb; }
-        .peso-excedido { 
-            background: #f8d7da; color: #721c24; border-color: #f5c6cb;
-            animation: piscar 2s infinite;
-        }
+        .peso-excedido { background: #f8d7da; color: #721c24; border-color: #f5c6cb; animation: piscar 2s infinite; }
         
         .sugestao-carga {
             background: #e2e3e5; color: #383d41; padding: 12px; border-radius: 8px;
-            margin-top: 15px; font-weight: bold; border: 1px solid #d6d8db;
-            display: none; text-align: center;
+            margin-top: 15px; font-weight: bold; border: 1px solid #d6d8db; display: none; text-align: center;
         }
         
-        @keyframes piscar {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; background: #f5c6cb; }
-            100% { opacity: 1; }
-        }
+        @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.8; background: #f5c6cb; } 100% { opacity: 1; } }
 
         .btn-ajuste {
             background: var(--warning); color: #000; border: none; padding: 10px 15px;
             border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
         }
-        .btn-ajuste:hover { background: #e0a800; }
+        .btn-pdf {
+            background: #343a40; color: #fff; border: none; padding: 10px 15px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
+        }
         
         #painelAjusteEstoque {
-            display: none; background: #fff3cd; padding: 15px; border-radius: 8px;
-            border: 1px solid #ffeeba; margin-bottom: 20px;
+            display: none; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px;
         }
         
-        .motoristas-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px;
-        }
+        .motoristas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
         .btn-motorista {
             background: #f8f9fa; border: 2px solid var(--border); border-radius: 8px;
-            padding: 10px 5px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;
-            font-size: 0.9rem;
+            padding: 10px 5px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s; font-size: 0.9rem;
         }
         .btn-motorista.selecionado { background: var(--primary); color: white; border-color: var(--primary); }
         .badge-viagens { display: block; margin-top: 5px; font-size: 0.7rem; font-weight: normal; }
 
-        .grid-inputs {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px;
-        }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; }
         label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; text-align: center; white-space: nowrap; text-transform: uppercase;}
         input[type="text"], input[type="number"] {
             width: 100%; padding: 8px; font-size: 1rem; border: 1px solid var(--border);
@@ -148,10 +105,8 @@
 
         .btn-salvar {
             background: var(--success); color: white; border: none; padding: 15px;
-            font-size: 1.1rem; font-weight: bold; border-radius: 8px; width: 100%;
-            cursor: pointer; text-transform: uppercase; margin-top: 15px;
+            font-size: 1.1rem; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 15px;
         }
-        .btn-salvar:hover { background: #218838; }
 
         .config-marca {
             display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; 
@@ -160,35 +115,53 @@
         .config-marca input { width: 180px; font-size: 0.9rem; padding: 6px; text-align: center;}
 
         .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; font-size: 0.8rem; background: white;}
+        table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 0.8rem; background: white;}
         th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
         th { background: #f8f9fa; }
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         
-        .sec-divisor {
-            grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0;
+        .sec-divisor { grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0; }
+        
+        /* Ocultar elementos ao gerar PDF/Imprimir */
+        @media print {
+            body { background: white; padding: 0; }
+            #registroForm, .btn-ajuste, .btn-pdf, .status-nuvem, .config-marca, button[onclick="sairSistema()"], .btn-excluir, #painelAjusteEstoque { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 10px; page-break-inside: avoid; }
+            table { min-width: 100%; font-size: 0.7rem; }
+            @page { margin: 1cm; }
         }
     </style>
     
-    <!-- FIREBASE SDK COMPAT -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="container">
+
+    <div id="telaLogin" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 300px;">
+            <h2 style="margin-top: 0; color: #0056b3;">Acesso Restrito</h2>
+            <input type="text" id="loginUser" placeholder="Usuário" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;">
+            <input type="password" id="loginSenha" placeholder="Senha" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;">
+            <button onclick="fazerLogin()" style="background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer;">Entrar</button>
+            <p id="erroLogin" style="color: red; display: none; font-size: 0.9rem; margin-top: 10px;">Usuário ou senha incorretos!</p>
+        </div>
+    </div>
+
+    <div class="container" id="conteudoSistema" style="display: none;">
         <h1>Controle de Pátio e Cargas</h1>
         
-        <div class="status-nuvem">
-            🟢 Conectado ao banco de dados em Nuvem (Firebase)
+        <div class="status-nuvem">🟢 Conectado ao banco de dados em Nuvem (Firebase)</div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: flex-end;">
+             <button class="btn-pdf" onclick="window.print()" style="margin: 0; width: auto;">📄 Gerar PDF</button>
+             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
-        <!-- ESTOQUE E PESO -->
         <div class="card">
             <h3 class="card-title">Estoque Atual & Peso do Pátio</h3>
             
             <div class="config-marca">
                 <label style="margin:0; font-size:0.9rem;">Nome da 4ª Marca:</label>
-                <!-- Alterado de oninput para onchange para salvar apenas quando sair do campo -->
                 <input type="text" id="configNomeMarca" onchange="salvarNomeMarca(this.value)" placeholder="Ex: Consigaz">
             </div>
 
@@ -200,72 +173,72 @@
                     <div><label>P13 LIQ</label><input type="number" id="est_c_liq" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="est_c_sup" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="est_c_nac" min="0"></div>
-                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="est_c_out" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="est_c_out" min="0"></div>
                     <div><label>P13 GERAL</label><input type="number" id="est_c_p13" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-                    
                     <div><label>P20 LIQ</label><input type="number" id="est_c_p20_liq" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="est_c_p20_sup" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="est_c_p20_nac" min="0"></div>
-                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="est_c_p20_out" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="est_c_p20_out" min="0"></div>
                     <div><label>P20 GERAL</label><input type="number" id="est_c_p20" min="0"></div>
-
                     <div class="sec-divisor"></div>
-
                     <div><label>P45 LIQ</label><input type="number" id="est_c_p45_liq" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="est_c_p45_sup" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="est_c_p45_nac" min="0"></div>
-                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="est_c_p45_out" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_c_p45_out" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="est_c_p45" min="0"></div>
-
                     <div class="sec-divisor"></div>
-                    
                     <div><label>P5 GERAL</label><input type="number" id="est_c_p5" min="0"></div>
                 </div>
                 
                 <p><strong>🟧 VAZIOS (Cascos no Pátio)</strong></p>
-                <div class="grid-inputs">
+                <div class="grid-inputs" style="margin-bottom:15px;">
                     <div><label>ÁGUA</label><input type="number" id="est_v_agua" min="0"></div>
                     <div class="sec-divisor"></div>
-                    
                     <div><label>P13 LIQ</label><input type="number" id="est_v_liq" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="est_v_sup" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="est_v_nac" min="0"></div>
-                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="est_v_out" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="est_v_out" min="0"></div>
                     <div><label>P13 GERAL</label><input type="number" id="est_v_p13" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-
                     <div><label>P20 LIQ</label><input type="number" id="est_v_p20_liq" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="est_v_p20_sup" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="est_v_p20_nac" min="0"></div>
-                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="est_v_p20_out" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="est_v_p20_out" min="0"></div>
                     <div><label>P20 GERAL</label><input type="number" id="est_v_p20" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-
                     <div><label>P45 LIQ</label><input type="number" id="est_v_p45_liq" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="est_v_p45_sup" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="est_v_p45_nac" min="0"></div>
-                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="est_v_p45_out" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_v_p45_out" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="est_v_p45" min="0"></div>
-
                     <div class="sec-divisor"></div>
-                    
                     <div><label>P5 GERAL</label><input type="number" id="est_v_p5" min="0"></div>
                 </div>
+
+                <p><strong>🟪 TROCAS (Defeitos no Pátio)</strong></p>
+                <div class="grid-inputs">
+                    <div><label>P13 TROCA</label><input type="number" id="est_t_p13" min="0"></div>
+                    <div><label>P20 TROCA</label><input type="number" id="est_t_p20" min="0"></div>
+                    <div><label>P45 TROCA</label><input type="number" id="est_t_p45" min="0"></div>
+                    <div><label>P5 TROCA</label><input type="number" id="est_t_p5" min="0"></div>
+                </div>
+                
                 <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste na Nuvem</button>
             </div>
 
             <div class="estoque-grid">
                 <div class="estoque-box" style="border-top: 4px solid var(--success);">
-                    <h4>🟩 BOTIJÕES CHEIOS NO PÁTIO</h4>
+                    <h4>🟩 CHEIOS NO PÁTIO</h4>
                     <div class="estoque-items" id="displayCheios">Carregando...</div>
                 </div>
                 <div class="estoque-box" style="border-top: 4px solid var(--warning);">
-                    <h4>🟧 CASCOS VAZIOS NO PÁTIO</h4>
+                    <h4>🟧 VAZIOS NO PÁTIO</h4>
                     <div class="estoque-items" id="displayVazios">Carregando...</div>
+                </div>
+                <div class="estoque-box" style="border-top: 4px solid var(--purple);">
+                    <h4>🟪 TROCAS NO PÁTIO</h4>
+                    <div class="estoque-items" id="displayTrocas">Carregando...</div>
                 </div>
             </div>
             
@@ -288,30 +261,24 @@
             <!-- 2. SAÍDA (CHEIOS) -->
             <div class="card" style="border-left: 4px solid var(--danger);">
                 <h3 class="card-title" style="color: var(--danger);">2. SAÍDA DE CHEIOS (Saindo do Pátio)</h3>
-                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Diminui os cheios, reduz o peso e <b>ADICIONA automaticamente a mesma qtd em VAZIOS</b>.</p>
                 <div class="grid-inputs">
                     <div><label>P13 LIQ</label><input type="number" id="s_liq" inputmode="numeric" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="s_sup" inputmode="numeric" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="s_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="s_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="s_out" inputmode="numeric" min="0"></div>
                     <div><label>P13 GERAL</label><input type="number" id="s_p13" inputmode="numeric" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-
                     <div><label>P20 LIQ</label><input type="number" id="s_p20_liq" inputmode="numeric" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="s_p20_sup" inputmode="numeric" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="s_p20_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="s_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="s_p20_out" inputmode="numeric" min="0"></div>
                     <div><label>P20 GERAL</label><input type="number" id="s_p20" inputmode="numeric" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-
                     <div><label>P45 LIQ</label><input type="number" id="s_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="s_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="s_p45_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="s_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="s_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="s_p45" inputmode="numeric" min="0"></div>
-
                     <div class="sec-divisor"></div>
                     <div><label>P5 GERAL</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
                 </div>
@@ -320,30 +287,24 @@
             <!-- 3. ENTRADA (CHEIOS) -->
             <div class="card" style="border-left: 4px solid var(--info);">
                 <h3 class="card-title" style="color: var(--info);">3. ENTRADA DE CHEIOS (Retorno ou Carga)</h3>
-                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Aumenta a quantidade de cheios no pátio e sobe o peso.</p>
                 <div class="grid-inputs">
                     <div><label>P13 LIQ</label><input type="number" id="e_liq" inputmode="numeric" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="e_sup" inputmode="numeric" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="e_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="e_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="e_out" inputmode="numeric" min="0"></div>
                     <div><label>P13 GERAL</label><input type="number" id="e_p13" inputmode="numeric" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-
                     <div><label>P20 LIQ</label><input type="number" id="e_p20_liq" inputmode="numeric" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="e_p20_sup" inputmode="numeric" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="e_p20_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="e_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="e_p20_out" inputmode="numeric" min="0"></div>
                     <div><label>P20 GERAL</label><input type="number" id="e_p20" inputmode="numeric" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-
                     <div><label>P45 LIQ</label><input type="number" id="e_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="e_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="e_p45_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="e_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="e_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="e_p45" inputmode="numeric" min="0"></div>
-
                     <div class="sec-divisor"></div>
                     <div><label>P5 GERAL</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
                 </div>
@@ -352,36 +313,42 @@
             <!-- 4. RETORNO (VAZIOS) -->
             <div class="card" style="border-left: 4px solid var(--warning);">
                 <h3 class="card-title" style="color: #d39e00;">4. ENTRADA DE VAZIOS (Cascos Extras)</h3>
-                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Use <b>APENAS</b> para vazios EXTRAS que chegarem.</p>
                 <div class="grid-inputs">
                     <div><label>ÁGUA</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
                     <div class="sec-divisor"></div>
-
                     <div><label>P13 LIQ</label><input type="number" id="r_liq" inputmode="numeric" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="r_sup" inputmode="numeric" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="r_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-13">P13 OUTRA</label><input type="number" id="r_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="r_out" inputmode="numeric" min="0"></div>
                     <div><label>P13 GERAL</label><input type="number" id="r_p13" inputmode="numeric" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-
                     <div><label>P20 LIQ</label><input type="number" id="r_p20_liq" inputmode="numeric" min="0"></div>
                     <div><label>P20 SUP</label><input type="number" id="r_p20_sup" inputmode="numeric" min="0"></div>
                     <div><label>P20 NAC</label><input type="number" id="r_p20_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-20">P20 OUTRA</label><input type="number" id="r_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="r_p20_out" inputmode="numeric" min="0"></div>
                     <div><label>P20 GERAL</label><input type="number" id="r_p20" inputmode="numeric" min="0"></div>
-                    
                     <div class="sec-divisor"></div>
-
                     <div><label>P45 LIQ</label><input type="number" id="r_p45_liq" inputmode="numeric" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="r_p45_sup" inputmode="numeric" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="r_p45_nac" inputmode="numeric" min="0"></div>
-                    <div><label class="lbl-out-45">P45 OUTRA</label><input type="number" id="r_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="r_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>P45 GERAL</label><input type="number" id="r_p45" inputmode="numeric" min="0"></div>
-
                     <div class="sec-divisor"></div>
                     <div><label>P5 GERAL</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
                 </div>
+            </div>
+
+            <!-- 5. RETORNO (TROCAS) -->
+            <div class="card" style="border-left: 4px solid var(--purple);">
+                <h3 class="card-title" style="color: var(--purple);">5. ENTRADA DE TROCAS (Defeitos)</h3>
+                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Ao registrar uma troca, o sistema desconta automaticamente 1 Cheio (Geral) para repor no carro.</p>
+                <div class="grid-inputs">
+                    <div><label>P13 TROCA</label><input type="number" id="t_p13" inputmode="numeric" min="0"></div>
+                    <div><label>P20 TROCA</label><input type="number" id="t_p20" inputmode="numeric" min="0"></div>
+                    <div><label>P45 TROCA</label><input type="number" id="t_p45" inputmode="numeric" min="0"></div>
+                    <div><label>P5 TROCA</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
+                </div>
+                
                 <div style="margin-top: 15px;">
                     <label style="text-align: left; font-size: 0.9rem;">Observações:</label>
                     <input type="text" id="obs" placeholder="Alguma avaria ou anotação?">
@@ -395,7 +362,7 @@
         <div class="card" style="margin-top: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px;">
                 <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico (Últimos 10 Dias)</h3>
-                <button onclick="limparTodoHistorico()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">🗑️ Limpar Tudo</button>
+                <button onclick="limparTodoHistorico()" class="btn-excluir" style="font-weight: bold;">🗑️ Limpar Tudo</button>
             </div>
             <div class="table-responsive">
                 <table>
@@ -405,7 +372,8 @@
                             <th>Entregador</th>
                             <th>Saídas (Cheios)</th>
                             <th>Entradas (Cheios)</th>
-                            <th>Entradas (Vazios Extras)</th>
+                            <th>Entradas (Vazios)</th>
+                            <th>Trocas</th>
                             <th>OBS</th>
                             <th>Ação</th>
                         </tr>
@@ -417,26 +385,45 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO FIREBASE FORNECIDA PELO USUÁRIO
+        function fazerLogin() {
+            const user = document.getElementById('loginUser').value.trim();
+            const senha = document.getElementById('loginSenha').value.trim();
+            if (user === "admin" && senha === "1234") {
+                document.getElementById('telaLogin').style.display = 'none';
+                document.getElementById('conteudoSistema').style.display = 'block';
+                localStorage.setItem('logadoJLH', 'sim');
+            } else {
+                document.getElementById('erroLogin').style.display = 'block';
+            }
+        }
+
+        function sairSistema() {
+            localStorage.removeItem('logadoJLH');
+            location.reload();
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('logadoJLH') === 'sim') {
+                document.getElementById('telaLogin').style.display = 'none';
+                document.getElementById('conteudoSistema').style.display = 'block';
+            }
+        };
+
         const firebaseConfig = {
             apiKey: "AIzaSyAy5d-MNdsiX-snU7ThHbu0MXpHTuKz_AI",
             authDomain: "controledepatiogasvila-nova.firebaseapp.com",
-            databaseURL: "https://controledepatiogasvila-nova-default-rtdb.firebaseio.com", // Adicionado automaticamente para garantir compatibilidade Realtime Database
+            databaseURL: "https://controledepatiogasvila-nova-default-rtdb.firebaseio.com", 
             projectId: "controledepatiogasvila-nova",
             storageBucket: "controledepatiogasvila-nova.firebasestorage.app",
             messagingSenderId: "910814111886",
-            appId: "1:910814111886:web:0e1c1f8fcac22b6cab01df",
-            measurementId: "G-Z25FN6PHVW"
+            appId: "1:910814111886:web:0e1c1f8fcac22b6cab01df"
         };
 
-        // Inicializa o app e conecta ao Database
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Variáveis globais
         window.NOME_MARCA_ATUAL = "OUTRA MARCA";
         
-        // --- COLOQUE AS PLACAS DOS CARROS AQUI ---
         const MOTORISTAS = [
             { nome: "Aécio", placa: "" }, { nome: "Yuri", placa: "" }, { nome: "Nicolas", placa: "" },
             { nome: "Anderson", placa: "" }, { nome: "Soares", placa: "" }, { nome: "Lucas", placa: "" },
@@ -451,73 +438,49 @@
         const PESO_MAXIMO = 6240;
         
         let estoque = {
-            cheios: { 
-                liq: 0, sup: 0, nac: 0, out: 0, p13: 0, 
-                p20_liq: 0, p20_sup: 0, p20_nac: 0, p20_out: 0, p20: 0,
-                p45_liq: 0, p45_sup: 0, p45_nac: 0, p45_out: 0, p45: 0,
-                p5: 0 
-            },
-            vazios: { 
-                agua: 0, 
-                liq: 0, sup: 0, nac: 0, out: 0, p13: 0, 
-                p20_liq: 0, p20_sup: 0, p20_nac: 0, p20_out: 0, p20: 0,
-                p45_liq: 0, p45_sup: 0, p45_nac: 0, p45_out: 0, p45: 0,
-                p5: 0 
-            }
+            cheios: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 },
+            vazios: { agua:0, liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 },
+            trocas: { p13:0, p20:0, p45:0, p5:0 }
         };
 
         let registrosApp = [];
-
-        // --- SINCRONIZAÇÃO EM TEMPO REAL (NUVEM) ---
         
-        // 1. Ouvir nome da marca
         db.ref('config/nomeMarca').on('value', (snapshot) => {
             const nomeSalvo = snapshot.val() || "OUTRA MARCA";
             document.getElementById('configNomeMarca').value = nomeSalvo;
             window.NOME_MARCA_ATUAL = nomeSalvo;
-            
             let nomeCurto = nomeSalvo.length > 8 ? nomeSalvo.substring(0, 8) + '.' : nomeSalvo;
             document.querySelectorAll('.lbl-out-13').forEach(el => el.innerText = `P13 ${nomeCurto}`);
             document.querySelectorAll('.lbl-out-20').forEach(el => el.innerText = `P20 ${nomeCurto}`);
             document.querySelectorAll('.lbl-out-45').forEach(el => el.innerText = `P45 ${nomeCurto}`);
-            
             renderizarEstoque();
             renderizarTabela(registrosApp);
         });
 
-        // 2. Ouvir estoque
         db.ref('estoque').on('value', (snapshot) => {
             const val = snapshot.val();
             if(val) {
                 estoque.cheios = { ...estoque.cheios, ...val.cheios };
                 estoque.vazios = { ...estoque.vazios, ...val.vazios };
+                estoque.trocas = { ...estoque.trocas, ...val.trocas };
             }
             renderizarEstoque();
             calcularPesoTotalAtual();
         });
 
-        // 3. Ouvir registros (Histórico)
         db.ref('registros').on('value', (snapshot) => {
             const val = snapshot.val();
             let lista = val || [];
-            
-            // Limpa automaticamente registros mais antigos que 10 dias
             const agora = new Date().getTime();
             const limite = 10 * 24 * 60 * 60 * 1000;
             const validos = lista.filter(reg => (agora - reg.timestamp) <= limite);
             
-            if (lista.length !== validos.length) {
-                // Atualiza a nuvem se removeu os antigos
-                db.ref('registros').set(validos);
-                lista = validos;
-            }
-            
+            if (lista.length !== validos.length) { db.ref('registros').set(validos); lista = validos; }
             registrosApp = lista;
             renderizarPainelMotoristas(registrosApp);
             renderizarTabela(registrosApp);
         });
 
-        // Gravar nome da marca na nuvem
         function salvarNomeMarca(novoNome) {
             const nomeFormatado = novoNome.trim() === "" ? "OUTRA MARCA" : novoNome.trim().toUpperCase();
             db.ref('config/nomeMarca').set(nomeFormatado);
@@ -537,30 +500,11 @@
 
         function calcularPesoTotalAtual() {
             let pesoTotal = 0;
-            
-            // P13
-            pesoTotal += (estoque.cheios.liq || 0) * 13;
-            pesoTotal += (estoque.cheios.sup || 0) * 13;
-            pesoTotal += (estoque.cheios.nac || 0) * 13;
-            pesoTotal += (estoque.cheios.out || 0) * 13;
-            pesoTotal += (estoque.cheios.p13 || 0) * 13;
-            
-            // P20
-            pesoTotal += (estoque.cheios.p20_liq || 0) * 20;
-            pesoTotal += (estoque.cheios.p20_sup || 0) * 20;
-            pesoTotal += (estoque.cheios.p20_nac || 0) * 20;
-            pesoTotal += (estoque.cheios.p20_out || 0) * 20;
-            pesoTotal += (estoque.cheios.p20 || 0) * 20;
-
-            // P45
-            pesoTotal += (estoque.cheios.p45_liq || 0) * 45;
-            pesoTotal += (estoque.cheios.p45_sup || 0) * 45;
-            pesoTotal += (estoque.cheios.p45_nac || 0) * 45;
-            pesoTotal += (estoque.cheios.p45_out || 0) * 45;
-            pesoTotal += (estoque.cheios.p45 || 0) * 45;
-
-            // P5
-            pesoTotal += (estoque.cheios.p5 || 0) * 5;
+            const c = estoque.cheios;
+            pesoTotal += ((c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0)) * 13;
+            pesoTotal += ((c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0)) * 20;
+            pesoTotal += ((c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0)) * 45;
+            pesoTotal += (c.p5||0) * 5;
 
             const display = document.getElementById('displayPesoTotal');
             const displaySugestao = document.getElementById('displaySugestao');
@@ -568,75 +512,49 @@
             if (pesoTotal > PESO_MAXIMO) {
                 const excesso = pesoTotal - PESO_MAXIMO;
                 display.className = 'peso-total peso-excedido';
-                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Total de Cheios no Pátio: ${pesoTotal} kg<br>(Excedeu ${excesso} kg do limite de ${PESO_MAXIMO} kg).`;
+                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Total: ${pesoTotal} kg<br>(Excedeu ${excesso} kg do limite).`;
                 displaySugestao.style.display = 'none';
             } else {
                 display.className = 'peso-total peso-normal';
-                display.innerHTML = `✅ Peso Seguro no Pátio: ${pesoTotal} kg / Limite: ${PESO_MAXIMO} kg<br><small>*Calculado apenas com botijões cheios</small>`;
-                
+                display.innerHTML = `✅ Peso Seguro: ${pesoTotal} kg / Limite: ${PESO_MAXIMO} kg`;
                 const restante = PESO_MAXIMO - pesoTotal;
                 if (restante > 0) {
                     displaySugestao.style.display = 'block';
-                    let sugestoes = [];
-                    
-                    if (restante >= 45) sugestoes.push(`${Math.floor(restante/45)} un. de P45`);
-                    if (restante >= 20) sugestoes.push(`${Math.floor(restante/20)} un. de P20`);
-                    if (restante >= 13) sugestoes.push(`${Math.floor(restante/13)} un. de P13`);
-                    if (restante >= 5) sugestoes.push(`${Math.floor(restante/5)} un. de P5`);
-                    
-                    displaySugestao.innerHTML = `Ainda há limite de peso! Você pode acrescentar:<br><br>${sugestoes.join(' <b>OU</b> ')}`;
-                } else {
-                    displaySugestao.style.display = 'none';
-                }
+                    let sug = [];
+                    if (restante >= 45) sug.push(`${Math.floor(restante/45)} un. P45`);
+                    if (restante >= 20) sug.push(`${Math.floor(restante/20)} un. P20`);
+                    if (restante >= 13) sug.push(`${Math.floor(restante/13)} un. P13`);
+                    displaySugestao.innerHTML = `Restante:<br><br>${sug.join(' <b>OU</b> ')}`;
+                } else { displaySugestao.style.display = 'none'; }
             }
         }
 
         function renderizarEstoque() {
-            const htmlCheios = Object.keys(estoque.cheios).map(k => 
-                `<div><div class="item-val">${estoque.cheios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`
-            ).join('');
-            document.getElementById('displayCheios').innerHTML = htmlCheios;
-
-            const htmlVazios = Object.keys(estoque.vazios).map(k => 
-                `<div><div class="item-val">${estoque.vazios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`
-            ).join('');
-            document.getElementById('displayVazios').innerHTML = htmlVazios;
+            document.getElementById('displayCheios').innerHTML = Object.keys(estoque.cheios).map(k => 
+                `<div><div class="item-val">${estoque.cheios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
+            document.getElementById('displayVazios').innerHTML = Object.keys(estoque.vazios).map(k => 
+                `<div><div class="item-val">${estoque.vazios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
+            document.getElementById('displayTrocas').innerHTML = Object.keys(estoque.trocas).map(k => 
+                `<div><div class="item-val">${estoque.trocas[k]}</div><div class="item-label">${k.toUpperCase()}</div></div>`).join('');
         }
 
         function toggleAjusteEstoque() {
             const painel = document.getElementById('painelAjusteEstoque');
-            if (painel.style.display === 'block') {
-                painel.style.display = 'none';
-            } else {
+            if (painel.style.display === 'block') { painel.style.display = 'none'; } 
+            else {
                 painel.style.display = 'block';
-                Object.keys(estoque.cheios).forEach(k => {
-                    const el = document.getElementById(`est_c_${k}`);
-                    if(el) el.value = estoque.cheios[k];
-                });
-                Object.keys(estoque.vazios).forEach(k => {
-                    const el = document.getElementById(`est_v_${k}`);
-                    if(el) el.value = estoque.vazios[k];
-                });
+                Object.keys(estoque.cheios).forEach(k => { const el = document.getElementById(`est_c_${k}`); if(el) el.value = estoque.cheios[k]; });
+                Object.keys(estoque.vazios).forEach(k => { const el = document.getElementById(`est_v_${k}`); if(el) el.value = estoque.vazios[k]; });
+                Object.keys(estoque.trocas).forEach(k => { const el = document.getElementById(`est_t_${k}`); if(el) el.value = estoque.trocas[k]; });
             }
         }
 
         function salvarEstoqueManual() {
-            Object.keys(estoque.cheios).forEach(k => {
-                const el = document.getElementById(`est_c_${k}`);
-                if(el) estoque.cheios[k] = parseInt(el.value) || 0;
-            });
-            Object.keys(estoque.vazios).forEach(k => {
-                const el = document.getElementById(`est_v_${k}`);
-                if(el) estoque.vazios[k] = parseInt(el.value) || 0;
-            });
+            Object.keys(estoque.cheios).forEach(k => { const el = document.getElementById(`est_c_${k}`); if(el) estoque.cheios[k] = parseInt(el.value) || 0; });
+            Object.keys(estoque.vazios).forEach(k => { const el = document.getElementById(`est_v_${k}`); if(el) estoque.vazios[k] = parseInt(el.value) || 0; });
+            Object.keys(estoque.trocas).forEach(k => { const el = document.getElementById(`est_t_${k}`); if(el) estoque.trocas[k] = parseInt(el.value) || 0; });
             
-            // Gravar direto no Firebase
-            db.ref('estoque').set(estoque).then(() => {
-                toggleAjusteEstoque();
-                alert("Estoque do pátio atualizado na nuvem com sucesso!");
-            }).catch(error => {
-                alert("Erro ao salvar: " + error.message);
-            });
+            db.ref('estoque').set(estoque).then(() => { toggleAjusteEstoque(); alert("Estoque atualizado!"); });
         }
 
         function renderizarPainelMotoristas(registros) {
@@ -645,17 +563,14 @@
             const hoje = new Date().toDateString();
 
             MOTORISTAS.forEach(motorista => {
-                const viagensHoje = registros.filter(reg => reg.entregador === motorista.nome && new Date(reg.timestamp).toDateString() === hoje).length;
+                const viagens = registros.filter(reg => reg.entregador === motorista.nome && new Date(reg.timestamp).toDateString() === hoje).length;
                 const btn = document.createElement('div');
                 btn.className = 'btn-motorista';
                 if(document.getElementById('entregador').value === motorista.nome) btn.classList.add('selecionado');
-                
-                btn.innerHTML = `${motorista.nome} <span class="badge-viagens">(${viagensHoje} hoje)</span>`;
-                
+                btn.innerHTML = `${motorista.nome} <span class="badge-viagens">(${viagens} hoje)</span>`;
                 btn.onclick = () => {
                     document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
                     btn.classList.add('selecionado');
-                    
                     document.getElementById('entregador').value = motorista.nome;
                     document.getElementById('carro').value = motorista.placa;
                     document.getElementById('s_liq').focus(); 
@@ -670,20 +585,25 @@
             return itens.length > 0 ? itens.join('<br>') : '-';
         }
 
+        function formatarTrocas(obj) {
+            if(!obj) return '-';
+            const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `<b>${obj[k]}</b> ${k.toUpperCase()}`);
+            return itens.length > 0 ? itens.join('<br>') : '-';
+        }
+
         function renderizarTabela(registros) {
             const tbody = document.getElementById('tabelaCorpo');
             tbody.innerHTML = '';
-            
             [...registros].sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
                 const tr = document.createElement('tr');
                 const hora = new Date(reg.timestamp).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
-                
                 tr.innerHTML = `
                     <td>${hora}</td>
                     <td><strong>${reg.entregador}</strong><br><small>${reg.carro}</small></td>
                     <td style="color:var(--danger)">${formatarItens(reg.saidas)}</td>
                     <td style="color:var(--info)">${formatarItens(reg.entradas)}</td>
                     <td style="color:#d39e00">${formatarItens(reg.retornos)}</td>
+                    <td style="color:var(--purple)">${formatarTrocas(reg.trocas)}</td>
                     <td>${reg.obs || '-'}</td>
                     <td><button class="btn-excluir" onclick="deletarRegistro(${reg.timestamp})">X</button></td>
                 `;
@@ -693,25 +613,19 @@
 
         function extrairValores(prefixo) {
             return {
-                liq: parseInt(document.getElementById(`${prefixo}_liq`).value) || 0,
-                sup: parseInt(document.getElementById(`${prefixo}_sup`).value) || 0,
-                nac: parseInt(document.getElementById(`${prefixo}_nac`).value) || 0,
-                out: parseInt(document.getElementById(`${prefixo}_out`).value) || 0,
-                p13: parseInt(document.getElementById(`${prefixo}_p13`).value) || 0,
-                
-                p20_liq: parseInt(document.getElementById(`${prefixo}_p20_liq`).value) || 0,
-                p20_sup: parseInt(document.getElementById(`${prefixo}_p20_sup`).value) || 0,
-                p20_nac: parseInt(document.getElementById(`${prefixo}_p20_nac`).value) || 0,
-                p20_out: parseInt(document.getElementById(`${prefixo}_p20_out`).value) || 0,
-                p20: parseInt(document.getElementById(`${prefixo}_p20`).value) || 0,
-                
-                p45_liq: parseInt(document.getElementById(`${prefixo}_p45_liq`).value) || 0,
-                p45_sup: parseInt(document.getElementById(`${prefixo}_p45_sup`).value) || 0,
-                p45_nac: parseInt(document.getElementById(`${prefixo}_p45_nac`).value) || 0,
-                p45_out: parseInt(document.getElementById(`${prefixo}_p45_out`).value) || 0,
-                p45: parseInt(document.getElementById(`${prefixo}_p45`).value) || 0,
-                
-                p5: parseInt(document.getElementById(`${prefixo}_p5`).value) || 0
+                liq: parseInt(document.getElementById(`${prefixo}_liq`).value)||0, sup: parseInt(document.getElementById(`${prefixo}_sup`).value)||0, nac: parseInt(document.getElementById(`${prefixo}_nac`).value)||0, out: parseInt(document.getElementById(`${prefixo}_out`).value)||0, p13: parseInt(document.getElementById(`${prefixo}_p13`).value)||0,
+                p20_liq: parseInt(document.getElementById(`${prefixo}_p20_liq`).value)||0, p20_sup: parseInt(document.getElementById(`${prefixo}_p20_sup`).value)||0, p20_nac: parseInt(document.getElementById(`${prefixo}_p20_nac`).value)||0, p20_out: parseInt(document.getElementById(`${prefixo}_p20_out`).value)||0, p20: parseInt(document.getElementById(`${prefixo}_p20`).value)||0,
+                p45_liq: parseInt(document.getElementById(`${prefixo}_p45_liq`).value)||0, p45_sup: parseInt(document.getElementById(`${prefixo}_p45_sup`).value)||0, p45_nac: parseInt(document.getElementById(`${prefixo}_p45_nac`).value)||0, p45_out: parseInt(document.getElementById(`${prefixo}_p45_out`).value)||0, p45: parseInt(document.getElementById(`${prefixo}_p45`).value)||0,
+                p5: parseInt(document.getElementById(`${prefixo}_p5`).value)||0
+            };
+        }
+
+        function extrairTrocas() {
+            return {
+                p13: parseInt(document.getElementById('t_p13').value)||0,
+                p20: parseInt(document.getElementById('t_p20').value)||0,
+                p45: parseInt(document.getElementById('t_p45').value)||0,
+                p5: parseInt(document.getElementById('t_p5').value)||0
             };
         }
 
@@ -727,29 +641,33 @@
                 obs: document.getElementById('obs').value.trim(),
                 saidas: extrairValores('s'),
                 entradas: extrairValores('e'),
-                retornos: extrairValores('r')
+                retornos: extrairValores('r'),
+                trocas: extrairTrocas()
             };
             novoRegistro.retornos.agua = parseInt(document.getElementById('r_agua').value) || 0;
             
-            // --- LÓGICA DE TROCA DE CHEIOS POR VAZIOS ---
             Object.keys(novoRegistro.saidas).forEach(k => {
                 let qtdSaida = novoRegistro.saidas[k];
-                if (qtdSaida > 0) {
-                    estoque.cheios[k] -= qtdSaida; 
-                    estoque.vazios[k] += qtdSaida; 
-                }
+                if (qtdSaida > 0) { estoque.cheios[k] -= qtdSaida; estoque.vazios[k] += qtdSaida; }
             });
-            
             Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]);
             Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
             
-            // Salvar no Firebase
-            db.ref('estoque').set(estoque);
+            // LOGICA DA TROCA: Adiciona na Troca e subtrai do Cheio (Geral)
+            Object.keys(novoRegistro.trocas).forEach(k => {
+                let qtdTroca = novoRegistro.trocas[k];
+                if (qtdTroca > 0) {
+                    estoque.trocas[k] += qtdTroca;
+                    if (estoque.cheios[k] !== undefined) {
+                        estoque.cheios[k] -= qtdTroca; 
+                    }
+                }
+            });
             
+            db.ref('estoque').set(estoque);
             registrosApp.push(novoRegistro);
             db.ref('registros').set(registrosApp);
 
-            // Limpeza
             document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
             document.getElementById('obs').value = '';
             document.getElementById('entregador').value = '';
@@ -760,24 +678,29 @@
         });
 
         function deletarRegistro(timestamp) {
-            if(confirm("Apagar este registro individual? O estoque será corrigido automaticamente na nuvem.")) {
+            if(confirm("Apagar este registro? O estoque será corrigido automaticamente na nuvem.")) {
                 const index = registrosApp.findIndex(reg => reg.timestamp === timestamp);
                 if (index > -1) {
                     const reg = registrosApp[index];
-                    
                     Object.keys(reg.saidas).forEach(k => {
-                        let qtdSaida = reg.saidas[k];
-                        if(qtdSaida > 0) {
-                            estoque.cheios[k] += qtdSaida;
-                            estoque.vazios[k] -= qtdSaida;
-                        }
+                        let q = reg.saidas[k];
+                        if(q > 0) { estoque.cheios[k] += q; estoque.vazios[k] -= q; }
                     });
-                    
                     if(reg.entradas) Object.keys(reg.entradas).forEach(k => estoque.cheios[k] -= reg.entradas[k]);
                     Object.keys(reg.retornos).forEach(k => estoque.vazios[k] -= reg.retornos[k]);
                     
-                    db.ref('estoque').set(estoque);
+                    // REVERTE A LÓGICA DA TROCA
+                    if(reg.trocas) Object.keys(reg.trocas).forEach(k => {
+                        let q = reg.trocas[k];
+                        if(q > 0) {
+                            estoque.trocas[k] -= q;
+                            if (estoque.cheios[k] !== undefined) {
+                                estoque.cheios[k] += q;
+                            }
+                        }
+                    });
                     
+                    db.ref('estoque').set(estoque);
                     registrosApp.splice(index, 1);
                     db.ref('registros').set(registrosApp);
                 }
@@ -785,9 +708,7 @@
         }
 
         function limparTodoHistorico() {
-            if(confirm("TEM CERTEZA que deseja apagar TODO o histórico? Isso apagará para todos os usuários.")) {
-                db.ref('registros').set([]);
-            }
+            if(confirm("Deseja apagar TODO o histórico?")) db.ref('registros').set([]);
         }
     </script>
 </body>
