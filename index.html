@@ -1,29 +1,22 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Pátio - Nuvem (JLH)</title>
+    
+    <!-- Biblioteca Geradora de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root {
-            --primary: #0056b3;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-            --purple: #6f42c1;
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --text: #333;
-            --border: #ced4da;
+            --primary: #0056b3; --success: #28a745; --danger: #dc3545;
+            --warning: #ffc107; --info: #17a2b8; --purple: #6f42c1;
+            --bg: #f0f2f5; --card-bg: #ffffff; --text: #333; --border: #ced4da;
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            margin: 0; 
-            padding: 10px; 
-            background-color: var(--bg); 
-            color: var(--text);
+            margin: 0; padding: 10px; background-color: var(--bg); color: var(--text);
         }
         .container { max-width: 1200px; margin: auto; }
         h1, h2, h3 { text-align: center; margin-bottom: 20px; }
@@ -77,7 +70,7 @@
             border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
         }
         .btn-pdf {
-            background: #343a40; color: #fff; border: none; padding: 10px 15px;
+            background: #6f42c1; color: #fff; border: none; padding: 10px 15px;
             border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px; width: auto;
         }
         
@@ -121,19 +114,23 @@
         
         .sec-divisor { grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0; }
         
-        /* Ocultar elementos ao gerar PDF/Imprimir */
-        @media print {
-            body { background: white; padding: 0; margin: 0; color: black; }
-            #registroForm, .btn-ajuste, .btn-pdf, .status-nuvem, .config-marca, 
-            button[onclick="sairSistema()"], .btn-excluir, #painelAjusteEstoque, .sugestao-carga { display: none !important; }
-            .card { box-shadow: none; border: 1px solid #000; margin-bottom: 10px; page-break-inside: avoid; background: transparent; }
-            table { min-width: 100%; font-size: 10pt; color: black; }
-            th, td { border: 1px solid #000; padding: 4px; }
-            .estoque-box { background: transparent; border: 1px solid #000; }
-            .item-val { color: black; }
-            @page { margin: 1cm; size: landscape; }
-            h1 { font-size: 16pt; margin: 0 0 10px 0; }
-        }
+        /* Ocultar elementos via classe JavaScript durante geração do PDF */
+        body.modo-pdf { background: white; padding: 10px; color: black; }
+        body.modo-pdf #registroForm, 
+        body.modo-pdf .btn-ajuste, 
+        body.modo-pdf .btn-pdf, 
+        body.modo-pdf .status-nuvem, 
+        body.modo-pdf .config-marca, 
+        body.modo-pdf button[onclick="sairSistema()"], 
+        body.modo-pdf .btn-excluir, 
+        body.modo-pdf #painelAjusteEstoque, 
+        body.modo-pdf .sugestao-carga { display: none !important; }
+        
+        body.modo-pdf .card { box-shadow: none; border: 1px solid #000; margin-bottom: 10px; background: transparent; }
+        body.modo-pdf table { min-width: 100%; font-size: 10pt; color: black; }
+        body.modo-pdf th, body.modo-pdf td { border: 1px solid #000; padding: 4px; }
+        body.modo-pdf .estoque-box { background: transparent; border: 1px solid #000; }
+        body.modo-pdf .item-val { color: black; }
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -153,7 +150,7 @@
 
     <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-pdf" onclick="window.print()">📄 Relatório PDF</button>
+            <button class="btn-pdf" onclick="gerarECompartilharPDF()">📲 Compartilhar PDF</button>
             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -161,7 +158,7 @@
         
         <div class="status-nuvem">🟢 Conectado ao banco de dados em Nuvem (Firebase)</div>
         
-        <div class="card">
+        <div class="card" id="areaRelatorioPDF">
             <h3 class="card-title">Estoque Atual & Peso do Pátio</h3>
             
             <div class="config-marca">
@@ -393,7 +390,7 @@
         </form>
 
         <!-- HISTÓRICO -->
-        <div class="card" style="margin-top: 20px;">
+        <div class="card" style="margin-top: 20px;" id="areaHistoricoPDF">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px;">
                 <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico (Últimos 20 Dias)</h3>
                 <button onclick="limparTodoHistorico()" class="btn-excluir" style="font-weight: bold;">🗑️ Limpar Tudo</button>
@@ -505,7 +502,7 @@
             const val = snapshot.val();
             let lista = val || [];
             const agora = new Date().getTime();
-            const limite = 20 * 24 * 60 * 60 * 1000;
+            const limite = 20 * 24 * 60 * 60 * 1000; // 20 dias
             const validos = lista.filter(reg => (agora - reg.timestamp) <= limite);
             
             if (lista.length !== validos.length) { db.ref('registros').set(validos); lista = validos; }
@@ -681,7 +678,6 @@
             Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]);
             Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
             
-            // LOGICA DA TROCA
             Object.keys(novoRegistro.trocas).forEach(k => {
                 let qtdTroca = novoRegistro.trocas[k];
                 if (qtdTroca > 0) {
@@ -737,7 +733,54 @@
         function limparTodoHistorico() {
             if(confirm("Deseja apagar TODO o histórico?")) db.ref('registros').set([]);
         }
+
+        // --- FUNÇÃO NATIVA PARA GERAR E COMPARTILHAR PDF ---
+        async function gerarECompartilharPDF() {
+            const btn = document.querySelector('.btn-pdf');
+            btn.innerHTML = "⏳ Gerando Arquivo...";
+            
+            // 1. Esconde os elementos de edição
+            document.body.classList.add('modo-pdf');
+            
+            // 2. Prepara o conteúdo (Estoque + Histórico)
+            const elemento = document.getElementById('conteudoSistema');
+            
+            // 3. Configura a qualidade da página
+            const opt = {
+                margin:       0.3,
+                filename:     'Relatorio_Patio_JLH.pdf',
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            try {
+                // 4. Cria o PDF em formato 'Blob' (Arquivo na memória)
+                const pdfBlob = await html2pdf().set(opt).from(elemento).output('blob');
+                const file = new File([pdfBlob], 'Relatorio_Patio_JLH.pdf', { type: 'application/pdf' });
+                
+                // 5. Tenta abrir a tela nativa de compartilhamento do celular (WhatsApp, Email, etc)
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: 'Relatório de Pátio JLH',
+                        files: [file]
+                    });
+                } else {
+                    // Fallback: Se não conseguir compartilhar direto, faz o download automático (Abre no app PDF)
+                    const fileURL = URL.createObjectURL(pdfBlob);
+                    const a = document.createElement('a');
+                    a.href = fileURL;
+                    a.download = 'Relatorio_Patio_JLH.pdf';
+                    a.click();
+                }
+            } catch (err) {
+                alert("Erro ao gerar o arquivo PDF: " + err);
+            } finally {
+                // 6. Restaura a página ao normal
+                document.body.classList.remove('modo-pdf');
+                btn.innerHTML = "📲 Compartilhar PDF";
+            }
+        }
     </script>
 </body>
 </html>
-
