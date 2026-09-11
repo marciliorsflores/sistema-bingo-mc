@@ -1,3 +1,5 @@
+As alterações foram feitas: as Trocas agora somam no peso do pátio, a Tarja de Atenção mostra os dados completos (Atual, Limite e Diferença), os Motoristas estão em ordem alfabética, o histórico foi ampliado para 20 dias, e a página está otimizada para gerar um Relatório PDF limpo e direto pelo navegador (usando a função nativa de impressão/salvar como PDF do seu celular).
+Substitua todo o seu código por este abaixo:
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -59,7 +61,7 @@
         
         .peso-total {
             text-align: center; font-size: 1.1rem; font-weight: bold; margin-top: 15px;
-            padding: 15px; border-radius: 8px; border: 2px solid transparent;
+            padding: 15px; border-radius: 8px; border: 2px solid transparent; line-height: 1.5;
         }
         .peso-normal { background: #d4edda; color: #155724; border-color: #c3e6cb; }
         .peso-excedido { background: #f8d7da; color: #721c24; border-color: #f5c6cb; animation: piscar 2s infinite; }
@@ -77,7 +79,7 @@
         }
         .btn-pdf {
             background: #343a40; color: #fff; border: none; padding: 10px 15px;
-            border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px; width: auto;
         }
         
         #painelAjusteEstoque {
@@ -122,11 +124,16 @@
         
         /* Ocultar elementos ao gerar PDF/Imprimir */
         @media print {
-            body { background: white; padding: 0; }
-            #registroForm, .btn-ajuste, .btn-pdf, .status-nuvem, .config-marca, button[onclick="sairSistema()"], .btn-excluir, #painelAjusteEstoque { display: none !important; }
-            .card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 10px; page-break-inside: avoid; }
-            table { min-width: 100%; font-size: 0.7rem; }
-            @page { margin: 1cm; }
+            body { background: white; padding: 0; margin: 0; color: black; }
+            #registroForm, .btn-ajuste, .btn-pdf, .status-nuvem, .config-marca, 
+            button[onclick="sairSistema()"], .btn-excluir, #painelAjusteEstoque, .sugestao-carga { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #000; margin-bottom: 10px; page-break-inside: avoid; background: transparent; }
+            table { min-width: 100%; font-size: 10pt; color: black; }
+            th, td { border: 1px solid #000; padding: 4px; }
+            .estoque-box { background: transparent; border: 1px solid #000; }
+            .item-val { color: black; }
+            @page { margin: 1cm; size: landscape; }
+            h1 { font-size: 16pt; margin: 0 0 10px 0; }
         }
     </style>
     
@@ -146,14 +153,14 @@
     </div>
 
     <div class="container" id="conteudoSistema" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <button class="btn-pdf" onclick="window.print()">📄 Relatório PDF</button>
+            <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
+        </div>
+        
         <h1>Controle de Pátio e Cargas</h1>
         
         <div class="status-nuvem">🟢 Conectado ao banco de dados em Nuvem (Firebase)</div>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: flex-end;">
-             <button class="btn-pdf" onclick="window.print()" style="margin: 0; width: auto;">📄 Gerar PDF</button>
-             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
-        </div>
         
         <div class="card">
             <h3 class="card-title">Estoque Atual & Peso do Pátio</h3>
@@ -216,10 +223,25 @@
 
                 <p><strong>🟪 TROCAS (Defeitos no Pátio)</strong></p>
                 <div class="grid-inputs">
-                    <div><label>P13 TROCA</label><input type="number" id="est_t_p13" min="0"></div>
-                    <div><label>P20 TROCA</label><input type="number" id="est_t_p20" min="0"></div>
-                    <div><label>P45 TROCA</label><input type="number" id="est_t_p45" min="0"></div>
-                    <div><label>P5 TROCA</label><input type="number" id="est_t_p5" min="0"></div>
+                    <div><label>P13 LIQ</label><input type="number" id="est_t_liq" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="est_t_sup" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="est_t_nac" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="est_t_out" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="est_t_p13" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="est_t_p20_liq" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="est_t_p20_sup" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="est_t_p20_nac" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="est_t_p20_out" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="est_t_p20" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P45 LIQ</label><input type="number" id="est_t_p45_liq" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="est_t_p45_sup" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="est_t_p45_nac" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_t_p45_out" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="est_t_p45" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P5 GERAL</label><input type="number" id="est_t_p5" min="0"></div>
                 </div>
                 
                 <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste na Nuvem</button>
@@ -339,12 +361,27 @@
             <!-- 5. RETORNO (TROCAS) -->
             <div class="card" style="border-left: 4px solid var(--purple);">
                 <h3 class="card-title" style="color: var(--purple);">5. ENTRADA DE TROCAS (Defeitos)</h3>
-                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Ao registrar uma troca, o sistema desconta automaticamente 1 Cheio (Geral) para repor no carro.</p>
+                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Ao registrar uma troca, o sistema desconta automaticamente 1 Cheio correspondente para repor no carro.</p>
                 <div class="grid-inputs">
-                    <div><label>P13 TROCA</label><input type="number" id="t_p13" inputmode="numeric" min="0"></div>
-                    <div><label>P20 TROCA</label><input type="number" id="t_p20" inputmode="numeric" min="0"></div>
-                    <div><label>P45 TROCA</label><input type="number" id="t_p45" inputmode="numeric" min="0"></div>
-                    <div><label>P5 TROCA</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
+                    <div><label>P13 LIQ</label><input type="number" id="t_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="t_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="t_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="t_out" inputmode="numeric" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="t_p13" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="t_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="t_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="t_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="t_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="t_p20" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P45 LIQ</label><input type="number" id="t_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="t_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="t_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="t_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="t_p45" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P5 GERAL</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
                 </div>
                 
                 <div style="margin-top: 15px;">
@@ -359,7 +396,7 @@
         <!-- HISTÓRICO -->
         <div class="card" style="margin-top: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px;">
-                <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico (Últimos 10 Dias)</h3>
+                <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico (Últimos 20 Dias)</h3>
                 <button onclick="limparTodoHistorico()" class="btn-excluir" style="font-weight: bold;">🗑️ Limpar Tudo</button>
             </div>
             <div class="table-responsive">
@@ -423,14 +460,13 @@
         window.NOME_MARCA_ATUAL = "OUTRA MARCA";
         
         const MOTORISTAS = [
-            { nome: "Aécio", placa: "" }, { nome: "Yuri", placa: "" }, { nome: "Nicolas", placa: "" },
-            { nome: "Anderson", placa: "" }, { nome: "Soares", placa: "" }, { nome: "Lucas", placa: "" },
-            { nome: "Rafa", placa: "" }, { nome: "Evandro", placa: "" }, { nome: "Alexandre", placa: "" },
-            { nome: "Nei", placa: "" }, { nome: "Edgar", placa: "" }, { nome: "Marcílio", placa: "" },
-            { nome: "Anderson Alemão", placa: "" }, { nome: "Soveral", placa: "" },
-            { nome: "Lucas Telefone", placa: "" }, { nome: "Pedro", placa: "" },
-            { nome: "Kleber", placa: "" }, { nome: "Jackson", placa: "" },
-            { nome: "Everton", placa: "" }, { nome: "Ayrton", placa: "" }
+            { nome: "Aécio", placa: "" }, { nome: "Alexandre", placa: "" }, { nome: "Anderson", placa: "" },
+            { nome: "Anderson Alemão", placa: "" }, { nome: "Ayrton", placa: "" }, { nome: "Edgar", placa: "" },
+            { nome: "Evandro", placa: "" }, { nome: "Everton", placa: "" }, { nome: "Jackson", placa: "" },
+            { nome: "Kleber", placa: "" }, { nome: "Lucas", placa: "" }, { nome: "Lucas Telefone", placa: "" },
+            { nome: "Marcílio", placa: "" }, { nome: "Nei", placa: "" }, { nome: "Nicolas", placa: "" },
+            { nome: "Pedro", placa: "" }, { nome: "Rafa", placa: "" }, { nome: "Soares", placa: "" },
+            { nome: "Soveral", placa: "" }, { nome: "Yuri", placa: "" }
         ];
         
         const PESO_MAXIMO = 6240;
@@ -438,7 +474,7 @@
         let estoque = {
             cheios: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 },
             vazios: { agua:0, liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 },
-            trocas: { p13:0, p20:0, p45:0, p5:0 }
+            trocas: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 }
         };
 
         let registrosApp = [];
@@ -470,7 +506,7 @@
             const val = snapshot.val();
             let lista = val || [];
             const agora = new Date().getTime();
-            const limite = 10 * 24 * 60 * 60 * 1000;
+            const limite = 20 * 24 * 60 * 60 * 1000;
             const validos = lista.filter(reg => (agora - reg.timestamp) <= limite);
             
             if (lista.length !== validos.length) { db.ref('registros').set(validos); lista = validos; }
@@ -499,10 +535,19 @@
         function calcularPesoTotalAtual() {
             let pesoTotal = 0;
             const c = estoque.cheios;
+            const t = estoque.trocas;
+            
+            // Soma peso dos CHEIOS
             pesoTotal += ((c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0)) * 13;
             pesoTotal += ((c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0)) * 20;
             pesoTotal += ((c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0)) * 45;
             pesoTotal += (c.p5||0) * 5;
+
+            // Soma peso das TROCAS
+            pesoTotal += ((t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0)) * 13;
+            pesoTotal += ((t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0)) * 20;
+            pesoTotal += ((t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0)) * 45;
+            pesoTotal += (t.p5||0) * 5;
 
             const display = document.getElementById('displayPesoTotal');
             const displaySugestao = document.getElementById('displaySugestao');
@@ -510,19 +555,20 @@
             if (pesoTotal > PESO_MAXIMO) {
                 const excesso = pesoTotal - PESO_MAXIMO;
                 display.className = 'peso-total peso-excedido';
-                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Total: ${pesoTotal} kg<br>(Excedeu ${excesso} kg do limite).`;
+                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Peso Total Atual: <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Excedeu: ${excesso} kg`;
                 displaySugestao.style.display = 'none';
             } else {
-                display.className = 'peso-total peso-normal';
-                display.innerHTML = `✅ Peso Seguro: ${pesoTotal} kg / Limite: ${PESO_MAXIMO} kg`;
                 const restante = PESO_MAXIMO - pesoTotal;
+                display.className = 'peso-total peso-normal';
+                display.innerHTML = `✅ Peso Seguro no Pátio<br>Peso Total Atual: <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Espaço Livre (Restante): ${restante} kg`;
+                
                 if (restante > 0) {
                     displaySugestao.style.display = 'block';
                     let sug = [];
                     if (restante >= 45) sug.push(`${Math.floor(restante/45)} un. P45`);
                     if (restante >= 20) sug.push(`${Math.floor(restante/20)} un. P20`);
                     if (restante >= 13) sug.push(`${Math.floor(restante/13)} un. P13`);
-                    displaySugestao.innerHTML = `Restante:<br><br>${sug.join(' <b>OU</b> ')}`;
+                    displaySugestao.innerHTML = `Você ainda pode colocar:<br><br>${sug.join(' <b>OU</b> ')}`;
                 } else { displaySugestao.style.display = 'none'; }
             }
         }
@@ -533,7 +579,7 @@
             document.getElementById('displayVazios').innerHTML = Object.keys(estoque.vazios).map(k => 
                 `<div><div class="item-val">${estoque.vazios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
             document.getElementById('displayTrocas').innerHTML = Object.keys(estoque.trocas).map(k => 
-                `<div><div class="item-val">${estoque.trocas[k]}</div><div class="item-label">${k.toUpperCase()}</div></div>`).join('');
+                `<div><div class="item-val">${estoque.trocas[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
         }
 
         function toggleAjusteEstoque() {
@@ -583,12 +629,6 @@
             return itens.length > 0 ? itens.join('<br>') : '-';
         }
 
-        function formatarTrocas(obj) {
-            if(!obj) return '-';
-            const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `<b>${obj[k]}</b> ${k.toUpperCase()}`);
-            return itens.length > 0 ? itens.join('<br>') : '-';
-        }
-
         function renderizarTabela(registros) {
             const tbody = document.getElementById('tabelaCorpo');
             tbody.innerHTML = '';
@@ -601,7 +641,7 @@
                     <td style="color:var(--danger)">${formatarItens(reg.saidas)}</td>
                     <td style="color:var(--info)">${formatarItens(reg.entradas)}</td>
                     <td style="color:#d39e00">${formatarItens(reg.retornos)}</td>
-                    <td style="color:var(--purple)">${formatarTrocas(reg.trocas)}</td>
+                    <td style="color:var(--purple)">${formatarItens(reg.trocas)}</td>
                     <td>${reg.obs || '-'}</td>
                     <td><button class="btn-excluir" onclick="deletarRegistro(${reg.timestamp})">X</button></td>
                 `;
@@ -618,15 +658,6 @@
             };
         }
 
-        function extrairTrocas() {
-            return {
-                p13: parseInt(document.getElementById('t_p13').value)||0,
-                p20: parseInt(document.getElementById('t_p20').value)||0,
-                p45: parseInt(document.getElementById('t_p45').value)||0,
-                p5: parseInt(document.getElementById('t_p5').value)||0
-            };
-        }
-
         document.getElementById('registroForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const entregador = document.getElementById('entregador').value;
@@ -640,7 +671,7 @@
                 saidas: extrairValores('s'),
                 entradas: extrairValores('e'),
                 retornos: extrairValores('r'),
-                trocas: extrairTrocas()
+                trocas: extrairValores('t')
             };
             novoRegistro.retornos.agua = parseInt(document.getElementById('r_agua').value) || 0;
             
@@ -651,7 +682,7 @@
             Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]);
             Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
             
-            // LOGICA DA TROCA: Adiciona na Troca e subtrai do Cheio (Geral)
+            // LOGICA DA TROCA
             Object.keys(novoRegistro.trocas).forEach(k => {
                 let qtdTroca = novoRegistro.trocas[k];
                 if (qtdTroca > 0) {
@@ -687,7 +718,6 @@
                     if(reg.entradas) Object.keys(reg.entradas).forEach(k => estoque.cheios[k] -= reg.entradas[k]);
                     Object.keys(reg.retornos).forEach(k => estoque.vazios[k] -= reg.retornos[k]);
                     
-                    // REVERTE A LÓGICA DA TROCA
                     if(reg.trocas) Object.keys(reg.trocas).forEach(k => {
                         let q = reg.trocas[k];
                         if(q > 0) {
