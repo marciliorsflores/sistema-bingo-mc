@@ -1,11 +1,3 @@
-Fique tranquilo, seus dados não foram apagados. O banco de dados fica protegido na nuvem (Firebase), e o arquivo HTML funciona apenas como um "leitor" dessa nuvem. Você nunca precisará preencher tudo do zero ao atualizar o código, pois o aplicativo é programado para fazer o download automático do histórico assim que é aberto.
-Se a tela apareceu zerada para você, ocorreu um destes dois motivos:
- * Lentidão de Carregamento: A biblioteca que gera o PDF (adicionada na versão anterior) é um arquivo externo pesado. Se a conexão do celular oscilou, o navegador pode ter travado a tela antes de conseguir baixar seus números do Firebase.
- * Gavetas Antigas vs. Gavetas Novas: Como transformamos o campo "GERAL" em uma soma automática, o sistema não adivinha em qual das novas marcas (LIQ, SUP, NAC) colocar o seu estoque que já estava salvo. Seus botijões estão lá, mas eles aparecem no pátio dentro da gaveta de alerta em vermelho chamada GERAL(L) (Legado/Antigo).
-O que foi resolvido neste novo código:
- * Prioridade de Conexão: Movi os scripts pesados de PDF para o final do arquivo. Agora, o sistema foca 100% em puxar seus dados da nuvem na mesma hora em que a tela abre, sem travar.
- * Aviso de Sincronização: Adicionei uma barra amarela no topo da tela escrito "🔄 Sincronizando com a Nuvem...". Ela só vai sumir quando o aplicativo tiver terminado de puxar todo o seu histórico com sucesso.
-Copie o código abaixo e substitua no seu arquivo. Quando abrir, espere o aviso de sincronização sumir. Em seguida, clique em ⚙️ Ajustar Estoque Inicial Manualmente, zere os valores que estão nos campos vermelhos GERAL(L) e digite essas quantidades nas marcas corretas.
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
