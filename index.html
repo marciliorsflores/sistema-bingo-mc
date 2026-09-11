@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -216,10 +215,25 @@
 
                 <p><strong>🟪 TROCAS (Defeitos no Pátio)</strong></p>
                 <div class="grid-inputs">
-                    <div><label>P13 TROCA</label><input type="number" id="est_t_p13" min="0"></div>
-                    <div><label>P20 TROCA</label><input type="number" id="est_t_p20" min="0"></div>
-                    <div><label>P45 TROCA</label><input type="number" id="est_t_p45" min="0"></div>
-                    <div><label>P5 TROCA</label><input type="number" id="est_t_p5" min="0"></div>
+                    <div><label>P13 LIQ</label><input type="number" id="est_t_liq" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="est_t_sup" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="est_t_nac" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="est_t_out" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="est_t_p13" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="est_t_p20_liq" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="est_t_p20_sup" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="est_t_p20_nac" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="est_t_p20_out" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="est_t_p20" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P45 LIQ</label><input type="number" id="est_t_p45_liq" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="est_t_p45_sup" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="est_t_p45_nac" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_t_p45_out" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="est_t_p45" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P5 GERAL</label><input type="number" id="est_t_p5" min="0"></div>
                 </div>
                 
                 <button class="btn-salvar" style="padding: 10px; font-size: 1rem; margin-top: 15px;" onclick="salvarEstoqueManual()">Salvar Ajuste na Nuvem</button>
@@ -339,12 +353,27 @@
             <!-- 5. RETORNO (TROCAS) -->
             <div class="card" style="border-left: 4px solid var(--purple);">
                 <h3 class="card-title" style="color: var(--purple);">5. ENTRADA DE TROCAS (Defeitos)</h3>
-                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Ao registrar uma troca, o sistema desconta automaticamente 1 Cheio (Geral) para repor no carro.</p>
+                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Ao registrar uma troca, o sistema desconta automaticamente 1 Cheio correspondente para repor no carro.</p>
                 <div class="grid-inputs">
-                    <div><label>P13 TROCA</label><input type="number" id="t_p13" inputmode="numeric" min="0"></div>
-                    <div><label>P20 TROCA</label><input type="number" id="t_p20" inputmode="numeric" min="0"></div>
-                    <div><label>P45 TROCA</label><input type="number" id="t_p45" inputmode="numeric" min="0"></div>
-                    <div><label>P5 TROCA</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
+                    <div><label>P13 LIQ</label><input type="number" id="t_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="t_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="t_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="t_out" inputmode="numeric" min="0"></div>
+                    <div><label>P13 GERAL</label><input type="number" id="t_p13" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="t_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="t_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="t_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="t_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>P20 GERAL</label><input type="number" id="t_p20" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P45 LIQ</label><input type="number" id="t_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="t_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="t_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="t_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>P45 GERAL</label><input type="number" id="t_p45" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P5 GERAL</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
                 </div>
                 
                 <div style="margin-top: 15px;">
@@ -438,7 +467,7 @@
         let estoque = {
             cheios: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 },
             vazios: { agua:0, liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 },
-            trocas: { p13:0, p20:0, p45:0, p5:0 }
+            trocas: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 }
         };
 
         let registrosApp = [];
@@ -533,7 +562,7 @@
             document.getElementById('displayVazios').innerHTML = Object.keys(estoque.vazios).map(k => 
                 `<div><div class="item-val">${estoque.vazios[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
             document.getElementById('displayTrocas').innerHTML = Object.keys(estoque.trocas).map(k => 
-                `<div><div class="item-val">${estoque.trocas[k]}</div><div class="item-label">${k.toUpperCase()}</div></div>`).join('');
+                `<div><div class="item-val">${estoque.trocas[k]}</div><div class="item-label">${getNomeFormatado(k)}</div></div>`).join('');
         }
 
         function toggleAjusteEstoque() {
@@ -583,12 +612,6 @@
             return itens.length > 0 ? itens.join('<br>') : '-';
         }
 
-        function formatarTrocas(obj) {
-            if(!obj) return '-';
-            const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `<b>${obj[k]}</b> ${k.toUpperCase()}`);
-            return itens.length > 0 ? itens.join('<br>') : '-';
-        }
-
         function renderizarTabela(registros) {
             const tbody = document.getElementById('tabelaCorpo');
             tbody.innerHTML = '';
@@ -601,7 +624,7 @@
                     <td style="color:var(--danger)">${formatarItens(reg.saidas)}</td>
                     <td style="color:var(--info)">${formatarItens(reg.entradas)}</td>
                     <td style="color:#d39e00">${formatarItens(reg.retornos)}</td>
-                    <td style="color:var(--purple)">${formatarTrocas(reg.trocas)}</td>
+                    <td style="color:var(--purple)">${formatarItens(reg.trocas)}</td>
                     <td>${reg.obs || '-'}</td>
                     <td><button class="btn-excluir" onclick="deletarRegistro(${reg.timestamp})">X</button></td>
                 `;
@@ -618,15 +641,6 @@
             };
         }
 
-        function extrairTrocas() {
-            return {
-                p13: parseInt(document.getElementById('t_p13').value)||0,
-                p20: parseInt(document.getElementById('t_p20').value)||0,
-                p45: parseInt(document.getElementById('t_p45').value)||0,
-                p5: parseInt(document.getElementById('t_p5').value)||0
-            };
-        }
-
         document.getElementById('registroForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const entregador = document.getElementById('entregador').value;
@@ -640,7 +654,7 @@
                 saidas: extrairValores('s'),
                 entradas: extrairValores('e'),
                 retornos: extrairValores('r'),
-                trocas: extrairTrocas()
+                trocas: extrairValores('t')
             };
             novoRegistro.retornos.agua = parseInt(document.getElementById('r_agua').value) || 0;
             
@@ -651,7 +665,7 @@
             Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]);
             Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
             
-            // LOGICA DA TROCA: Adiciona na Troca e subtrai do Cheio (Geral)
+            // LOGICA DA TROCA: Adiciona na Troca e subtrai do Cheio
             Object.keys(novoRegistro.trocas).forEach(k => {
                 let qtdTroca = novoRegistro.trocas[k];
                 if (qtdTroca > 0) {
