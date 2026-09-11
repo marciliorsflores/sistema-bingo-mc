@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Pátio - Nuvem (JLH)</title>
     
-    <!-- FIREBASE CARREGA PRIMEIRO -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
@@ -122,17 +121,6 @@
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         
         .sec-divisor { grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0; }
-        
-        /* Ocultar elementos via classe JavaScript durante geração do PDF */
-        body.modo-pdf { background: white; padding: 10px; color: black; }
-        body.modo-pdf #registroForm, body.modo-pdf .btn-ajuste, body.modo-pdf .btn-pdf, body.modo-pdf .status-nuvem, 
-        body.modo-pdf .config-marca, body.modo-pdf button[onclick="sairSistema()"], body.modo-pdf .btn-excluir, 
-        body.modo-pdf #painelAjusteEstoque, body.modo-pdf .sugestao-carga { display: none !important; }
-        body.modo-pdf .card { box-shadow: none; border: 1px solid #000; margin-bottom: 10px; background: transparent; }
-        body.modo-pdf table { min-width: 100%; font-size: 10pt; color: black; }
-        body.modo-pdf th, body.modo-pdf td { border: 1px solid #000; padding: 4px; }
-        body.modo-pdf .estoque-box { background: transparent; border: 1px solid #000; }
-        body.modo-pdf .item-val { color: black; }
     </style>
 </head>
 <body>
@@ -151,7 +139,7 @@
 
     <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-pdf" onclick="gerarECompartilharPDF()">📲 Compartilhar PDF</button>
+            <button class="btn-pdf" onclick="gerarECompartilharPDF()">📋 Gerar Relatório PDF em Lista</button>
             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -419,7 +407,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PDF CARREGA POR ÚLTIMO PARA NÃO TRAVAR O APLICATIVO -->
+    <!-- SCRIPT DE PDF CARREGA POR ÚLTIMO -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 
     <script>
@@ -460,7 +448,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Faz o aviso sumir assim que a Nuvem responder
+        // Avisa quando conectou
         db.ref('.info/connected').on('value', function(snap) {
             if (snap.val() === true) {
                 setTimeout(() => {
@@ -519,7 +507,7 @@
             const val = snapshot.val();
             let lista = val || [];
             const agora = new Date().getTime();
-            const limite = 20 * 24 * 60 * 60 * 1000; // 20 dias
+            const limite = 20 * 24 * 60 * 60 * 1000;
             const validos = lista.filter(reg => (agora - reg.timestamp) <= limite);
             
             if (lista.length !== validos.length) { db.ref('registros').set(validos); lista = validos; }
@@ -528,7 +516,7 @@
             renderizarTabela(registrosApp);
         });
 
-        // --- CÁLCULO AO VIVO NOS FORMULÁRIOS ---
+        // SOMAS AO VIVO
         document.addEventListener('input', (e) => {
             if(e.target.type === 'number') {
                 const prefixos = ['s', 'e', 'r', 't'];
@@ -814,32 +802,123 @@
             if(confirm("Deseja apagar TODO o histórico?")) db.ref('registros').set([]);
         }
 
-        // --- GERAÇÃO DE PDF ---
+        // ==========================================
+        //  GERADOR DE PDF (NOVO FORMATO EM LISTA)
+        // ==========================================
+
+        function renderListaPDF(titulo, obj) {
+            let html = `<div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 5px; font-size: 13pt;">${titulo}</h3>
+                <ul style="list-style: none; padding-left: 10px; margin-top: 0; font-size: 11pt; line-height: 1.6;">`;
+            
+            const parseGroup = (prefix, display) => {
+                let items = [];
+                let total = 0;
+                let keys = prefix === 'p13' ? ['liq','sup','nac','out','p13'] : 
+                           prefix === 'p20' ? ['p20_liq','p20_sup','p20_nac','p20_out','p20'] : 
+                           ['p45_liq','p45_sup','p45_nac','p45_out','p45'];
+                
+                keys.forEach(k => {
+                    if (obj[k] > 0) {
+                        total += obj[k];
+                        items.push(`<b>${obj[k]}x</b> ${getNomeFormatado(k).replace(display + ' ', '')}`);
+                    }
+                });
+                if(total > 0) return `<li><strong>${display} (Total: ${total}) ➔</strong> ${items.join(' | ')}</li>`;
+                return `<li><strong>${display}:</strong> Zerado</li>`;
+            };
+
+            html += parseGroup('p13', 'P13');
+            html += parseGroup('p20', 'P20');
+            html += parseGroup('p45', 'P45');
+            
+            if (obj.p5 > 0) html += `<li><strong>P5 TOTAL:</strong> ${obj.p5}x</li>`;
+            else html += `<li><strong>P5 TOTAL:</strong> Zerado</li>`;
+
+            if (titulo.includes("VAZIOS")) {
+                if (obj.agua > 0) html += `<li><strong>ÁGUA:</strong> ${obj.agua}x</li>`;
+                else html += `<li><strong>ÁGUA:</strong> Zerado</li>`;
+            }
+
+            html += `</ul></div>`;
+            return html;
+        }
+
+        function formatarItensTexto(obj) {
+            if(!obj) return 'Nada';
+            const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `${obj[k]}x ${getNomeFormatado(k)}`);
+            return itens.length > 0 ? itens.join(', ') : 'Nada';
+        }
+
         async function gerarECompartilharPDF() {
             if(typeof html2pdf === 'undefined') {
-                alert("A biblioteca do PDF ainda está carregando. Tente de novo em 3 segundos.");
+                alert("Aguarde, sistema de PDF carregando. Tente novamente em alguns segundos.");
                 return;
             }
             const btn = document.querySelector('.btn-pdf');
-            btn.innerHTML = "⏳ Gerando Arquivo...";
+            btn.innerHTML = "⏳ Gerando PDF (Aguarde)...";
             
-            document.body.classList.add('modo-pdf');
-            const elemento = document.getElementById('conteudoSistema');
+            // Cria o corpo em HTML limpo especificamente para o documento do PDF
+            let htmlPDF = `
+                <div style="padding: 20px; font-family: Arial, sans-serif; color: #000; background: #fff;">
+                    <h1 style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px;">Relatório de Pátio e Cargas</h1>
+                    <p style="text-align: right; font-style: italic; font-size: 10pt; margin-top: -10px;">Data de emissão: ${new Date().toLocaleString('pt-BR')}</p>
+                    
+                    <h2 style="background: #f0f2f5; padding: 8px; font-size: 14pt; border-left: 4px solid #0056b3;">1. ESTOQUE ATUAL</h2>
+                    <div style="padding-left: 10px;">
+                        ${renderListaPDF('🟩 CHEIOS', estoque.cheios)}
+                        ${renderListaPDF('🟧 VAZIOS', estoque.vazios)}
+                        ${renderListaPDF('🟪 TROCAS', estoque.trocas)}
+                    </div>
+
+                    <h2 style="background: #f0f2f5; padding: 8px; font-size: 14pt; border-left: 4px solid #0056b3; margin-top: 20px;">2. PESO DO PÁTIO</h2>
+                    <p style="font-size: 12pt; padding-left: 20px; line-height: 1.6;">${document.getElementById('displayPesoTotal').innerText.replace(/\n/g, '<br>')}</p>
+
+                    <h2 style="background: #f0f2f5; padding: 8px; font-size: 14pt; border-left: 4px solid #0056b3; margin-top: 20px;">3. HISTÓRICO (Últimos 20 dias)</h2>
+                    <ul style="list-style: none; padding-left: 0;">
+            `;
+
+            [...registrosApp].sort((a,b)=>b.timestamp - a.timestamp).forEach(reg => {
+                let d = new Date(reg.timestamp).toLocaleString('pt-BR');
+                htmlPDF += `
+                    <li style="border-bottom: 1px solid #ccc; padding: 15px 10px; margin-bottom: 5px; page-break-inside: avoid;">
+                        <strong style="font-size: 11pt; color: #000;">🕒 ${d} | Motorista: ${reg.entregador} (Carro: ${reg.carro})</strong>
+                        <div style="font-size: 10pt; margin-top: 8px; padding-left: 15px; line-height: 1.5;">
+                            <div><b style="color: #dc3545;">Saídas (Cheios) ➔</b> ${formatarItensTexto(reg.saidas)}</div>
+                            <div><b style="color: #17a2b8;">Entradas (Cheios) ➔</b> ${formatarItensTexto(reg.entradas)}</div>
+                            <div><b style="color: #d39e00;">Entradas (Vazios) ➔</b> ${formatarItensTexto(reg.retornos)}</div>
+                            <div><b style="color: #6f42c1;">Trocas (Defeito) ➔</b> ${formatarItensTexto(reg.trocas)}</div>
+                            ${reg.obs ? `<div style="margin-top: 5px;"><b>OBS:</b> <i>${reg.obs}</i></div>` : ''}
+                        </div>
+                    </li>
+                `;
+            });
+
+            htmlPDF += `</ul></div>`;
+
+            // Adiciona esse formato limpo na tela mas escondido de você
+            const boxRelatorio = document.createElement('div');
+            boxRelatorio.innerHTML = htmlPDF;
+            document.body.appendChild(boxRelatorio);
             
+            // Oculta seu sistema por 1 segundo enquanto tira a "foto"
+            document.getElementById('conteudoSistema').style.display = 'none';
+
+            // Configuração para folha A4 (Retrato - igual papel normal)
             const opt = {
-                margin:       0.3,
+                margin:       [0.4, 0.4], 
                 filename:     'Relatorio_Patio_JLH.pdf',
                 image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
 
             try {
-                const pdfBlob = await html2pdf().set(opt).from(elemento).output('blob');
+                const pdfBlob = await html2pdf().set(opt).from(boxRelatorio).output('blob');
                 const file = new File([pdfBlob], 'Relatorio_Patio_JLH.pdf', { type: 'application/pdf' });
                 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ title: 'Relatório de Pátio JLH', files: [file] });
+                    await navigator.share({ title: 'Relatório Pátio JLH', files: [file] });
                 } else {
                     const fileURL = URL.createObjectURL(pdfBlob);
                     const a = document.createElement('a');
@@ -848,11 +927,12 @@
             } catch (err) {
                 alert("Erro ao gerar o arquivo PDF: " + err);
             } finally {
-                document.body.classList.remove('modo-pdf');
-                btn.innerHTML = "📲 Compartilhar PDF";
+                // Deleta a página temporária e volta o sistema ao normal
+                document.body.removeChild(boxRelatorio);
+                document.getElementById('conteudoSistema').style.display = 'block';
+                btn.innerHTML = "📋 Gerar Relatório PDF em Lista";
             }
         }
     </script>
 </body>
 </html>
-
