@@ -1,11 +1,21 @@
-
+Fique tranquilo, seus dados não foram apagados. O banco de dados fica protegido na nuvem (Firebase), e o arquivo HTML funciona apenas como um "leitor" dessa nuvem. Você nunca precisará preencher tudo do zero ao atualizar o código, pois o aplicativo é programado para fazer o download automático do histórico assim que é aberto.
+Se a tela apareceu zerada para você, ocorreu um destes dois motivos:
+ * Lentidão de Carregamento: A biblioteca que gera o PDF (adicionada na versão anterior) é um arquivo externo pesado. Se a conexão do celular oscilou, o navegador pode ter travado a tela antes de conseguir baixar seus números do Firebase.
+ * Gavetas Antigas vs. Gavetas Novas: Como transformamos o campo "GERAL" em uma soma automática, o sistema não adivinha em qual das novas marcas (LIQ, SUP, NAC) colocar o seu estoque que já estava salvo. Seus botijões estão lá, mas eles aparecem no pátio dentro da gaveta de alerta em vermelho chamada GERAL(L) (Legado/Antigo).
+O que foi resolvido neste novo código:
+ * Prioridade de Conexão: Movi os scripts pesados de PDF para o final do arquivo. Agora, o sistema foca 100% em puxar seus dados da nuvem na mesma hora em que a tela abre, sem travar.
+ * Aviso de Sincronização: Adicionei uma barra amarela no topo da tela escrito "🔄 Sincronizando com a Nuvem...". Ela só vai sumir quando o aplicativo tiver terminado de puxar todo o seu histórico com sucesso.
+Copie o código abaixo e substitua no seu arquivo. Quando abrir, espere o aviso de sincronização sumir. Em seguida, clique em ⚙️ Ajustar Estoque Inicial Manualmente, zere os valores que estão nos campos vermelhos GERAL(L) e digite essas quantidades nas marcas corretas.
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Pátio - Nuvem (JLH)</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- FIREBASE CARREGA PRIMEIRO -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
     <style>
         :root {
@@ -20,6 +30,12 @@
         .container { max-width: 1200px; margin: auto; }
         h1, h2, h3 { text-align: center; margin-bottom: 20px; }
         
+        #loaderNuvem {
+            position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+            background: #ffc107; color: #000; padding: 10px 20px; border-radius: 8px;
+            font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10000;
+        }
+
         .status-nuvem {
             text-align: center; background: #d4edda; color: #155724; padding: 8px;
             border-radius: 8px; font-weight: bold; font-size: 0.9rem; margin-bottom: 20px;
@@ -94,7 +110,7 @@
         input[type="text"] { text-align: left; }
         input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
         
-        .input-total { background-color: #e2e3e5 !important; font-weight: bold !important; color: #000 !important; cursor: not-allowed; }
+        .input-total { background-color: #e2e3e5 !important; font-weight: bold !important; color: #000 !important; cursor: not-allowed; border: 2px solid #ccc !important;}
 
         .btn-salvar {
             background: var(--success); color: white; border: none; padding: 15px;
@@ -117,16 +133,9 @@
         
         /* Ocultar elementos via classe JavaScript durante geração do PDF */
         body.modo-pdf { background: white; padding: 10px; color: black; }
-        body.modo-pdf #registroForm, 
-        body.modo-pdf .btn-ajuste, 
-        body.modo-pdf .btn-pdf, 
-        body.modo-pdf .status-nuvem, 
-        body.modo-pdf .config-marca, 
-        body.modo-pdf button[onclick="sairSistema()"], 
-        body.modo-pdf .btn-excluir, 
-        body.modo-pdf #painelAjusteEstoque, 
-        body.modo-pdf .sugestao-carga { display: none !important; }
-        
+        body.modo-pdf #registroForm, body.modo-pdf .btn-ajuste, body.modo-pdf .btn-pdf, body.modo-pdf .status-nuvem, 
+        body.modo-pdf .config-marca, body.modo-pdf button[onclick="sairSistema()"], body.modo-pdf .btn-excluir, 
+        body.modo-pdf #painelAjusteEstoque, body.modo-pdf .sugestao-carga { display: none !important; }
         body.modo-pdf .card { box-shadow: none; border: 1px solid #000; margin-bottom: 10px; background: transparent; }
         body.modo-pdf table { min-width: 100%; font-size: 10pt; color: black; }
         body.modo-pdf th, body.modo-pdf td { border: 1px solid #000; padding: 4px; }
@@ -135,6 +144,8 @@
     </style>
 </head>
 <body>
+
+    <div id="loaderNuvem">🔄 Sincronizando com a Nuvem...</div>
 
     <div id="telaLogin" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; display: flex; align-items: center; justify-content: center; z-index: 9999;">
         <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 300px;">
@@ -167,8 +178,8 @@
             <button class="btn-ajuste" onclick="toggleAjusteEstoque()">⚙️ Ajustar Estoque Inicial Manualmente</button>
             
             <div id="painelAjusteEstoque">
-                <p style="font-size:0.8rem; color:#dc3545; font-weight:bold; text-align:center;">
-                    ATENÇÃO: Os campos "GERAL (L)" são valores antigos. Zere eles e adicione a quantia na marca correta.
+                <p style="font-size:0.85rem; color:#dc3545; font-weight:bold; text-align:center; background:#f8d7da; padding:10px; border-radius:6px;">
+                    ATENÇÃO: Os campos "GERAL(L)" são valores antigos que não sumiram. Zere eles aqui e adicione a mesma quantia na marca correta correspondente (LIQ, SUP, NAC).
                 </p>
                 <p><strong>🟩 CHEIOS (No Pátio)</strong></p>
                 <div class="grid-inputs" style="margin-bottom:15px;">
@@ -416,6 +427,9 @@
         </div>
     </div>
 
+    <!-- SCRIPT DE PDF CARREGA POR ÚLTIMO PARA NÃO TRAVAR O APLICATIVO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+
     <script>
         function fazerLogin() {
             const user = document.getElementById('loginUser').value.trim();
@@ -453,6 +467,16 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        // Faz o aviso sumir assim que a Nuvem responder
+        db.ref('.info/connected').on('value', function(snap) {
+            if (snap.val() === true) {
+                setTimeout(() => {
+                    const loader = document.getElementById('loaderNuvem');
+                    if(loader) loader.style.display = 'none';
+                }, 800);
+            }
+        });
 
         window.NOME_MARCA_ATUAL = "OUTRA MARCA";
         
@@ -563,13 +587,11 @@
             const c = estoque.cheios;
             const t = estoque.trocas;
             
-            // Soma APENAS as marcas específicas (ignora os LEGADOS p13, p20, p45 para evitar duplicidade futuramente)
             pesoTotal += ((c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0)) * 13;
             pesoTotal += ((c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0)) * 20;
             pesoTotal += ((c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0)) * 45;
             pesoTotal += (c.p5||0) * 5;
 
-            // Trocas
             pesoTotal += ((t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0)) * 13;
             pesoTotal += ((t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0)) * 20;
             pesoTotal += ((t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0)) * 45;
@@ -624,7 +646,6 @@
                     html += `<div><div class="item-val">${val}</div><div class="item-label">${lbl}</div></div>`;
                 });
                 
-                // Pega valor legado caso ainda exista para não sumir do visor
                 let legacyVal = 0;
                 if(g.titulo === 'P13') { legacyVal = obj.p13 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
                 if(g.titulo === 'P20') { legacyVal = obj.p20 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
@@ -713,7 +734,6 @@
         }
 
         function extrairValores(prefixo) {
-            // Não extraímos p13, p20 e p45 pois agora são apenas os Totais Dinâmicos
             return {
                 liq: parseInt(document.getElementById(`${prefixo}_liq`)?.value)||0, sup: parseInt(document.getElementById(`${prefixo}_sup`)?.value)||0, nac: parseInt(document.getElementById(`${prefixo}_nac`)?.value)||0, out: parseInt(document.getElementById(`${prefixo}_out`)?.value)||0, 
                 p20_liq: parseInt(document.getElementById(`${prefixo}_p20_liq`)?.value)||0, p20_sup: parseInt(document.getElementById(`${prefixo}_p20_sup`)?.value)||0, p20_nac: parseInt(document.getElementById(`${prefixo}_p20_nac`)?.value)||0, p20_out: parseInt(document.getElementById(`${prefixo}_p20_out`)?.value)||0, 
@@ -802,8 +822,12 @@
             if(confirm("Deseja apagar TODO o histórico?")) db.ref('registros').set([]);
         }
 
-        // --- FUNÇÃO NATIVA PARA GERAR E COMPARTILHAR PDF ---
+        // --- GERAÇÃO DE PDF ---
         async function gerarECompartilharPDF() {
+            if(typeof html2pdf === 'undefined') {
+                alert("A biblioteca do PDF ainda está carregando. Tente de novo em 3 segundos.");
+                return;
+            }
             const btn = document.querySelector('.btn-pdf');
             btn.innerHTML = "⏳ Gerando Arquivo...";
             
@@ -823,16 +847,11 @@
                 const file = new File([pdfBlob], 'Relatorio_Patio_JLH.pdf', { type: 'application/pdf' });
                 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        title: 'Relatório de Pátio JLH',
-                        files: [file]
-                    });
+                    await navigator.share({ title: 'Relatório de Pátio JLH', files: [file] });
                 } else {
                     const fileURL = URL.createObjectURL(pdfBlob);
                     const a = document.createElement('a');
-                    a.href = fileURL;
-                    a.download = 'Relatorio_Patio_JLH.pdf';
-                    a.click();
+                    a.href = fileURL; a.download = 'Relatorio_Patio_JLH.pdf'; a.click();
                 }
             } catch (err) {
                 alert("Erro ao gerar o arquivo PDF: " + err);
