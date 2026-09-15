@@ -17,7 +17,7 @@
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            margin: 0; padding: 10px; padding-bottom: 90px; /* Espaço para o botão flutuante */
+            margin: 0; padding: 10px; padding-bottom: 90px;
             background-color: var(--bg); color: var(--text);
         }
         .container { max-width: 1200px; margin: auto; }
@@ -110,7 +110,6 @@
             font-size: 1.1rem; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; text-transform: uppercase; margin-top: 15px;
         }
 
-        /* BOTÃO FLUTUANTE INFERIOR ESQUERDO */
         .btn-flutuante {
             position: fixed;
             bottom: 20px;
@@ -147,7 +146,6 @@
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         
         .sec-divisor { grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0; }
-        
     </style>
 </head>
 <body>
@@ -392,7 +390,6 @@
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="r_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>TOTAL P45</label><input type="text" id="r_tot_p45" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
-                    <!-- VAZIOS CONTINUA TOTALIZADO COMO SOLICITADO -->
                     <div><label>ÁGUA TOTAL</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>TOTAL P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
@@ -504,7 +501,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Avisa quando conectou
         db.ref('.info/connected').on('value', function(snap) {
             if (snap.val() === true) {
                 setTimeout(() => {
@@ -572,7 +568,6 @@
             renderizarTabela(registrosApp);
         });
 
-        // SOMAS AO VIVO NOS FORMULÁRIOS
         document.addEventListener('input', (e) => {
             if(e.target.type === 'number') {
                 const prefixos = ['s', 'e', 'r', 't'];
@@ -634,7 +629,7 @@
             pesoTotal += ((c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0)) * 20;
             pesoTotal += ((c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0)) * 45;
             pesoTotal += (c.p5||0) * 5;
-            pesoTotal += ((c.ag_est||0)+(c.ag_ela||0)+(c.ag_ped||0)+(c.agua||0)) * 20; // 20kg por agua de 20l
+            pesoTotal += ((c.ag_est||0)+(c.ag_ela||0)+(c.ag_ped||0)+(c.agua||0)) * 20;
 
             pesoTotal += ((t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0)) * 13;
             pesoTotal += ((t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0)) * 20;
@@ -696,7 +691,6 @@
                 html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
             });
 
-            // AGUAS E P5
             if (tipoEstoque === 'vazios') {
                 html += `<div><div class="item-val">${obj.agua||0}</div><div class="item-label">ÁGUA (VAZIA)</div></div>`;
                 html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
@@ -762,12 +756,10 @@
                     btn.classList.add('selecionado');
                     document.getElementById('entregador').value = motorista.nome;
                     
-                    // Lógica adicionada para recuperar a ÚLTIMA PLACA DE CARRO salva para este motorista
-                    let ultimaPlaca = motorista.placa; // vazio por padrão
+                    let ultimaPlaca = motorista.placa;
                     const registrosDoMotorista = registros.filter(r => r.entregador === motorista.nome);
                     
                     if (registrosDoMotorista.length > 0) {
-                        // Como os registros podem não estar perfeitamente ordenados, garantimos o mais recente
                         const ultimoRegistro = registrosDoMotorista.reduce((prev, curr) => (prev.timestamp > curr.timestamp) ? prev : curr);
                         ultimaPlaca = ultimoRegistro.carro || "";
                     }
@@ -827,11 +819,10 @@
                 obs: document.getElementById('obs').value.trim(),
                 saidas: extrairValores('s'),
                 entradas: extrairValores('e'),
-                retornos: extrairValores('r'), // Aqui só vêm zerados pro Retorno (menos gás vazio se fosse adaptado, mas usamos r_agua separado)
+                retornos: extrairValores('r'),
                 trocas: extrairValores('t')
             };
             
-            // Retornos de VAZIOS usam campos próprios pro geral
             novoRegistro.retornos = {
                 liq: parseInt(document.getElementById('r_liq')?.value)||0, sup: parseInt(document.getElementById('r_sup')?.value)||0, nac: parseInt(document.getElementById('r_nac')?.value)||0, out: parseInt(document.getElementById('r_out')?.value)||0, 
                 p20_liq: parseInt(document.getElementById('r_p20_liq')?.value)||0, p20_sup: parseInt(document.getElementById('r_p20_sup')?.value)||0, p20_nac: parseInt(document.getElementById('r_p20_nac')?.value)||0, p20_out: parseInt(document.getElementById('r_p20_out')?.value)||0, 
@@ -844,7 +835,6 @@
                 let qtdSaida = novoRegistro.saidas[k];
                 if (qtdSaida > 0) { 
                     estoque.cheios[k] -= qtdSaida; 
-                    // Se saiu Água de marca, volta Água Geral Vazia
                     if (k === 'ag_est' || k === 'ag_ela' || k === 'ag_ped') {
                         estoque.vazios.agua = (estoque.vazios.agua || 0) + qtdSaida;
                     } else {
@@ -933,7 +923,7 @@
 
 
         // ==========================================
-        //  GERADOR DE PDF (FORMATO PLANILHA FÍSICA)
+        //  GERADOR DE PDF (CORRIGIDO PARA EXPORTAR COMPLETO)
         // ==========================================
 
         function formatZero(val) { return val > 0 ? val : ''; }
@@ -950,7 +940,7 @@
                 return;
             }
             const btn = document.querySelector('.btn-pdf');
-            btn.innerHTML = "⏳ Gerando PDF (Aguarde)...";
+            btn.innerHTML = "⏳ Gerando PDF Completo...";
             
             let c = estoque.cheios;
             let v = estoque.vazios;
@@ -962,8 +952,9 @@
             let tot45_v = (v.p45_liq||0) + (v.p45_sup||0) + (v.p45_nac||0) + (v.p45_out||0) + (v.p45||0);
 
             let htmlPDF = `
-                <div style="padding: 10px; font-family: Arial, sans-serif; color: #000; background: #fff; width: 100%; box-sizing: border-box;">
-                    <p style="text-align: right; font-style: italic; font-size: 10pt; margin: 0 0 10px 0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
+                <div style="padding: 15px; font-family: Arial, sans-serif; color: #000; background: #fff; width: 100%; box-sizing: border-box;">
+                    <h2 style="text-align: center; margin: 0 0 5px 0;">Relatório de Pátio e Cargas</h2>
+                    <p style="text-align: right; font-style: italic; font-size: 10pt; margin: 0 0 15px 0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
 
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11pt;">
                         <thead>
@@ -1079,19 +1070,19 @@
                         </tbody>
                     </table>
 
-                    <h2 style="background: #f0f2f5; padding: 6px; font-size: 12pt; border-left: 4px solid #0056b3; margin-top: 15px;">PESO DO PÁTIO</h2>
-                    <p style="font-size: 11pt; padding-left: 10px; line-height: 1.5; margin-bottom:20px;">${document.getElementById('displayPesoTotal').innerText.replace(/\n/g, '<br>')}</p>
+                    <h3 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 20px;">PESO DO PÁTIO</h3>
+                    <p style="font-size: 11pt; padding-left: 5px; line-height: 1.5; margin-bottom:20px;">${document.getElementById('displayPesoTotal').innerText.replace(/\n/g, '<br>')}</p>
 
-                    <h2 style="background: #f0f2f5; padding: 6px; font-size: 12pt; border-left: 4px solid #0056b3;">HISTÓRICO (Últimos dias)</h2>
-                    <ul style="list-style: none; padding-left: 0; font-size: 9pt;">
+                    <h3 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 20px;">HISTÓRICO (Últimos dias)</h3>
+                    <ul style="list-style: none; padding-left: 0; font-size: 10pt;">
             `;
 
             [...registrosApp].sort((a,b)=>b.timestamp - a.timestamp).forEach(reg => {
                 let d = new Date(reg.timestamp).toLocaleString('pt-BR');
                 htmlPDF += `
-                    <li style="border-bottom: 1px solid #ccc; padding: 8px 5px; margin-bottom: 2px; page-break-inside: avoid;">
-                        <strong style="font-size: 10pt; color: #000;">🕒 ${d} | Motorista: ${reg.entregador} (Carro: ${reg.carro})</strong>
-                        <div style="margin-top: 5px; padding-left: 10px; line-height: 1.4;">
+                    <li style="border-bottom: 1px solid #ccc; padding: 10px 5px; margin-bottom: 5px; page-break-inside: avoid;">
+                        <strong style="font-size: 11pt; color: #000;">🕒 ${d} | Motorista: ${reg.entregador} (Carro: ${reg.carro})</strong>
+                        <div style="margin-top: 5px; padding-left: 10px; line-height: 1.5;">
                             <div><b style="color: #dc3545;">Saídas (Cheios):</b> ${formatarItensTexto(reg.saidas)}</div>
                             <div><b style="color: #17a2b8;">Entradas (Cheios):</b> ${formatarItensTexto(reg.entradas)}</div>
                             <div><b style="color: #d39e00;">Entradas (Vazios):</b> ${formatarItensTexto(reg.retornos)}</div>
@@ -1104,17 +1095,20 @@
 
             htmlPDF += `</ul></div>`;
 
+            // Cria o elemento fora da tela com largura fixa grande para renderizar completo
             const boxRelatorio = document.createElement('div');
+            boxRelatorio.style.position = 'absolute';
+            boxRelatorio.style.left = '-9999px';
+            boxRelatorio.style.top = '0';
+            boxRelatorio.style.width = '800px';
             boxRelatorio.innerHTML = htmlPDF;
             document.body.appendChild(boxRelatorio);
-            
-            document.getElementById('conteudoSistema').style.display = 'none';
 
             const opt = {
-                margin:       [0.4, 0.4], 
+                margin:       [0.3, 0.3], 
                 filename:     'Relatorio_Patio_JLH.pdf',
-                image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { scale: 2, useCORS: true },
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
 
@@ -1123,7 +1117,14 @@
                 const file = new File([pdfBlob], 'Relatorio_Patio_JLH.pdf', { type: 'application/pdf' });
                 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ title: 'Relatório Pátio JLH', files: [file] });
+                    try {
+                        await navigator.share({ title: 'Relatório Pátio JLH', files: [file] });
+                    } catch (shareErr) {
+                        // Se o usuário cancelar a partilha, apenas ignoramos sem dar alerta de erro vermelho
+                        if (shareErr.name !== 'AbortError') {
+                            console.error(shareErr);
+                        }
+                    }
                 } else {
                     const fileURL = URL.createObjectURL(pdfBlob);
                     const a = document.createElement('a');
@@ -1133,7 +1134,6 @@
                 alert("Erro ao gerar o arquivo PDF: " + err);
             } finally {
                 document.body.removeChild(boxRelatorio);
-                document.getElementById('conteudoSistema').style.display = 'block';
                 btn.innerHTML = "📋 Gerar Relatório PDF em Planilha";
             }
         }
