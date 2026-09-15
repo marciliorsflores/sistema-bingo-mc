@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Pátio - Nuvem (JLH)</title>
     
+    <!-- FIREBASE CARREGA PRIMEIRO -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
@@ -121,6 +122,17 @@
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         
         .sec-divisor { grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0; }
+        
+        /* Ocultar elementos via classe JavaScript durante geração do PDF */
+        body.modo-pdf { background: white; padding: 10px; color: black; }
+        body.modo-pdf #registroForm, body.modo-pdf .btn-ajuste, body.modo-pdf .btn-pdf, body.modo-pdf .status-nuvem, 
+        body.modo-pdf .config-marca, body.modo-pdf button[onclick="sairSistema()"], body.modo-pdf .btn-excluir, 
+        body.modo-pdf #painelAjusteEstoque, body.modo-pdf .sugestao-carga { display: none !important; }
+        body.modo-pdf .card { box-shadow: none; border: 1px solid #000; margin-bottom: 10px; background: transparent; }
+        body.modo-pdf table { min-width: 100%; font-size: 10pt; color: black; }
+        body.modo-pdf th, body.modo-pdf td { border: 1px solid #000; padding: 4px; }
+        body.modo-pdf .estoque-box { background: transparent; border: 1px solid #000; }
+        body.modo-pdf .item-val { color: black; }
     </style>
 </head>
 <body>
@@ -139,7 +151,7 @@
 
     <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-pdf" onclick="gerarECompartilharPDF()">📋 Gerar Relatório PDF em Lista</button>
+            <button class="btn-pdf" onclick="gerarECompartilharPDF()">📋 Gerar Relatório PDF em Planilha</button>
             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -151,8 +163,8 @@
             <h3 class="card-title">Estoque Atual & Peso do Pátio</h3>
             
             <div class="config-marca">
-                <label style="margin:0; font-size:0.9rem;">Nome da 4ª Marca:</label>
-                <input type="text" id="configNomeMarca" onchange="salvarNomeMarca(this.value)" placeholder="Ex: Consigaz">
+                <label style="margin:0; font-size:0.9rem;">Nome da 4ª Marca (Gás):</label>
+                <input type="text" id="configNomeMarca" onchange="salvarNomeMarca(this.value)" placeholder="Nome da Marca 4">
             </div>
 
             <button class="btn-ajuste" onclick="toggleAjusteEstoque()">⚙️ Ajustar Estoque Inicial Manualmente</button>
@@ -181,13 +193,16 @@
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_c_p45_out" min="0"></div>
                     <div><label style="color:red">P45 GERAL(L)</label><input type="number" id="est_c_p45" min="0"></div>
                     <div class="sec-divisor"></div>
+                    <div><label>ESTÂNCIA</label><input type="number" id="est_c_ag_est" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="est_c_ag_ela" min="0"></div>
+                    <div><label>DA PEDRA</label><input type="number" id="est_c_ag_ped" min="0"></div>
+                    <div><label style="color:red">ÁGUA GERAL(L)</label><input type="number" id="est_c_agua" min="0"></div>
+                    <div class="sec-divisor"></div>
                     <div><label>P5 TOTAL</label><input type="number" id="est_c_p5" min="0"></div>
                 </div>
                 
                 <p><strong>🟧 VAZIOS (Cascos no Pátio)</strong></p>
                 <div class="grid-inputs" style="margin-bottom:15px;">
-                    <div><label>ÁGUA</label><input type="number" id="est_v_agua" min="0"></div>
-                    <div class="sec-divisor"></div>
                     <div><label>P13 LIQ</label><input type="number" id="est_v_liq" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="est_v_sup" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="est_v_nac" min="0"></div>
@@ -205,6 +220,8 @@
                     <div><label>P45 NAC</label><input type="number" id="est_v_p45_nac" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_v_p45_out" min="0"></div>
                     <div><label style="color:red">P45 GERAL(L)</label><input type="number" id="est_v_p45" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>ÁGUA TOTAL</label><input type="number" id="est_v_agua" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P5 TOTAL</label><input type="number" id="est_v_p5" min="0"></div>
                 </div>
@@ -228,6 +245,11 @@
                     <div><label>P45 NAC</label><input type="number" id="est_t_p45_nac" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_t_p45_out" min="0"></div>
                     <div><label style="color:red">P45 GERAL(L)</label><input type="number" id="est_t_p45" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>ESTÂNCIA</label><input type="number" id="est_t_ag_est" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="est_t_ag_ela" min="0"></div>
+                    <div><label>DA PEDRA</label><input type="number" id="est_t_ag_ped" min="0"></div>
+                    <div><label style="color:red">ÁGUA GERAL(L)</label><input type="number" id="est_t_agua" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P5 TOTAL</label><input type="number" id="est_t_p5" min="0"></div>
                 </div>
@@ -288,6 +310,11 @@
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="s_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>TOTAL P45</label><input type="text" id="s_tot_p45" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
+                    <div><label>ESTÂNCIA</label><input type="number" id="s_ag_est" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="s_ag_ela" inputmode="numeric" min="0"></div>
+                    <div><label>DA PEDRA</label><input type="number" id="s_ag_ped" inputmode="numeric" min="0"></div>
+                    <div><label>TOT ÁGUAS</label><input type="text" id="s_tot_ag" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
                     <div><label>TOTAL P5</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
                 </div>
             </div>
@@ -314,6 +341,11 @@
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="e_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>TOTAL P45</label><input type="text" id="e_tot_p45" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
+                    <div><label>ESTÂNCIA</label><input type="number" id="e_ag_est" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="e_ag_ela" inputmode="numeric" min="0"></div>
+                    <div><label>DA PEDRA</label><input type="number" id="e_ag_ped" inputmode="numeric" min="0"></div>
+                    <div><label>TOT ÁGUAS</label><input type="text" id="e_tot_ag" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
                     <div><label>TOTAL P5</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
                 </div>
             </div>
@@ -322,8 +354,6 @@
             <div class="card" style="border-left: 4px solid var(--warning);">
                 <h3 class="card-title" style="color: #d39e00;">4. ENTRADA DE VAZIOS (Cascos Extras)</h3>
                 <div class="grid-inputs">
-                    <div><label>ÁGUA</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
-                    <div class="sec-divisor"></div>
                     <div><label>P13 LIQ</label><input type="number" id="r_liq" inputmode="numeric" min="0"></div>
                     <div><label>P13 SUP</label><input type="number" id="r_sup" inputmode="numeric" min="0"></div>
                     <div><label>P13 NAC</label><input type="number" id="r_nac" inputmode="numeric" min="0"></div>
@@ -341,6 +371,9 @@
                     <div><label>P45 NAC</label><input type="number" id="r_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="r_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>TOTAL P45</label><input type="text" id="r_tot_p45" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <!-- VAZIOS CONTINUA TOTALIZADO COMO SOLICITADO -->
+                    <div><label>ÁGUA TOTAL</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>TOTAL P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
                 </div>
@@ -368,6 +401,11 @@
                     <div><label>P45 NAC</label><input type="number" id="t_p45_nac" inputmode="numeric" min="0"></div>
                     <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="t_p45_out" inputmode="numeric" min="0"></div>
                     <div><label>TOTAL P45</label><input type="text" id="t_tot_p45" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>ESTÂNCIA</label><input type="number" id="t_ag_est" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="t_ag_ela" inputmode="numeric" min="0"></div>
+                    <div><label>DA PEDRA</label><input type="number" id="t_ag_ped" inputmode="numeric" min="0"></div>
+                    <div><label>TOT ÁGUAS</label><input type="text" id="t_tot_ag" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>TOTAL P5</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
                 </div>
@@ -473,9 +511,9 @@
         const PESO_MAXIMO = 6240;
         
         let estoque = {
-            cheios: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 },
-            vazios: { agua:0, liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 },
-            trocas: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0 }
+            cheios: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0, agua:0, ag_est:0, ag_ela:0, ag_ped:0 },
+            vazios: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0, agua:0, ag_est:0, ag_ela:0, ag_ped:0 },
+            trocas: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0, agua:0, ag_est:0, ag_ela:0, ag_ped:0 }
         };
 
         let registrosApp = [];
@@ -516,7 +554,7 @@
             renderizarTabela(registrosApp);
         });
 
-        // SOMAS AO VIVO
+        // SOMAS AO VIVO NOS FORMULÁRIOS
         document.addEventListener('input', (e) => {
             if(e.target.type === 'number') {
                 const prefixos = ['s', 'e', 'r', 't'];
@@ -541,6 +579,12 @@
                     const p45_out = parseInt(document.getElementById(`${p}_p45_out`)?.value) || 0;
                     const tot45 = document.getElementById(`${p}_tot_p45`);
                     if(tot45) tot45.value = (p45_liq + p45_sup + p45_nac + p45_out) > 0 ? (p45_liq + p45_sup + p45_nac + p45_out) : '';
+
+                    const ag_est = parseInt(document.getElementById(`${p}_ag_est`)?.value) || 0;
+                    const ag_ela = parseInt(document.getElementById(`${p}_ag_ela`)?.value) || 0;
+                    const ag_ped = parseInt(document.getElementById(`${p}_ag_ped`)?.value) || 0;
+                    const totAg = document.getElementById(`${p}_tot_ag`);
+                    if(totAg) totAg.value = (ag_est + ag_ela + ag_ped) > 0 ? (ag_est + ag_ela + ag_ped) : '';
                 });
             }
         });
@@ -557,7 +601,8 @@
                 liq: 'P13 LIQ', sup: 'P13 SUP', nac: 'P13 NAC', out: `P13 ${nomeCurto}`, p13: 'P13 GERAL(L)',
                 p20_liq: 'P20 LIQ', p20_sup: 'P20 SUP', p20_nac: 'P20 NAC', p20_out: `P20 ${nomeCurto}`, p20: 'P20 GERAL(L)',
                 p45_liq: 'P45 LIQ', p45_sup: 'P45 SUP', p45_nac: 'P45 NAC', p45_out: `P45 ${nomeCurto}`, p45: 'P45 GERAL(L)',
-                p5: 'P5 TOTAL', agua: 'ÁGUA'
+                p5: 'P5 TOTAL', 
+                ag_est: 'ESTÂNCIA', ag_ela: 'ELAN', ag_ped: 'ÁGUA DA PEDRA', agua: 'ÁGUA'
             };
             return nomes[k] || k.toUpperCase();
         }
@@ -571,11 +616,13 @@
             pesoTotal += ((c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0)) * 20;
             pesoTotal += ((c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0)) * 45;
             pesoTotal += (c.p5||0) * 5;
+            pesoTotal += ((c.ag_est||0)+(c.ag_ela||0)+(c.ag_ped||0)+(c.agua||0)) * 20; // 20kg por agua de 20l
 
             pesoTotal += ((t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0)) * 13;
             pesoTotal += ((t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0)) * 20;
             pesoTotal += ((t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0)) * 45;
             pesoTotal += (t.p5||0) * 5;
+            pesoTotal += ((t.ag_est||0)+(t.ag_ela||0)+(t.ag_ped||0)+(t.agua||0)) * 20;
 
             const display = document.getElementById('displayPesoTotal');
             const displaySugestao = document.getElementById('displaySugestao');
@@ -594,7 +641,7 @@
                     displaySugestao.style.display = 'block';
                     let sug = [];
                     if (restante >= 45) sug.push(`${Math.floor(restante/45)} un. P45`);
-                    if (restante >= 20) sug.push(`${Math.floor(restante/20)} un. P20`);
+                    if (restante >= 20) sug.push(`${Math.floor(restante/20)} un. P20/ÁGUA`);
                     if (restante >= 13) sug.push(`${Math.floor(restante/13)} un. P13`);
                     displaySugestao.innerHTML = `Você ainda pode colocar:<br><br>${sug.join(' <b>OU</b> ')}`;
                 } else { displaySugestao.style.display = 'none'; }
@@ -611,11 +658,6 @@
                 { titulo: 'P20', keys: ['p20_liq', 'p20_sup', 'p20_nac', 'p20_out'] },
                 { titulo: 'P45', keys: ['p45_liq', 'p45_sup', 'p45_nac', 'p45_out'] }
             ];
-
-            if (tipoEstoque === 'vazios') {
-                html += `<div><div class="item-val">${obj.agua||0}</div><div class="item-label">ÁGUA</div></div>`;
-                html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
-            }
 
             grupos.forEach(g => {
                 let total = 0;
@@ -635,6 +677,27 @@
                 html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;"><div class="item-val" style="color:#000;">${total}</div><div class="item-label">TOTAL ${g.titulo}</div></div>`;
                 html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
             });
+
+            // AGUAS E P5
+            if (tipoEstoque === 'vazios') {
+                html += `<div><div class="item-val">${obj.agua||0}</div><div class="item-label">ÁGUA (VAZIA)</div></div>`;
+                html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
+            } else {
+                let vEst = obj.ag_est || 0;
+                let vEla = obj.ag_ela || 0;
+                let vPed = obj.ag_ped || 0;
+                let totAg = vEst + vEla + vPed;
+
+                html += `<div><div class="item-val">${vEst}</div><div class="item-label">ESTÂNCIA</div></div>`;
+                html += `<div><div class="item-val">${vEla}</div><div class="item-label">ELAN</div></div>`;
+                html += `<div><div class="item-val">${vPed}</div><div class="item-label">ÁGUA DA PEDRA</div></div>`;
+                
+                let legacyAgua = obj.agua || 0;
+                if(legacyAgua > 0) { html += `<div><div class="item-val" style="color:red">${legacyAgua}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; totAg += legacyAgua; }
+
+                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;"><div class="item-val" style="color:#000;">${totAg}</div><div class="item-label">TOTAL ÁGUAS</div></div>`;
+                html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
+            }
 
             html += `<div><div class="item-val">${obj.p5||0}</div><div class="item-label">TOTAL P5</div></div>`;
             return html;
@@ -718,6 +781,7 @@
                 liq: parseInt(document.getElementById(`${prefixo}_liq`)?.value)||0, sup: parseInt(document.getElementById(`${prefixo}_sup`)?.value)||0, nac: parseInt(document.getElementById(`${prefixo}_nac`)?.value)||0, out: parseInt(document.getElementById(`${prefixo}_out`)?.value)||0, 
                 p20_liq: parseInt(document.getElementById(`${prefixo}_p20_liq`)?.value)||0, p20_sup: parseInt(document.getElementById(`${prefixo}_p20_sup`)?.value)||0, p20_nac: parseInt(document.getElementById(`${prefixo}_p20_nac`)?.value)||0, p20_out: parseInt(document.getElementById(`${prefixo}_p20_out`)?.value)||0, 
                 p45_liq: parseInt(document.getElementById(`${prefixo}_p45_liq`)?.value)||0, p45_sup: parseInt(document.getElementById(`${prefixo}_p45_sup`)?.value)||0, p45_nac: parseInt(document.getElementById(`${prefixo}_p45_nac`)?.value)||0, p45_out: parseInt(document.getElementById(`${prefixo}_p45_out`)?.value)||0, 
+                ag_est: parseInt(document.getElementById(`${prefixo}_ag_est`)?.value)||0, ag_ela: parseInt(document.getElementById(`${prefixo}_ag_ela`)?.value)||0, ag_ped: parseInt(document.getElementById(`${prefixo}_ag_ped`)?.value)||0,
                 p5: parseInt(document.getElementById(`${prefixo}_p5`)?.value)||0
             };
         }
@@ -734,17 +798,39 @@
                 obs: document.getElementById('obs').value.trim(),
                 saidas: extrairValores('s'),
                 entradas: extrairValores('e'),
-                retornos: extrairValores('r'),
+                retornos: extrairValores('r'), // Aqui só vêm zerados pro Retorno (menos gás vazio se fosse adaptado, mas usamos r_agua separado)
                 trocas: extrairValores('t')
             };
-            novoRegistro.retornos.agua = parseInt(document.getElementById('r_agua').value) || 0;
+            
+            // Retornos de VAZIOS usam campos próprios pro geral
+            novoRegistro.retornos = {
+                liq: parseInt(document.getElementById('r_liq')?.value)||0, sup: parseInt(document.getElementById('r_sup')?.value)||0, nac: parseInt(document.getElementById('r_nac')?.value)||0, out: parseInt(document.getElementById('r_out')?.value)||0, 
+                p20_liq: parseInt(document.getElementById('r_p20_liq')?.value)||0, p20_sup: parseInt(document.getElementById('r_p20_sup')?.value)||0, p20_nac: parseInt(document.getElementById('r_p20_nac')?.value)||0, p20_out: parseInt(document.getElementById('r_p20_out')?.value)||0, 
+                p45_liq: parseInt(document.getElementById('r_p45_liq')?.value)||0, p45_sup: parseInt(document.getElementById('r_p45_sup')?.value)||0, p45_nac: parseInt(document.getElementById('r_p45_nac')?.value)||0, p45_out: parseInt(document.getElementById('r_p45_out')?.value)||0, 
+                agua: parseInt(document.getElementById('r_agua')?.value)||0,
+                p5: parseInt(document.getElementById('r_p5')?.value)||0
+            };
             
             Object.keys(novoRegistro.saidas).forEach(k => {
                 let qtdSaida = novoRegistro.saidas[k];
-                if (qtdSaida > 0) { estoque.cheios[k] -= qtdSaida; estoque.vazios[k] += qtdSaida; }
+                if (qtdSaida > 0) { 
+                    estoque.cheios[k] -= qtdSaida; 
+                    // Se saiu Água de marca, volta Água Geral Vazia
+                    if (k === 'ag_est' || k === 'ag_ela' || k === 'ag_ped') {
+                        estoque.vazios.agua = (estoque.vazios.agua || 0) + qtdSaida;
+                    } else {
+                        estoque.vazios[k] = (estoque.vazios[k] || 0) + qtdSaida; 
+                    }
+                }
             });
-            Object.keys(novoRegistro.entradas).forEach(k => estoque.cheios[k] += novoRegistro.entradas[k]);
-            Object.keys(novoRegistro.retornos).forEach(k => estoque.vazios[k] += novoRegistro.retornos[k]);
+
+            Object.keys(novoRegistro.entradas).forEach(k => { 
+                if (novoRegistro.entradas[k] > 0) estoque.cheios[k] += novoRegistro.entradas[k];
+            });
+
+            Object.keys(novoRegistro.retornos).forEach(k => { 
+                if (novoRegistro.retornos[k] > 0) estoque.vazios[k] = (estoque.vazios[k] || 0) + novoRegistro.retornos[k];
+            });
             
             Object.keys(novoRegistro.trocas).forEach(k => {
                 let qtdTroca = novoRegistro.trocas[k];
@@ -774,12 +860,26 @@
                 const index = registrosApp.findIndex(reg => reg.timestamp === timestamp);
                 if (index > -1) {
                     const reg = registrosApp[index];
+                    
                     Object.keys(reg.saidas).forEach(k => {
                         let q = reg.saidas[k];
-                        if(q > 0) { estoque.cheios[k] += q; estoque.vazios[k] -= q; }
+                        if(q > 0) { 
+                            estoque.cheios[k] += q; 
+                            if (k === 'ag_est' || k === 'ag_ela' || k === 'ag_ped') {
+                                estoque.vazios.agua -= q;
+                            } else {
+                                estoque.vazios[k] -= q; 
+                            }
+                        }
                     });
-                    if(reg.entradas) Object.keys(reg.entradas).forEach(k => estoque.cheios[k] -= reg.entradas[k]);
-                    Object.keys(reg.retornos).forEach(k => estoque.vazios[k] -= reg.retornos[k]);
+
+                    if(reg.entradas) Object.keys(reg.entradas).forEach(k => {
+                        if (reg.entradas[k] > 0) estoque.cheios[k] -= reg.entradas[k];
+                    });
+
+                    if(reg.retornos) Object.keys(reg.retornos).forEach(k => {
+                        if (reg.retornos[k] > 0) estoque.vazios[k] -= reg.retornos[k];
+                    });
                     
                     if(reg.trocas) Object.keys(reg.trocas).forEach(k => {
                         let q = reg.trocas[k];
@@ -802,48 +902,13 @@
             if(confirm("Deseja apagar TODO o histórico?")) db.ref('registros').set([]);
         }
 
+
         // ==========================================
-        //  GERADOR DE PDF (NOVO FORMATO EM LISTA)
+        //  GERADOR DE PDF (FORMATO PLANILHA FÍSICA ATUALIZADO)
         // ==========================================
 
-        function renderListaPDF(titulo, obj) {
-            let html = `<div style="margin-bottom: 20px;">
-                <h3 style="margin-bottom: 5px; font-size: 13pt;">${titulo}</h3>
-                <ul style="list-style: none; padding-left: 10px; margin-top: 0; font-size: 11pt; line-height: 1.6;">`;
-            
-            const parseGroup = (prefix, display) => {
-                let items = [];
-                let total = 0;
-                let keys = prefix === 'p13' ? ['liq','sup','nac','out','p13'] : 
-                           prefix === 'p20' ? ['p20_liq','p20_sup','p20_nac','p20_out','p20'] : 
-                           ['p45_liq','p45_sup','p45_nac','p45_out','p45'];
-                
-                keys.forEach(k => {
-                    if (obj[k] > 0) {
-                        total += obj[k];
-                        items.push(`<b>${obj[k]}x</b> ${getNomeFormatado(k).replace(display + ' ', '')}`);
-                    }
-                });
-                if(total > 0) return `<li><strong>${display} (Total: ${total}) ➔</strong> ${items.join(' | ')}</li>`;
-                return `<li><strong>${display}:</strong> Zerado</li>`;
-            };
-
-            html += parseGroup('p13', 'P13');
-            html += parseGroup('p20', 'P20');
-            html += parseGroup('p45', 'P45');
-            
-            if (obj.p5 > 0) html += `<li><strong>P5 TOTAL:</strong> ${obj.p5}x</li>`;
-            else html += `<li><strong>P5 TOTAL:</strong> Zerado</li>`;
-
-            if (titulo.includes("VAZIOS")) {
-                if (obj.agua > 0) html += `<li><strong>ÁGUA:</strong> ${obj.agua}x</li>`;
-                else html += `<li><strong>ÁGUA:</strong> Zerado</li>`;
-            }
-
-            html += `</ul></div>`;
-            return html;
-        }
-
+        function formatZero(val) { return val > 0 ? val : ''; }
+        
         function formatarItensTexto(obj) {
             if(!obj) return 'Nada';
             const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `${obj[k]}x ${getNomeFormatado(k)}`);
@@ -858,37 +923,154 @@
             const btn = document.querySelector('.btn-pdf');
             btn.innerHTML = "⏳ Gerando PDF (Aguarde)...";
             
-            // Cria o corpo em HTML limpo especificamente para o documento do PDF
+            let c = estoque.cheios;
+            let v = estoque.vazios;
+            let t = estoque.trocas;
+            let m4 = window.NOME_MARCA_ATUAL;
+
+            // Totaliza os vazios para mesclar as células grandes
+            let tot13_v = (v.liq||0) + (v.sup||0) + (v.nac||0) + (v.out||0) + (v.p13||0);
+            let tot20_v = (v.p20_liq||0) + (v.p20_sup||0) + (v.p20_nac||0) + (v.p20_out||0) + (v.p20||0);
+            let tot45_v = (v.p45_liq||0) + (v.p45_sup||0) + (v.p45_nac||0) + (v.p45_out||0) + (v.p45||0);
+
+            // Monta o layout exato da planilha, agora com as 3 águas e 1 caixa unificada de vazios.
             let htmlPDF = `
-                <div style="padding: 20px; font-family: Arial, sans-serif; color: #000; background: #fff;">
-                    <h1 style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px;">Relatório de Pátio e Cargas</h1>
-                    <p style="text-align: right; font-style: italic; font-size: 10pt; margin-top: -10px;">Data de emissão: ${new Date().toLocaleString('pt-BR')}</p>
-                    
-                    <h2 style="background: #f0f2f5; padding: 8px; font-size: 14pt; border-left: 4px solid #0056b3;">1. ESTOQUE ATUAL</h2>
-                    <div style="padding-left: 10px;">
-                        ${renderListaPDF('🟩 CHEIOS', estoque.cheios)}
-                        ${renderListaPDF('🟧 VAZIOS', estoque.vazios)}
-                        ${renderListaPDF('🟪 TROCAS', estoque.trocas)}
-                    </div>
+                <div style="padding: 10px; font-family: Arial, sans-serif; color: #000; background: #fff; width: 100%; box-sizing: border-box;">
+                    <p style="text-align: right; font-style: italic; font-size: 10pt; margin: 0 0 10px 0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
 
-                    <h2 style="background: #f0f2f5; padding: 8px; font-size: 14pt; border-left: 4px solid #0056b3; margin-top: 20px;">2. PESO DO PÁTIO</h2>
-                    <p style="font-size: 12pt; padding-left: 20px; line-height: 1.6;">${document.getElementById('displayPesoTotal').innerText.replace(/\n/g, '<br>')}</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11pt;">
+                        <thead>
+                            <tr>
+                                <th colspan="4" style="border: 2px solid #000; background-color: #d3d3d3; padding: 6px; font-size: 13pt;">Gás Vila Nova</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- P13 -->
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; width: 22%; padding: 4px;">P13 Nacional</td>
+                                <td style="border: 1px solid #000; width: 12%; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.nac)}</td>
+                                <td style="border: 1px solid #000; width: 33%; padding: 4px;">Trocas P13 Nacional: <b style="float:right;">${formatZero(t.nac)}</b></td>
+                                <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; width: 33%; text-align: center; vertical-align: middle;">
+                                    <b>P13 Vazios:</b><br><br><span style="font-size: 20pt; font-weight: bold;">${formatZero(tot13_v)}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 Super</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.sup)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 Super: <b style="float:right;">${formatZero(t.sup)}</b></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 Liquigás</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.liq)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 Liquigás: <b style="float:right;">${formatZero(t.liq)}</b></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 ${m4}</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.out)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 ${m4}: <b style="float:right;">${formatZero(t.out)}</b></td>
+                            </tr>
 
-                    <h2 style="background: #f0f2f5; padding: 8px; font-size: 14pt; border-left: 4px solid #0056b3; margin-top: 20px;">3. HISTÓRICO (Últimos 20 dias)</h2>
-                    <ul style="list-style: none; padding-left: 0;">
+                            <!-- P45 -->
+                            <tr>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Nacional</td>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_nac)}</td>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P45 Nacional: <b style="float:right;">${formatZero(t.p45_nac)}</b></td>
+                                <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
+                                    <b>P45 Vazios:</b><br><br><span style="font-size: 20pt; font-weight: bold;">${formatZero(tot45_v)}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Super</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_sup)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 Super: <b style="float:right;">${formatZero(t.p45_sup)}</b></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Liquigás</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_liq)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 Liquigás: <b style="float:right;">${formatZero(t.p45_liq)}</b></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 ${m4}</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_out)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 ${m4}: <b style="float:right;">${formatZero(t.p45_out)}</b></td>
+                            </tr>
+
+                            <!-- P20 -->
+                            <tr>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Nacional</td>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_nac)}</td>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P20 Nacional: <b style="float:right;">${formatZero(t.p20_nac)}</b></td>
+                                <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
+                                    <b>P20 Vazios:</b><br><br><span style="font-size: 20pt; font-weight: bold;">${formatZero(tot20_v)}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Super</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_sup)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 Super: <b style="float:right;">${formatZero(t.p20_sup)}</b></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Liquigás</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_liq)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 Liquigás: <b style="float:right;">${formatZero(t.p20_liq)}</b></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 ${m4}</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_out)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 ${m4}: <b style="float:right;">${formatZero(t.p20_out)}</b></td>
+                            </tr>
+
+                            <!-- P05 -->
+                            <tr>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P05 Total</td>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p5)}</td>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P05 Total: <b style="float:right;">${formatZero(t.p5)}</b></td>
+                                <td style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
+                                    <b>P05 Vazios:</b><br><span style="font-size: 14pt; font-weight: bold;">${formatZero(v.p5)}</span>
+                                </td>
+                            </tr>
+
+                            <!-- AGUAS -->
+                            <tr>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água Estância</td>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_est)}</td>
+                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas Estância: <b style="float:right;">${formatZero(t.ag_est)}</b></td>
+                                <td rowspan="3" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
+                                    <b>Águas Vazias:</b><br><br><span style="font-size: 20pt; font-weight: bold;">${formatZero(v.agua)}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água Elan</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_ela)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas Elan: <b style="float:right;">${formatZero(t.ag_ela)}</b></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água da Pedra</td>
+                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_ped)}</td>
+                                <td style="border: 1px solid #000; padding: 4px;">Trocas da Pedra: <b style="float:right;">${formatZero(t.ag_ped)}</b></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- PESO E HISTÓRICO MANTIDOS NA PARTE INFERIOR DO PDF -->
+                    <h2 style="background: #f0f2f5; padding: 6px; font-size: 12pt; border-left: 4px solid #0056b3; margin-top: 15px;">PESO DO PÁTIO</h2>
+                    <p style="font-size: 11pt; padding-left: 10px; line-height: 1.5; margin-bottom:20px;">${document.getElementById('displayPesoTotal').innerText.replace(/\n/g, '<br>')}</p>
+
+                    <h2 style="background: #f0f2f5; padding: 6px; font-size: 12pt; border-left: 4px solid #0056b3;">HISTÓRICO (Últimos dias)</h2>
+                    <ul style="list-style: none; padding-left: 0; font-size: 9pt;">
             `;
 
             [...registrosApp].sort((a,b)=>b.timestamp - a.timestamp).forEach(reg => {
                 let d = new Date(reg.timestamp).toLocaleString('pt-BR');
                 htmlPDF += `
-                    <li style="border-bottom: 1px solid #ccc; padding: 15px 10px; margin-bottom: 5px; page-break-inside: avoid;">
-                        <strong style="font-size: 11pt; color: #000;">🕒 ${d} | Motorista: ${reg.entregador} (Carro: ${reg.carro})</strong>
-                        <div style="font-size: 10pt; margin-top: 8px; padding-left: 15px; line-height: 1.5;">
-                            <div><b style="color: #dc3545;">Saídas (Cheios) ➔</b> ${formatarItensTexto(reg.saidas)}</div>
-                            <div><b style="color: #17a2b8;">Entradas (Cheios) ➔</b> ${formatarItensTexto(reg.entradas)}</div>
-                            <div><b style="color: #d39e00;">Entradas (Vazios) ➔</b> ${formatarItensTexto(reg.retornos)}</div>
-                            <div><b style="color: #6f42c1;">Trocas (Defeito) ➔</b> ${formatarItensTexto(reg.trocas)}</div>
-                            ${reg.obs ? `<div style="margin-top: 5px;"><b>OBS:</b> <i>${reg.obs}</i></div>` : ''}
+                    <li style="border-bottom: 1px solid #ccc; padding: 8px 5px; margin-bottom: 2px; page-break-inside: avoid;">
+                        <strong style="font-size: 10pt; color: #000;">🕒 ${d} | Motorista: ${reg.entregador} (Carro: ${reg.carro})</strong>
+                        <div style="margin-top: 5px; padding-left: 10px; line-height: 1.4;">
+                            <div><b style="color: #dc3545;">Saídas (Cheios):</b> ${formatarItensTexto(reg.saidas)}</div>
+                            <div><b style="color: #17a2b8;">Entradas (Cheios):</b> ${formatarItensTexto(reg.entradas)}</div>
+                            <div><b style="color: #d39e00;">Entradas (Vazios):</b> ${formatarItensTexto(reg.retornos)}</div>
+                            <div><b style="color: #6f42c1;">Trocas (Defeito):</b> ${formatarItensTexto(reg.trocas)}</div>
+                            ${reg.obs ? `<div style="margin-top: 3px;"><b>OBS:</b> <i>${reg.obs}</i></div>` : ''}
                         </div>
                     </li>
                 `;
@@ -896,15 +1078,15 @@
 
             htmlPDF += `</ul></div>`;
 
-            // Adiciona esse formato limpo na tela mas escondido de você
+            // Cria um contêiner temporário invisível para desenhar o PDF
             const boxRelatorio = document.createElement('div');
             boxRelatorio.innerHTML = htmlPDF;
             document.body.appendChild(boxRelatorio);
             
-            // Oculta seu sistema por 1 segundo enquanto tira a "foto"
+            // Esconde a tela principal do app para não atrapalhar
             document.getElementById('conteudoSistema').style.display = 'none';
 
-            // Configuração para folha A4 (Retrato - igual papel normal)
+            // Configuração A4 em Pé (Retrato) para caber como no papel físico
             const opt = {
                 margin:       [0.4, 0.4], 
                 filename:     'Relatorio_Patio_JLH.pdf',
@@ -927,10 +1109,10 @@
             } catch (err) {
                 alert("Erro ao gerar o arquivo PDF: " + err);
             } finally {
-                // Deleta a página temporária e volta o sistema ao normal
+                // Apaga o molde invisível e devolve a tela pro aplicativo
                 document.body.removeChild(boxRelatorio);
                 document.getElementById('conteudoSistema').style.display = 'block';
-                btn.innerHTML = "📋 Gerar Relatório PDF em Lista";
+                btn.innerHTML = "📋 Gerar Relatório PDF em Planilha";
             }
         }
     </script>
