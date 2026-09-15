@@ -761,7 +761,18 @@
                     document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
                     btn.classList.add('selecionado');
                     document.getElementById('entregador').value = motorista.nome;
-                    document.getElementById('carro').value = motorista.placa;
+                    
+                    // Lógica adicionada para recuperar a ÚLTIMA PLACA DE CARRO salva para este motorista
+                    let ultimaPlaca = motorista.placa; // vazio por padrão
+                    const registrosDoMotorista = registros.filter(r => r.entregador === motorista.nome);
+                    
+                    if (registrosDoMotorista.length > 0) {
+                        // Como os registros podem não estar perfeitamente ordenados, garantimos o mais recente
+                        const ultimoRegistro = registrosDoMotorista.reduce((prev, curr) => (prev.timestamp > curr.timestamp) ? prev : curr);
+                        ultimaPlaca = ultimoRegistro.carro || "";
+                    }
+
+                    document.getElementById('carro').value = ultimaPlaca;
                     document.getElementById('s_liq').focus(); 
                 };
                 grid.appendChild(btn);
@@ -864,7 +875,7 @@
             registrosApp.push(novoRegistro);
             db.ref('registros').set(registrosApp);
 
-            document.querySelectorAll('input[type="number"], input[type="text"]').forEach(inp => inp.value = '');
+            document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
             document.getElementById('obs').value = '';
             document.getElementById('entregador').value = '';
             document.getElementById('carro').value = '';
