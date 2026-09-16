@@ -9,9 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
-    <!-- BIBLIOTECA XLSX PARA GERAR PLANILHA REAL -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
     <style>
         :root {
             --primary: #0056b3; --success: #28a745; --danger: #dc3545;
@@ -80,7 +77,7 @@
             background: var(--warning); color: #000; border: none; padding: 10px 15px;
             border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
         }
-        .btn-pdf {
+        .btn-planilha {
             background: #28a745; color: #fff; border: none; padding: 10px 15px;
             border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px; width: auto;
         }
@@ -153,7 +150,7 @@
 
     <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-pdf" onclick="gerarPlanilhaExcel()">📊 Baixar / Compartilhar Planilha Real (.xlsx)</button>
+            <button class="btn-planilha" onclick="gerarPlanilhaCSV()">📊 Gerar e Compartilhar Planilha (.csv)</button>
             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -909,24 +906,16 @@
 
 
         // ==========================================
-        //  GERADOR DE PLANILHA EXCEL REAL (.xlsx)
+        //  GERADOR DE PLANILHA CSV REAL (ABRE NO EXCEL)
         // ==========================================
 
         function formatarItensTexto(obj) {
             if(!obj) return 'Nenhum';
             const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `${obj[k]}x ${getNomeFormatado(k)}`);
-            return itens.length > 0 ? itens.join(', ') : 'Nenhum';
+            return itens.length > 0 ? itens.join(' | ') : 'Nenhum';
         }
 
-        async function gerarPlanilhaExcel() {
-            if(typeof XLSX === 'undefined') {
-                alert("Aguarde a ferramenta de planilha carregar e tente novamente.");
-                return;
-            }
-
-            const btn = document.querySelector('.btn-pdf');
-            btn.innerHTML = "⏳ Montando Planilha...";
-
+        async function gerarPlanilhaCSV() {
             let c = estoque.cheios;
             let v = estoque.vazios;
             let t = estoque.trocas;
@@ -936,41 +925,41 @@
             let tot20_v = (v.p20_liq||0) + (v.p20_sup||0) + (v.p20_nac||0) + (v.p20_out||0) + (v.p20||0);
             let tot45_v = (v.p45_liq||0) + (v.p45_sup||0) + (v.p45_nac||0) + (v.p45_out||0) + (v.p45||0);
 
-            // Monta as linhas da planilha em formato de tabela de dados real
-            let dadosPlanilha = [
-                ["CONTROLE DE PÁTIO E CARGAS - GÁS VILA NOVA"],
-                ["Data de Emissão:", new Date().toLocaleString('pt-BR')],
-                [],
-                ["=== ESTOQUE ATUAL NO PÁTIO ==="],
-                ["Produto / Marca", "Cheios", "Vazios", "Trocas (Defeito)"],
-                ["P13 Nacional", c.nac || 0, tot13_v, t.nac || 0],
-                ["P13 Super", c.sup || 0, "", t.sup || 0],
-                ["P13 Liquigás", c.liq || 0, "", t.liq || 0],
-                ["P13 " + m4, c.out || 0, "", t.out || 0],
-                
-                ["P20 Nacional", c.p20_nac || 0, tot20_v, t.p20_nac || 0],
-                ["P20 Super", c.p20_sup || 0, "", t.p20_sup || 0],
-                ["P20 Liquigás", c.p20_liq || 0, "", t.p20_liq || 0],
-                ["P20 " + m4, c.p20_out || 0, "", t.p20_out || 0],
+            let linhas = [];
 
-                ["P45 Nacional", c.p45_nac || 0, tot45_v, t.p45_nac || 0],
-                ["P45 Super", c.p45_sup || 0, "", t.p45_sup || 0],
-                ["P45 Liquigás", c.p45_liq || 0, "", t.p45_liq || 0],
-                ["P45 " + m4, c.p45_out || 0, "", t.p45_out || 0],
+            linhas.push(["CONTROLE DE PATIO E CARGAS - GAS VILA NOVA"]);
+            linhas.push(["Data de Emissao:", new Date().toLocaleString('pt-BR')]);
+            linhas.push([]);
+            linhas.push(["=== ESTOQUE ATUAL NO PATIO ==="]);
+            linhas.push(["Produto / Marca", "Cheios", "Vazios", "Trocas (Defeito)"]);
+            
+            linhas.push(["P13 Nacional", c.nac || 0, tot13_v, t.nac || 0]);
+            linhas.push(["P13 Super", c.sup || 0, "", t.sup || 0]);
+            linhas.push(["P13 Liquigas", c.liq || 0, "", t.liq || 0]);
+            linhas.push(["P13 " + m4, c.out || 0, "", t.out || 0]);
+            
+            linhas.push(["P20 Nacional", c.p20_nac || 0, tot20_v, t.p20_nac || 0]);
+            linhas.push(["P20 Super", c.p20_sup || 0, "", t.p20_sup || 0]);
+            linhas.push(["P20 Liquigas", c.p20_liq || 0, "", t.p20_liq || 0]);
+            linhas.push(["P20 " + m4, c.p20_out || 0, "", t.p20_out || 0]);
 
-                ["P05 Total", c.p5 || 0, v.p5 || 0, t.p5 || 0],
-                ["Água Estância", c.ag_est || 0, v.agua || 0, t.ag_est || 0],
-                ["Água Elan", c.ag_ela || 0, "", t.ag_ela || 0],
-                ["Água da Pedra", c.ag_ped || 0, "", t.ag_ped || 0],
-                [],
-                ["=== HISTÓRICO DE MOVIMENTAÇÕES (Últimos Dias) ==="],
-                ["Data/Hora", "Motorista", "Veículo", "Saídas (Cheios)", "Entradas (Cheios)", "Entradas (Vazios)", "Trocas", "Observações"]
-            ];
+            linhas.push(["P45 Nacional", c.p45_nac || 0, tot45_v, t.p45_nac || 0]);
+            linhas.push(["P45 Super", c.p45_sup || 0, "", t.p45_sup || 0]);
+            linhas.push(["P45 Liquigas", c.p45_liq || 0, "", t.p45_liq || 0]);
+            linhas.push(["P45 " + m4, c.p45_out || 0, "", t.p45_out || 0]);
 
-            // Adiciona o histórico ordenado
+            linhas.push(["P05 Total", c.p5 || 0, v.p5 || 0, t.p5 || 0]);
+            linhas.push(["Agua Estancia", c.ag_est || 0, v.agua || 0, t.ag_est || 0]);
+            linhas.push(["Agua Elan", c.ag_ela || 0, "", t.ag_ela || 0]);
+            linhas.push(["Agua da Pedra", c.ag_ped || 0, "", t.ag_ped || 0]);
+            
+            linhas.push([]);
+            linhas.push(["=== HISTORICO DE MOVIMENTACOES (Ultimos Dias) ==="]);
+            linhas.push(["Data/Hora", "Motorista", "Veiculo", "Saidas (Cheios)", "Entradas (Cheios)", "Entradas (Vazios)", "Trocas", "Observacoes"]);
+
             [...registrosApp].sort((a,b)=>b.timestamp - a.timestamp).forEach(reg => {
                 let d = new Date(reg.timestamp).toLocaleString('pt-BR');
-                dadosPlanilha.push([
+                linhas.push([
                     d,
                     reg.entregador,
                     reg.carro || '',
@@ -982,18 +971,16 @@
                 ]);
             });
 
-            // Cria o arquivo Excel workbook
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(dadosPlanilha);
-            
-            // Adiciona a folha ao livro
-            XLSX.utils.book_append_sheet(wb, ws, "Controle de Patio");
+            // Converte para formato CSV usando ponto e vírgula (padrão brasileiro para Excel)
+            let csvContent = "\uFEFF"; // BOM para reconhecer acentuação no Excel
+            linhas.forEach(row => {
+                let linhaFormatada = row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(";");
+                csvContent += linhaFormatada + "\r\n";
+            });
 
             try {
-                // Gera o arquivo em formato Blob (.xlsx real)
-                const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const file = new File([blob], 'Controle_Patio_JLH.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const file = new File([blob], 'Controle_Patio_JLH.csv', { type: 'text/csv' });
 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
@@ -1004,12 +991,10 @@
                 } else {
                     const fileURL = URL.createObjectURL(blob);
                     const a = document.createElement('a');
-                    a.href = fileURL; a.download = 'Controle_Patio_JLH.xlsx'; a.click();
+                    a.href = fileURL; a.download = 'Controle_Patio_JLH.csv'; a.click();
                 }
             } catch (err) {
                 alert("Erro ao gerar a planilha: " + err);
-            } finally {
-                btn.innerHTML = "📊 Baixar / Compartilhar Planilha Real (.xlsx)";
             }
         }
     </script>
