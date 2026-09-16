@@ -923,7 +923,7 @@
 
 
         // ==========================================
-        //  GERADOR DE PDF (CORRIGIDO PARA EXPORTAR COMPLETO)
+        //  GERADOR DE PDF (CORRIGIDO CONTRA TELA BRANCA)
         // ==========================================
 
         function formatZero(val) { return val > 0 ? val : ''; }
@@ -952,7 +952,7 @@
             let tot45_v = (v.p45_liq||0) + (v.p45_sup||0) + (v.p45_nac||0) + (v.p45_out||0) + (v.p45||0);
 
             let htmlPDF = `
-                <div style="padding: 15px; font-family: Arial, sans-serif; color: #000; background: #fff; width: 100%; box-sizing: border-box;">
+                <div style="padding: 15px; font-family: Arial, sans-serif; color: #000; background: #fff; width: 750px; box-sizing: border-box;">
                     <h2 style="text-align: center; margin: 0 0 5px 0;">Relatório de Pátio e Cargas</h2>
                     <p style="text-align: right; font-style: italic; font-size: 10pt; margin: 0 0 15px 0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
 
@@ -1095,20 +1095,26 @@
 
             htmlPDF += `</ul></div>`;
 
-            // Cria o elemento fora da tela com largura fixa grande para renderizar completo
+            // Renderiza visível na tela por 1 segundo para o navegador processar as imagens e tabelas sem falhas
             const boxRelatorio = document.createElement('div');
-            boxRelatorio.style.position = 'absolute';
-            boxRelatorio.style.left = '-9999px';
+            boxRelatorio.id = 'tempPdfRender';
+            boxRelatorio.style.position = 'fixed';
             boxRelatorio.style.top = '0';
-            boxRelatorio.style.width = '800px';
+            boxRelatorio.style.left = '0';
+            boxRelatorio.style.zIndex = '99999';
+            boxRelatorio.style.background = '#fff';
+            boxRelatorio.style.width = '750px';
+            boxRelatorio.style.padding = '20px';
             boxRelatorio.innerHTML = htmlPDF;
             document.body.appendChild(boxRelatorio);
+
+            await new Promise(resolve => setTimeout(resolve, 600));
 
             const opt = {
                 margin:       [0.3, 0.3], 
                 filename:     'Relatorio_Patio_JLH.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
                 jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } 
             };
 
@@ -1116,14 +1122,13 @@
                 const pdfBlob = await html2pdf().set(opt).from(boxRelatorio).output('blob');
                 const file = new File([pdfBlob], 'Relatorio_Patio_JLH.pdf', { type: 'application/pdf' });
                 
+                document.body.removeChild(boxRelatorio);
+
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
                         await navigator.share({ title: 'Relatório Pátio JLH', files: [file] });
                     } catch (shareErr) {
-                        // Se o usuário cancelar a partilha, apenas ignoramos sem dar alerta de erro vermelho
-                        if (shareErr.name !== 'AbortError') {
-                            console.error(shareErr);
-                        }
+                        if (shareErr.name !== 'AbortError') console.error(shareErr);
                     }
                 } else {
                     const fileURL = URL.createObjectURL(pdfBlob);
@@ -1131,12 +1136,13 @@
                     a.href = fileURL; a.download = 'Relatorio_Patio_JLH.pdf'; a.click();
                 }
             } catch (err) {
+                if(document.getElementById('tempPdfRender')) document.body.removeChild(boxRelatorio);
                 alert("Erro ao gerar o arquivo PDF: " + err);
             } finally {
-                document.body.removeChild(boxRelatorio);
                 btn.innerHTML = "📋 Gerar Relatório PDF em Planilha";
             }
         }
     </script>
 </body>
 </html>
+
