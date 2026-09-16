@@ -923,7 +923,7 @@
 
 
         // ==========================================
-        //  GERADOR DE PDF (CORRIGIDO CONTRA TELA BRANCA)
+        //  GERADOR DE PDF (CORRIGIDO PARA NÃO IR EM BRANCO)
         // ==========================================
 
         function formatZero(val) { return val > 0 ? val : ''; }
@@ -940,7 +940,7 @@
                 return;
             }
             const btn = document.querySelector('.btn-pdf');
-            btn.innerHTML = "⏳ Gerando PDF Completo...";
+            btn.innerHTML = "⏳ Renderizando dados...";
             
             let c = estoque.cheios;
             let v = estoque.vazios;
@@ -952,7 +952,7 @@
             let tot45_v = (v.p45_liq||0) + (v.p45_sup||0) + (v.p45_nac||0) + (v.p45_out||0) + (v.p45||0);
 
             let htmlPDF = `
-                <div style="padding: 15px; font-family: Arial, sans-serif; color: #000; background: #fff; width: 750px; box-sizing: border-box;">
+                <div style="padding: 20px; font-family: Arial, sans-serif; color: #000; background: #fff; width: 750px; box-sizing: border-box;">
                     <h2 style="text-align: center; margin: 0 0 5px 0;">Relatório de Pátio e Cargas</h2>
                     <p style="text-align: right; font-style: italic; font-size: 10pt; margin: 0 0 15px 0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
 
@@ -1095,7 +1095,7 @@
 
             htmlPDF += `</ul></div>`;
 
-            // Renderiza visível na tela por 1 segundo para o navegador processar as imagens e tabelas sem falhas
+            // Injeta temporariamente o painel visível na tela para o motor de conversão capturar corretamente
             const boxRelatorio = document.createElement('div');
             boxRelatorio.id = 'tempPdfRender';
             boxRelatorio.style.position = 'fixed';
@@ -1104,11 +1104,12 @@
             boxRelatorio.style.zIndex = '99999';
             boxRelatorio.style.background = '#fff';
             boxRelatorio.style.width = '750px';
-            boxRelatorio.style.padding = '20px';
             boxRelatorio.innerHTML = htmlPDF;
             document.body.appendChild(boxRelatorio);
 
-            await new Promise(resolve => setTimeout(resolve, 600));
+            // Aguarda 1.2 segundos para garantir que o renderizador do celular processou todos os textos e estilos
+            btn.innerHTML = "⏳ Gerando arquivo PDF...";
+            await new Promise(resolve => setTimeout(resolve, 1200));
 
             const opt = {
                 margin:       [0.3, 0.3], 
@@ -1145,4 +1146,3 @@
     </script>
 </body>
 </html>
-
