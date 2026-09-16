@@ -9,6 +9,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
+    <!-- BIBLIOTECA XLSX PARA GERAR PLANILHA REAL -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         :root {
             --primary: #0056b3; --success: #28a745; --danger: #dc3545;
@@ -78,7 +81,7 @@
             border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
         }
         .btn-pdf {
-            background: #6f42c1; color: #fff; border: none; padding: 10px 15px;
+            background: #28a745; color: #fff; border: none; padding: 10px 15px;
             border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px; width: auto;
         }
         
@@ -111,24 +114,10 @@
         }
 
         .btn-flutuante {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 1000;
-            text-transform: uppercase;
-            transition: transform 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            position: fixed; bottom: 20px; left: 20px; background-color: var(--success);
+            color: white; border: none; padding: 15px 25px; font-size: 1.1rem; font-weight: bold;
+            border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 1000;
+            text-transform: uppercase; transition: transform 0.2s; display: flex; align-items: center; gap: 8px;
         }
         .btn-flutuante:hover { background-color: #218838; }
         .btn-flutuante:active { transform: scale(0.95); }
@@ -164,7 +153,7 @@
 
     <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-pdf" onclick="gerarECompartilharPDF()">📋 Gerar Relatório PDF em Planilha</button>
+            <button class="btn-pdf" onclick="gerarPlanilhaExcel()">📊 Baixar / Compartilhar Planilha Real (.xlsx)</button>
             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -459,9 +448,6 @@
             </div>
         </div>
     </div>
-
-    <!-- SCRIPT DE PDF CARREGA POR ÚLTIMO -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 
     <script>
         function fazerLogin() {
@@ -923,25 +909,24 @@
 
 
         // ==========================================
-        //  GERADOR DE PDF (CORRIGIDO PARA NÃO IR EM BRANCO)
+        //  GERADOR DE PLANILHA EXCEL REAL (.xlsx)
         // ==========================================
 
-        function formatZero(val) { return val > 0 ? val : ''; }
-        
         function formatarItensTexto(obj) {
-            if(!obj) return 'Nada';
+            if(!obj) return 'Nenhum';
             const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `${obj[k]}x ${getNomeFormatado(k)}`);
-            return itens.length > 0 ? itens.join(', ') : 'Nada';
+            return itens.length > 0 ? itens.join(', ') : 'Nenhum';
         }
 
-        async function gerarECompartilharPDF() {
-            if(typeof html2pdf === 'undefined') {
-                alert("Aguarde, sistema de PDF carregando. Tente novamente em alguns segundos.");
+        async function gerarPlanilhaExcel() {
+            if(typeof XLSX === 'undefined') {
+                alert("Aguarde a ferramenta de planilha carregar e tente novamente.");
                 return;
             }
+
             const btn = document.querySelector('.btn-pdf');
-            btn.innerHTML = "⏳ Renderizando dados...";
-            
+            btn.innerHTML = "⏳ Montando Planilha...";
+
             let c = estoque.cheios;
             let v = estoque.vazios;
             let t = estoque.trocas;
@@ -951,196 +936,80 @@
             let tot20_v = (v.p20_liq||0) + (v.p20_sup||0) + (v.p20_nac||0) + (v.p20_out||0) + (v.p20||0);
             let tot45_v = (v.p45_liq||0) + (v.p45_sup||0) + (v.p45_nac||0) + (v.p45_out||0) + (v.p45||0);
 
-            let htmlPDF = `
-                <div style="padding: 20px; font-family: Arial, sans-serif; color: #000; background: #fff; width: 750px; box-sizing: border-box;">
-                    <h2 style="text-align: center; margin: 0 0 5px 0;">Relatório de Pátio e Cargas</h2>
-                    <p style="text-align: right; font-style: italic; font-size: 10pt; margin: 0 0 15px 0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
+            // Monta as linhas da planilha em formato de tabela de dados real
+            let dadosPlanilha = [
+                ["CONTROLE DE PÁTIO E CARGAS - GÁS VILA NOVA"],
+                ["Data de Emissão:", new Date().toLocaleString('pt-BR')],
+                [],
+                ["=== ESTOQUE ATUAL NO PÁTIO ==="],
+                ["Produto / Marca", "Cheios", "Vazios", "Trocas (Defeito)"],
+                ["P13 Nacional", c.nac || 0, tot13_v, t.nac || 0],
+                ["P13 Super", c.sup || 0, "", t.sup || 0],
+                ["P13 Liquigás", c.liq || 0, "", t.liq || 0],
+                ["P13 " + m4, c.out || 0, "", t.out || 0],
+                
+                ["P20 Nacional", c.p20_nac || 0, tot20_v, t.p20_nac || 0],
+                ["P20 Super", c.p20_sup || 0, "", t.p20_sup || 0],
+                ["P20 Liquigás", c.p20_liq || 0, "", t.p20_liq || 0],
+                ["P20 " + m4, c.p20_out || 0, "", t.p20_out || 0],
 
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11pt;">
-                        <thead>
-                            <tr>
-                                <th colspan="4" style="border: 2px solid #000; background-color: #d3d3d3; padding: 6px; font-size: 13pt;">Gás Vila Nova</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- P13 -->
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; width: 22%; padding: 4px;">P13 Nacional</td>
-                                <td style="border: 1px solid #000; width: 12%; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.nac)}</td>
-                                <td style="border: 1px solid #000; width: 33%; padding: 4px;">Trocas P13 Nacional: <b style="float:right;">${formatZero(t.nac)}</b></td>
-                                <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; width: 33%; text-align: center; vertical-align: middle;">
-                                    <b>P13 Vazios:</b><br><br><span style="font-size: 20pt; font-weight: bold;">${formatZero(tot13_v)}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 Super</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.sup)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 Super: <b style="float:right;">${formatZero(t.sup)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 Liquigás</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.liq)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 Liquigás: <b style="float:right;">${formatZero(t.liq)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 ${m4}</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.out)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 ${m4}: <b style="float:right;">${formatZero(t.out)}</b></td>
-                            </tr>
+                ["P45 Nacional", c.p45_nac || 0, tot45_v, t.p45_nac || 0],
+                ["P45 Super", c.p45_sup || 0, "", t.p45_sup || 0],
+                ["P45 Liquigás", c.p45_liq || 0, "", t.p45_liq || 0],
+                ["P45 " + m4, c.p45_out || 0, "", t.p45_out || 0],
 
-                            <!-- P45 -->
-                            <tr>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Nacional</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_nac)}</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P45 Nacional: <b style="float:right;">${formatZero(t.p45_nac)}</b></td>
-                                <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
-                                    <b>P45 Vazios:</b><br><br><span style="font-size: 20pt; font-weight: bold;">${formatZero(tot45_v)}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Super</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_sup)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 Super: <b style="float:right;">${formatZero(t.p45_sup)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Liquigás</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_liq)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 Liquigás: <b style="float:right;">${formatZero(t.p45_liq)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 ${m4}</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_out)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 ${m4}: <b style="float:right;">${formatZero(t.p45_out)}</b></td>
-                            </tr>
+                ["P05 Total", c.p5 || 0, v.p5 || 0, t.p5 || 0],
+                ["Água Estância", c.ag_est || 0, v.agua || 0, t.ag_est || 0],
+                ["Água Elan", c.ag_ela || 0, "", t.ag_ela || 0],
+                ["Água da Pedra", c.ag_ped || 0, "", t.ag_ped || 0],
+                [],
+                ["=== HISTÓRICO DE MOVIMENTAÇÕES (Últimos Dias) ==="],
+                ["Data/Hora", "Motorista", "Veículo", "Saídas (Cheios)", "Entradas (Cheios)", "Entradas (Vazios)", "Trocas", "Observações"]
+            ];
 
-                            <!-- P20 -->
-                            <tr>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Nacional</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_nac)}</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P20 Nacional: <b style="float:right;">${formatZero(t.p20_nac)}</b></td>
-                                <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
-                                    <b>P20 Vazios:</b><br><br><span style="font-size: 20pt; font-weight: bold;">${formatZero(tot20_v)}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Super</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_sup)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 Super: <b style="float:right;">${formatZero(t.p20_sup)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Liquigás</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_liq)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 Liquigás: <b style="float:right;">${formatZero(t.p20_liq)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 ${m4}</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_out)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 ${m4}: <b style="float:right;">${formatZero(t.p20_out)}</b></td>
-                            </tr>
-
-                            <!-- P05 -->
-                            <tr>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P05 Total</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p5)}</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P05 Total: <b style="float:right;">${formatZero(t.p5)}</b></td>
-                                <td style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
-                                    <b>P05 Vazios:</b><br><span style="font-size: 14pt; font-weight: bold;">${formatZero(v.p5)}</span>
-                                </td>
-                            </tr>
-
-                            <!-- AGUAS -->
-                            <tr>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água Estância</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_est)}</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas Estância: <b style="float:right;">${formatZero(t.ag_est)}</b></td>
-                                <td rowspan="3" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
-                                    <b>Águas Vazias:</b><br><br><span style="font-size: 20pt; font-weight: bold;">${formatZero(v.agua)}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água Elan</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_ela)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas Elan: <b style="float:right;">${formatZero(t.ag_ela)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água da Pedra</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_ped)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas da Pedra: <b style="float:right;">${formatZero(t.ag_ped)}</b></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h3 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 20px;">PESO DO PÁTIO</h3>
-                    <p style="font-size: 11pt; padding-left: 5px; line-height: 1.5; margin-bottom:20px;">${document.getElementById('displayPesoTotal').innerText.replace(/\n/g, '<br>')}</p>
-
-                    <h3 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 20px;">HISTÓRICO (Últimos dias)</h3>
-                    <ul style="list-style: none; padding-left: 0; font-size: 10pt;">
-            `;
-
+            // Adiciona o histórico ordenado
             [...registrosApp].sort((a,b)=>b.timestamp - a.timestamp).forEach(reg => {
                 let d = new Date(reg.timestamp).toLocaleString('pt-BR');
-                htmlPDF += `
-                    <li style="border-bottom: 1px solid #ccc; padding: 10px 5px; margin-bottom: 5px; page-break-inside: avoid;">
-                        <strong style="font-size: 11pt; color: #000;">🕒 ${d} | Motorista: ${reg.entregador} (Carro: ${reg.carro})</strong>
-                        <div style="margin-top: 5px; padding-left: 10px; line-height: 1.5;">
-                            <div><b style="color: #dc3545;">Saídas (Cheios):</b> ${formatarItensTexto(reg.saidas)}</div>
-                            <div><b style="color: #17a2b8;">Entradas (Cheios):</b> ${formatarItensTexto(reg.entradas)}</div>
-                            <div><b style="color: #d39e00;">Entradas (Vazios):</b> ${formatarItensTexto(reg.retornos)}</div>
-                            <div><b style="color: #6f42c1;">Trocas (Defeito):</b> ${formatarItensTexto(reg.trocas)}</div>
-                            ${reg.obs ? `<div style="margin-top: 3px;"><b>OBS:</b> <i>${reg.obs}</i></div>` : ''}
-                        </div>
-                    </li>
-                `;
+                dadosPlanilha.push([
+                    d,
+                    reg.entregador,
+                    reg.carro || '',
+                    formatarItensTexto(reg.saidas),
+                    formatarItensTexto(reg.entradas),
+                    formatarItensTexto(reg.retornos),
+                    formatarItensTexto(reg.trocas),
+                    reg.obs || ''
+                ]);
             });
 
-            htmlPDF += `</ul></div>`;
-
-            // Injeta temporariamente o painel visível na tela para o motor de conversão capturar corretamente
-            const boxRelatorio = document.createElement('div');
-            boxRelatorio.id = 'tempPdfRender';
-            boxRelatorio.style.position = 'fixed';
-            boxRelatorio.style.top = '0';
-            boxRelatorio.style.left = '0';
-            boxRelatorio.style.zIndex = '99999';
-            boxRelatorio.style.background = '#fff';
-            boxRelatorio.style.width = '750px';
-            boxRelatorio.innerHTML = htmlPDF;
-            document.body.appendChild(boxRelatorio);
-
-            // Aguarda 1.2 segundos para garantir que o renderizador do celular processou todos os textos e estilos
-            btn.innerHTML = "⏳ Gerando arquivo PDF...";
-            await new Promise(resolve => setTimeout(resolve, 1200));
-
-            const opt = {
-                margin:       [0.3, 0.3], 
-                filename:     'Relatorio_Patio_JLH.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' } 
-            };
+            // Cria o arquivo Excel workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(dadosPlanilha);
+            
+            // Adiciona a folha ao livro
+            XLSX.utils.book_append_sheet(wb, ws, "Controle de Patio");
 
             try {
-                const pdfBlob = await html2pdf().set(opt).from(boxRelatorio).output('blob');
-                const file = new File([pdfBlob], 'Relatorio_Patio_JLH.pdf', { type: 'application/pdf' });
-                
-                document.body.removeChild(boxRelatorio);
+                // Gera o arquivo em formato Blob (.xlsx real)
+                const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const file = new File([blob], 'Controle_Patio_JLH.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
-                        await navigator.share({ title: 'Relatório Pátio JLH', files: [file] });
+                        await navigator.share({ title: 'Planilha Pátio JLH', files: [file] });
                     } catch (shareErr) {
                         if (shareErr.name !== 'AbortError') console.error(shareErr);
                     }
                 } else {
-                    const fileURL = URL.createObjectURL(pdfBlob);
+                    const fileURL = URL.createObjectURL(blob);
                     const a = document.createElement('a');
-                    a.href = fileURL; a.download = 'Relatorio_Patio_JLH.pdf'; a.click();
+                    a.href = fileURL; a.download = 'Controle_Patio_JLH.xlsx'; a.click();
                 }
             } catch (err) {
-                if(document.getElementById('tempPdfRender')) document.body.removeChild(boxRelatorio);
-                alert("Erro ao gerar o arquivo PDF: " + err);
+                alert("Erro ao gerar a planilha: " + err);
             } finally {
-                btn.innerHTML = "📋 Gerar Relatório PDF em Planilha";
+                btn.innerHTML = "📊 Baixar / Compartilhar Planilha Real (.xlsx)";
             }
         }
     </script>
