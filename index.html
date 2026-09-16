@@ -150,7 +150,7 @@
 
     <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-planilha" onclick="gerarPlanilhaCSV()">📊 Gerar e Compartilhar Planilha (.csv)</button>
+            <button class="btn-planilha" onclick="gerarPlanilhaCSV()">📊 Baixar / Compartilhar Planilha (.csv)</button>
             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -906,7 +906,7 @@
 
 
         // ==========================================
-        //  GERADOR DE PLANILHA CSV REAL (ABRE NO EXCEL)
+        //  GERADOR DE PLANILHA CSV (COMPATÍVEL PC E CELULAR)
         // ==========================================
 
         function formatarItensTexto(obj) {
@@ -971,8 +971,7 @@
                 ]);
             });
 
-            // Converte para formato CSV usando ponto e vírgula (padrão brasileiro para Excel)
-            let csvContent = "\uFEFF"; // BOM para reconhecer acentuação no Excel
+            let csvContent = "\uFEFF"; 
             linhas.forEach(row => {
                 let linhaFormatada = row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(";");
                 csvContent += linhaFormatada + "\r\n";
@@ -982,17 +981,26 @@
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const file = new File([blob], 'Controle_Patio_JLH.csv', { type: 'text/csv' });
 
+                // Se estiver no celular e o navegador suportar compartilhamento por arquivo, usa ele
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
                         await navigator.share({ title: 'Planilha Pátio JLH', files: [file] });
+                        return;
                     } catch (shareErr) {
-                        if (shareErr.name !== 'AbortError') console.error(shareErr);
+                        if (shareErr.name === 'AbortError') return; // Usuário cancelou
                     }
-                } else {
-                    const fileURL = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = fileURL; a.download = 'Controle_Patio_JLH.csv'; a.click();
                 }
+                
+                // Se estiver no computador ou o compartilhamento falhar, faz o download direto
+                const fileURL = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = fileURL; 
+                a.download = 'Controle_Patio_JLH.csv'; 
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(fileURL);
+
             } catch (err) {
                 alert("Erro ao gerar a planilha: " + err);
             }
