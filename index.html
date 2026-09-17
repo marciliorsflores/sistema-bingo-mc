@@ -142,9 +142,20 @@
 
     <div id="loaderNuvem">🔄 Sincronizando com a Nuvem...</div>
 
-    <div class="container" id="conteudoSistema">
+    <div id="telaLogin" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; display: flex; align-items: center; justify-content: center; z-index: 9999;">
+        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 300px;">
+            <h2 style="margin-top: 0; color: #0056b3;">Acesso Restrito</h2>
+            <input type="text" id="loginUser" placeholder="Usuário" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;">
+            <input type="password" id="loginSenha" placeholder="Senha" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;">
+            <button onclick="fazerLogin()" style="background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer;">Entrar</button>
+            <p id="erroLogin" style="color: red; display: none; font-size: 0.9rem; margin-top: 10px;">Usuário ou senha incorretos!</p>
+        </div>
+    </div>
+
+    <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <button class="btn-doc" onclick="gerarRelatorioPDF()">📑 Pré-visualizar PDF</button>
+            <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
         <h1>Controle de Pátio e Cargas</h1>
@@ -302,4 +313,828 @@
                     <div><label>TOTAL P20</label><input type="text" id="s_tot_p20" class="input-total" readonly placeholder="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>P45 LIQ</label><input type="number" id="s_p45_liq" inputmode="numeric" min="0"></div>
-                    <div><label>P45 SUP</lab
+                    <div><label>P45 SUP</label><input type="number" id="s_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="s_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="s_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P45</label><input type="text" id="s_tot_p45" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>ESTÂNCIA</label><input type="number" id="s_ag_est" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="s_ag_ela" inputmode="numeric" min="0"></div>
+                    <div><label>DA PEDRA</label><input type="number" id="s_ag_ped" inputmode="numeric" min="0"></div>
+                    <div><label>TOT ÁGUAS</label><input type="text" id="s_tot_ag" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>TOTAL P5</label><input type="number" id="s_p5" inputmode="numeric" min="0"></div>
+                </div>
+            </div>
+
+            <!-- 3. ENTRADA (CHEIOS) -->
+            <div class="card" style="border-left: 4px solid var(--info);">
+                <h3 class="card-title" style="color: var(--info);">3. ENTRADA DE CHEIOS (Retorno ou Carga)</h3>
+                <div class="grid-inputs">
+                    <div><label>P13 LIQ</label><input type="number" id="e_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="e_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="e_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="e_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P13</label><input type="text" id="e_tot_p13" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="e_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="e_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="e_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="e_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P20</label><input type="text" id="e_tot_p20" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P45 LIQ</label><input type="number" id="e_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="e_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="e_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="e_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P45</label><input type="text" id="e_tot_p45" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>ESTÂNCIA</label><input type="number" id="e_ag_est" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="e_ag_ela" inputmode="numeric" min="0"></div>
+                    <div><label>DA PEDRA</label><input type="number" id="e_ag_ped" inputmode="numeric" min="0"></div>
+                    <div><label>TOT ÁGUAS</label><input type="text" id="e_tot_ag" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>TOTAL P5</label><input type="number" id="e_p5" inputmode="numeric" min="0"></div>
+                </div>
+            </div>
+
+            <!-- 4. RETORNO (VAZIOS) -->
+            <div class="card" style="border-left: 4px solid var(--warning);">
+                <h3 class="card-title" style="color: #d39e00;">4. ENTRADA DE VAZIOS (Cascos Extras)</h3>
+                <div class="grid-inputs">
+                    <div><label>P13 LIQ</label><input type="number" id="r_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="r_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="r_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="r_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P13</label><input type="text" id="r_tot_p13" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="r_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="r_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="r_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="r_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P20</label><input type="text" id="r_tot_p20" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P45 LIQ</label><input type="number" id="r_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="r_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="r_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="r_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P45</label><input type="text" id="r_tot_p45" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>ÁGUA TOTAL</label><input type="number" id="r_agua" inputmode="numeric" min="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>TOTAL P5</label><input type="number" id="r_p5" inputmode="numeric" min="0"></div>
+                </div>
+            </div>
+
+            <!-- 5. RETORNO (TROCAS) -->
+            <div class="card" style="border-left: 4px solid var(--purple);">
+                <h3 class="card-title" style="color: var(--purple);">5. ENTRADA DE TROCAS (Defeitos)</h3>
+                <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">* Ao registrar uma troca, o sistema desconta automaticamente 1 Cheio correspondente para repor no carro.</p>
+                <div class="grid-inputs">
+                    <div><label>P13 LIQ</label><input type="number" id="t_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="t_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="t_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="t_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P13</label><input type="text" id="t_tot_p13" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="t_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="t_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="t_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="t_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P20</label><input type="text" id="t_tot_p20" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P45 LIQ</label><input type="number" id="t_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</label><input type="number" id="t_p45_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P45 NAC</label><input type="number" id="t_p45_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="t_p45_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P45</label><input type="text" id="t_tot_p45" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>ESTÂNCIA</label><input type="number" id="t_ag_est" inputmode="numeric" min="0"></div>
+                    <div><label>ELAN</label><input type="number" id="t_ag_ela" inputmode="numeric" min="0"></div>
+                    <div><label>DA PEDRA</label><input type="number" id="t_ag_ped" inputmode="numeric" min="0"></div>
+                    <div><label>TOT ÁGUAS</label><input type="text" id="t_tot_ag" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>TOTAL P5</label><input type="number" id="t_p5" inputmode="numeric" min="0"></div>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="text-align: left; font-size: 0.9rem;">Observações:</label>
+                    <input type="text" id="obs" placeholder="Alguma avaria ou anotação?">
+                </div>
+            </div>
+        </form>
+
+        <!-- HISTÓRICO -->
+        <div class="card" style="margin-top: 20px;" id="areaHistoricoPDF">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px;">
+                <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico (Últimos 20 Dias)</h3>
+                <button onclick="limparTodoHistorico()" class="btn-excluir" style="font-weight: bold;">🗑️ Limpar Tudo</button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Entregador</th>
+                            <th>Saídas (Cheios)</th>
+                            <th>Entradas (Cheios)</th>
+                            <th>Entradas (Vazios)</th>
+                            <th>Trocas</th>
+                            <th>OBS</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaCorpo"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function fazerLogin() {
+            const user = document.getElementById('loginUser').value.trim();
+            const senha = document.getElementById('loginSenha').value.trim();
+            if (user === "admin" && senha === "1234") {
+                document.getElementById('telaLogin').style.display = 'none';
+                document.getElementById('conteudoSistema').style.display = 'block';
+                localStorage.setItem('logadoJLH', 'sim');
+            } else {
+                document.getElementById('erroLogin').style.display = 'block';
+            }
+        }
+
+        function sairSistema() {
+            localStorage.removeItem('logadoJLH');
+            location.reload();
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('logadoJLH') === 'sim') {
+                document.getElementById('telaLogin').style.display = 'none';
+                document.getElementById('conteudoSistema').style.display = 'block';
+            }
+        };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAy5d-MNdsiX-snU7ThHbu0MXpHTuKz_AI",
+            authDomain: "controledepatiogasvila-nova.firebaseapp.com",
+            databaseURL: "https://controledepatiogasvila-nova-default-rtdb.firebaseio.com", 
+            projectId: "controledepatiogasvila-nova",
+            storageBucket: "controledepatiogasvila-nova.firebasestorage.app",
+            messagingSenderId: "910814111886",
+            appId: "1:910814111886:web:0e1c1f8fcac22b6cab01df"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        db.ref('.info/connected').on('value', function(snap) {
+            if (snap.val() === true) {
+                setTimeout(() => {
+                    const loader = document.getElementById('loaderNuvem');
+                    if(loader) loader.style.display = 'none';
+                }, 800);
+            }
+        });
+
+        window.NOME_MARCA_ATUAL = "OUTRA MARCA";
+        
+        const MOTORISTAS = [
+            { nome: "Aécio", placa: "" }, { nome: "Alexandre", placa: "" }, { nome: "Anderson", placa: "" },
+            { nome: "Anderson Alemão", placa: "" }, { nome: "Ayrton", placa: "" }, { nome: "Edgar", placa: "" },
+            { nome: "Evandro", placa: "" }, { nome: "Everton", placa: "" }, { nome: "Jackson", placa: "" },
+            { nome: "Kleber", placa: "" }, { nome: "Lucas", placa: "" }, { nome: "Lucas Telefone", placa: "" },
+            { nome: "Marcílio", placa: "" }, { nome: "Nei", placa: "" }, { nome: "Nicolas", placa: "" },
+            { nome: "Pedro", placa: "" }, { nome: "Rafa", placa: "" }, { nome: "Soares", placa: "" },
+            { nome: "Soveral", placa: "" }, { nome: "Yuri", placa: "" }
+        ];
+        
+        const PESO_MAXIMO = 6240;
+        
+        let estoque = {
+            cheios: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0, agua:0, ag_est:0, ag_ela:0, ag_ped:0 },
+            vazios: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0, agua:0, ag_est:0, ag_ela:0, ag_ped:0 },
+            trocas: { liq:0, sup:0, nac:0, out:0, p13:0, p20_liq:0, p20_sup:0, p20_nac:0, p20_out:0, p20:0, p45_liq:0, p45_sup:0, p45_nac:0, p45_out:0, p45:0, p5:0, agua:0, ag_est:0, ag_ela:0, ag_ped:0 }
+        };
+
+        let registrosApp = [];
+        
+        db.ref('config/nomeMarca').on('value', (snapshot) => {
+            const nomeSalvo = snapshot.val() || "OUTRA MARCA";
+            document.getElementById('configNomeMarca').value = nomeSalvo;
+            window.NOME_MARCA_ATUAL = nomeSalvo;
+            let nomeCurto = nomeSalvo.length > 8 ? nomeSalvo.substring(0, 8) + '.' : nomeSalvo;
+            document.querySelectorAll('.lbl-out-13').forEach(el => el.innerText = `P13 ${nomeCurto}`);
+            document.querySelectorAll('.lbl-out-20').forEach(el => el.innerText = `P20 ${nomeCurto}`);
+            document.querySelectorAll('.lbl-out-45').forEach(el => el.innerText = `P45 ${nomeCurto}`);
+            renderizarEstoque();
+            renderizarTabela(registrosApp);
+        });
+
+        db.ref('estoque').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if(val) {
+                estoque.cheios = { ...estoque.cheios, ...val.cheios };
+                estoque.vazios = { ...estoque.vazios, ...val.vazios };
+                estoque.trocas = { ...estoque.trocas, ...val.trocas };
+            }
+            renderizarEstoque();
+            calcularPesoTotalAtual();
+        });
+
+        db.ref('registros').on('value', (snapshot) => {
+            const val = snapshot.val();
+            let lista = val || [];
+            const agora = new Date().getTime();
+            const limite = 20 * 24 * 60 * 60 * 1000;
+            const validos = lista.filter(reg => (agora - reg.timestamp) <= limite);
+            
+            if (lista.length !== validos.length) { db.ref('registros').set(validos); lista = validos; }
+            registrosApp = lista;
+            renderizarPainelMotoristas(registrosApp);
+            renderizarTabela(registrosApp);
+        });
+
+        document.addEventListener('input', (e) => {
+            if(e.target.type === 'number') {
+                const prefixos = ['s', 'e', 'r', 't'];
+                prefixos.forEach(p => {
+                    const liq = parseInt(document.getElementById(`${p}_liq`)?.value) || 0;
+                    const sup = parseInt(document.getElementById(`${p}_sup`)?.value) || 0;
+                    const nac = parseInt(document.getElementById(`${p}_nac`)?.value) || 0;
+                    const out = parseInt(document.getElementById(`${p}_out`)?.value) || 0;
+                    const tot13 = document.getElementById(`${p}_tot_p13`);
+                    if(tot13) tot13.value = (liq + sup + nac + out) > 0 ? (liq + sup + nac + out) : '';
+
+                    const p20_liq = parseInt(document.getElementById(`${p}_p20_liq`)?.value) || 0;
+                    const p20_sup = parseInt(document.getElementById(`${p}_p20_sup`)?.value) || 0;
+                    const p20_nac = parseInt(document.getElementById(`${p}_p20_nac`)?.value) || 0;
+                    const p20_out = parseInt(document.getElementById(`${p}_p20_out`)?.value) || 0;
+                    const tot20 = document.getElementById(`${p}_tot_p20`);
+                    if(tot20) tot20.value = (p20_liq + p20_sup + p20_nac + p20_out) > 0 ? (p20_liq + p20_sup + p20_nac + p20_out) : '';
+
+                    const p45_liq = parseInt(document.getElementById(`${p}_p45_liq`)?.value) || 0;
+                    const p45_sup = parseInt(document.getElementById(`${p}_p45_sup`)?.value) || 0;
+                    const p45_nac = parseInt(document.getElementById(`${p}_p45_nac`)?.value) || 0;
+                    const p45_out = parseInt(document.getElementById(`${p}_p45_out`)?.value) || 0;
+                    const tot45 = document.getElementById(`${p}_tot_p45`);
+                    if(tot45) tot45.value = (p45_liq + p45_sup + p45_nac + p45_out) > 0 ? (p45_liq + p45_sup + p45_nac + p45_out) : '';
+
+                    const ag_est = parseInt(document.getElementById(`${p}_ag_est`)?.value) || 0;
+                    const ag_ela = parseInt(document.getElementById(`${p}_ag_ela`)?.value) || 0;
+                    const ag_ped = parseInt(document.getElementById(`${p}_ag_ped`)?.value) || 0;
+                    const totAg = document.getElementById(`${p}_tot_ag`);
+                    if(totAg) totAg.value = (ag_est + ag_ela + ag_ped) > 0 ? (ag_est + ag_ela + ag_ped) : '';
+                });
+            }
+        });
+
+        function salvarNomeMarca(novoNome) {
+            const nomeFormatado = novoNome.trim() === "" ? "OUTRA MARCA" : novoNome.trim().toUpperCase();
+            db.ref('config/nomeMarca').set(nomeFormatado);
+        }
+
+        function getNomeFormatado(k) {
+            const nomeOut = window.NOME_MARCA_ATUAL;
+            const nomeCurto = nomeOut.length > 8 ? nomeOut.substring(0, 8) + '.' : nomeOut;
+            const nomes = {
+                liq: 'P13 LIQ', sup: 'P13 SUP', nac: 'P13 NAC', out: `P13 ${nomeCurto}`, p13: 'P13 GERAL(L)',
+                p20_liq: 'P20 LIQ', p20_sup: 'P20 SUP', p20_nac: 'P20 NAC', p20_out: `P20 ${nomeCurto}`, p20: 'P20 GERAL(L)',
+                p45_liq: 'P45 LIQ', p45_sup: 'P45 SUP', p45_nac: 'P45 NAC', p45_out: `P45 ${nomeCurto}`, p45: 'P45 GERAL(L)',
+                p5: 'P5 TOTAL', 
+                ag_est: 'ESTÂNCIA', ag_ela: 'ELAN', ag_ped: 'ÁGUA DA PEDRA', agua: 'ÁGUA'
+            };
+            return nomes[k] || k.toUpperCase();
+        }
+
+        function calcularPesoTotalAtual() {
+            let pesoTotal = 0;
+            const c = estoque.cheios;
+            const t = estoque.trocas;
+            
+            pesoTotal += ((c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0)) * 13;
+            pesoTotal += ((c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0)) * 20;
+            pesoTotal += ((c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0)) * 45;
+            pesoTotal += (c.p5||0) * 5;
+            pesoTotal += ((c.ag_est||0)+(c.ag_ela||0)+(c.ag_ped||0)+(c.agua||0)) * 20;
+
+            pesoTotal += ((t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0)) * 13;
+            pesoTotal += ((t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0)) * 20;
+            pesoTotal += ((t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0)) * 45;
+            pesoTotal += (t.p5||0) * 5;
+            pesoTotal += ((t.ag_est||0)+(t.ag_ela||0)+(t.ag_ped||0)+(t.agua||0)) * 20;
+
+            const display = document.getElementById('displayPesoTotal');
+            const displaySugestao = document.getElementById('displaySugestao');
+            
+            if (pesoTotal > PESO_MAXIMO) {
+                const excesso = pesoTotal - PESO_MAXIMO;
+                display.className = 'peso-total peso-excedido';
+                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Peso Total Atual: <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Excedeu: ${excesso} kg`;
+                displaySugestao.style.display = 'none';
+            } else {
+                const restante = PESO_MAXIMO - pesoTotal;
+                display.className = 'peso-total peso-normal';
+                display.innerHTML = `✅ Peso Seguro no Pátio<br>Peso Total Atual: <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Espaço Livre (Restante): ${restante} kg`;
+                
+                if (restante > 0) {
+                    displaySugestao.style.display = 'block';
+                    let sug = [];
+                    if (restante >= 45) sug.push(`${Math.floor(restante/45)} un. P45`);
+                    if (restante >= 20) sug.push(`${Math.floor(restante/20)} un. P20/ÁGUA`);
+                    if (restante >= 13) sug.push(`${Math.floor(restante/13)} un. P13`);
+                    displaySugestao.innerHTML = `Você ainda pode colocar:<br><br>${sug.join(' <b>OU</b> ')}`;
+                } else { displaySugestao.style.display = 'none'; }
+            }
+        }
+
+        function renderizarGrupo(tipoEstoque, obj) {
+            let outName = window.NOME_MARCA_ATUAL;
+            let nomeCurto = outName.length > 8 ? outName.substring(0, 8) + '.' : outName;
+            let html = '';
+
+            const grupos = [
+                { titulo: 'P13', keys: ['liq', 'sup', 'nac', 'out'] },
+                { titulo: 'P20', keys: ['p20_liq', 'p20_sup', 'p20_nac', 'p20_out'] },
+                { titulo: 'P45', keys: ['p45_liq', 'p45_sup', 'p45_nac', 'p45_out'] }
+            ];
+
+            grupos.forEach(g => {
+                let total = 0;
+                g.keys.forEach(k => {
+                    let val = obj[k] || 0;
+                    total += val;
+                    let lbl = (k === 'out' || k === 'p20_out' || k === 'p45_out') ? `${g.titulo} ${nomeCurto}` : getNomeFormatado(k);
+                    html += `<div><div class="item-val">${val}</div><div class="item-label">${lbl}</div></div>`;
+                });
+                
+                let legacyVal = 0;
+                if(g.titulo === 'P13') { legacyVal = obj.p13 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
+                if(g.titulo === 'P20') { legacyVal = obj.p20 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
+                if(g.titulo === 'P45') { legacyVal = obj.p45 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
+                total += legacyVal;
+
+                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;"><div class="item-val" style="color:#000;">${total}</div><div class="item-label">TOTAL ${g.titulo}</div></div>`;
+                html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
+            });
+
+            if (tipoEstoque === 'vazios') {
+                html += `<div><div class="item-val">${obj.agua||0}</div><div class="item-label">ÁGUA (VAZIA)</div></div>`;
+                html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
+            } else {
+                let vEst = obj.ag_est || 0;
+                let vEla = obj.ag_ela || 0;
+                let vPed = obj.ag_ped || 0;
+                let totAg = vEst + vEla + vPed;
+
+                html += `<div><div class="item-val">${vEst}</div><div class="item-label">ESTÂNCIA</div></div>`;
+                html += `<div><div class="item-val">${vEla}</div><div class="item-label">ELAN</div></div>`;
+                html += `<div><div class="item-val">${vPed}</div><div class="item-label">ÁGUA DA PEDRA</div></div>`;
+                
+                let legacyAgua = obj.agua || 0;
+                if(legacyAgua > 0) { html += `<div><div class="item-val" style="color:red">${legacyAgua}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; totAg += legacyAgua; }
+
+                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;"><div class="item-val" style="color:#000;">${totAg}</div><div class="item-label">TOTAL ÁGUAS</div></div>`;
+                html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
+            }
+
+            html += `<div><div class="item-val">${obj.p5||0}</div><div class="item-label">TOTAL P5</div></div>`;
+            return html;
+        }
+
+        function renderizarEstoque() {
+            document.getElementById('displayCheios').innerHTML = renderizarGrupo('cheios', estoque.cheios);
+            document.getElementById('displayVazios').innerHTML = renderizarGrupo('vazios', estoque.vazios);
+            document.getElementById('displayTrocas').innerHTML = renderizarGrupo('trocas', estoque.trocas);
+        }
+
+        function toggleAjusteEstoque() {
+            const painel = document.getElementById('painelAjusteEstoque');
+            if (painel.style.display === 'block') { painel.style.display = 'none'; } 
+            else {
+                painel.style.display = 'block';
+                Object.keys(estoque.cheios).forEach(k => { const el = document.getElementById(`est_c_${k}`); if(el) el.value = estoque.cheios[k]; });
+                Object.keys(estoque.vazios).forEach(k => { const el = document.getElementById(`est_v_${k}`); if(el) el.value = estoque.vazios[k]; });
+                Object.keys(estoque.trocas).forEach(k => { const el = document.getElementById(`est_t_${k}`); if(el) el.value = estoque.trocas[k]; });
+            }
+        }
+
+        function salvarEstoqueManual() {
+            Object.keys(estoque.cheios).forEach(k => { const el = document.getElementById(`est_c_${k}`); if(el) estoque.cheios[k] = parseInt(el.value) || 0; });
+            Object.keys(estoque.vazios).forEach(k => { const el = document.getElementById(`est_v_${k}`); if(el) estoque.vazios[k] = parseInt(el.value) || 0; });
+            Object.keys(estoque.trocas).forEach(k => { const el = document.getElementById(`est_t_${k}`); if(el) estoque.trocas[k] = parseInt(el.value) || 0; });
+            
+            db.ref('estoque').set(estoque).then(() => { toggleAjusteEstoque(); alert("Estoque atualizado!"); });
+        }
+
+        function renderizarPainelMotoristas(registros) {
+            const grid = document.getElementById('gridMotoristas');
+            grid.innerHTML = '';
+            const hoje = new Date().toDateString();
+
+            MOTORISTAS.forEach(motorista => {
+                const viagens = registros.filter(reg => reg.entregador === motorista.nome && new Date(reg.timestamp).toDateString() === hoje).length;
+                const btn = document.createElement('div');
+                btn.className = 'btn-motorista';
+                if(document.getElementById('entregador').value === motorista.nome) btn.classList.add('selecionado');
+                btn.innerHTML = `${motorista.nome} <span class="badge-viagens">(${viagens} hoje)</span>`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
+                    btn.classList.add('selecionado');
+                    document.getElementById('entregador').value = motorista.nome;
+                    
+                    let ultimaPlaca = motorista.placa;
+                    const registrosDoMotorista = registros.filter(r => r.entregador === motorista.nome);
+                    
+                    if (registrosDoMotorista.length > 0) {
+                        const ultimoRegistro = registrosDoMotorista.reduce((prev, curr) => (prev.timestamp > curr.timestamp) ? prev : curr);
+                        ultimaPlaca = ultimoRegistro.carro || "";
+                    }
+
+                    document.getElementById('carro').value = ultimaPlaca;
+                    document.getElementById('s_liq').focus(); 
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function formatarItens(obj) {
+            if(!obj) return '-';
+            const itens = Object.keys(obj).filter(k => obj[k] > 0).map(k => `<b>${obj[k]}</b> ${getNomeFormatado(k)}`);
+            return itens.length > 0 ? itens.join('<br>') : '-';
+        }
+
+        function renderizarTabela(registros) {
+            const tbody = document.getElementById('tabelaCorpo');
+            tbody.innerHTML = '';
+            [...registros].sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
+                const tr = document.createElement('tr');
+                const hora = new Date(reg.timestamp).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+                tr.innerHTML = `
+                    <td>${hora}</td>
+                    <td><strong>${reg.entregador}</strong><br><small>${reg.carro}</small></td>
+                    <td style="color:var(--danger)">${formatarItens(reg.saidas)}</td>
+                    <td style="color:var(--info)">${formatarItens(reg.entradas)}</td>
+                    <td style="color:#d39e00">${formatarItens(reg.retornos)}</td>
+                    <td style="color:var(--purple)">${formatarItens(reg.trocas)}</td>
+                    <td>${reg.obs || '-'}</td>
+                    <td><button class="btn-excluir" onclick="deletarRegistro(${reg.timestamp})">X</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function extrairValores(prefixo) {
+            return {
+                liq: parseInt(document.getElementById(`${prefixo}_liq`)?.value)||0, sup: parseInt(document.getElementById(`${prefixo}_sup`)?.value)||0, nac: parseInt(document.getElementById(`${prefixo}_nac`)?.value)||0, out: parseInt(document.getElementById(`${prefixo}_out`)?.value)||0, 
+                p20_liq: parseInt(document.getElementById(`${prefixo}_p20_liq`)?.value)||0, p20_sup: parseInt(document.getElementById(`${prefixo}_p20_sup`)?.value)||0, p20_nac: parseInt(document.getElementById(`${prefixo}_p20_nac`)?.value)||0, p20_out: parseInt(document.getElementById(`${prefixo}_p20_out`)?.value)||0, 
+                p45_liq: parseInt(document.getElementById(`${prefixo}_p45_liq`)?.value)||0, p45_sup: parseInt(document.getElementById(`${prefixo}_p45_sup`)?.value)||0, p45_nac: parseInt(document.getElementById(`${prefixo}_p45_nac`)?.value)||0, p45_out: parseInt(document.getElementById(`${prefixo}_p45_out`)?.value)||0, 
+                ag_est: parseInt(document.getElementById(`${prefixo}_ag_est`)?.value)||0, ag_ela: parseInt(document.getElementById(`${prefixo}_ag_ela`)?.value)||0, ag_ped: parseInt(document.getElementById(`${prefixo}_ag_ped`)?.value)||0,
+                p5: parseInt(document.getElementById(`${prefixo}_p5`)?.value)||0
+            };
+        }
+
+        document.getElementById('registroForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const entregador = document.getElementById('entregador').value;
+            if(!entregador) { alert("Selecione um motorista!"); return; }
+
+            const novoRegistro = {
+                timestamp: new Date().getTime(),
+                entregador: entregador,
+                carro: document.getElementById('carro').value.trim(),
+                obs: document.getElementById('obs').value.trim(),
+                saidas: extrairValores('s'),
+                entradas: extrairValores('e'),
+                retornos: extrairValores('r'),
+                trocas: extrairValores('t')
+            };
+            
+            novoRegistro.retornos = {
+                liq: parseInt(document.getElementById('r_liq')?.value)||0, sup: parseInt(document.getElementById('r_sup')?.value)||0, nac: parseInt(document.getElementById('r_nac')?.value)||0, out: parseInt(document.getElementById('r_out')?.value)||0, 
+                p20_liq: parseInt(document.getElementById('r_p20_liq')?.value)||0, p20_sup: parseInt(document.getElementById('r_p20_sup')?.value)||0, p20_nac: parseInt(document.getElementById('r_p20_nac')?.value)||0, p20_out: parseInt(document.getElementById('r_p20_out')?.value)||0, 
+                p45_liq: parseInt(document.getElementById('r_p45_liq')?.value)||0, p45_sup: parseInt(document.getElementById('r_p45_sup')?.value)||0, p45_nac: parseInt(document.getElementById('r_p45_nac')?.value)||0, p45_out: parseInt(document.getElementById('r_p45_out')?.value)||0, 
+                agua: parseInt(document.getElementById('r_agua')?.value)||0,
+                p5: parseInt(document.getElementById('r_p5')?.value)||0
+            };
+            
+            Object.keys(novoRegistro.saidas).forEach(k => {
+                let qtdSaida = novoRegistro.saidas[k];
+                if (qtdSaida > 0) { 
+                    estoque.cheios[k] -= qtdSaida; 
+                    if (k === 'ag_est' || k === 'ag_ela' || k === 'ag_ped') {
+                        estoque.vazios.agua = (estoque.vazios.agua || 0) + qtdSaida;
+                    } else {
+                        estoque.vazios[k] = (estoque.vazios[k] || 0) + qtdSaida; 
+                    }
+                }
+            });
+
+            Object.keys(novoRegistro.entradas).forEach(k => { 
+                if (novoRegistro.entradas[k] > 0) estoque.cheios[k] += novoRegistro.entradas[k];
+            });
+
+            Object.keys(novoRegistro.retornos).forEach(k => { 
+                if (novoRegistro.retornos[k] > 0) estoque.vazios[k] = (estoque.vazios[k] || 0) + novoRegistro.retornos[k];
+            });
+            
+            Object.keys(novoRegistro.trocas).forEach(k => {
+                let qtdTroca = novoRegistro.trocas[k];
+                if (qtdTroca > 0) {
+                    estoque.trocas[k] += qtdTroca;
+                    if (estoque.cheios[k] !== undefined) {
+                        estoque.cheios[k] -= qtdTroca; 
+                    }
+                }
+            });
+            
+            db.ref('estoque').set(estoque);
+            registrosApp.push(novoRegistro);
+            db.ref('registros').set(registrosApp);
+
+            document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
+            document.getElementById('obs').value = '';
+            document.getElementById('entregador').value = '';
+            document.getElementById('carro').value = '';
+            document.querySelectorAll('.btn-motorista').forEach(b => b.classList.remove('selecionado'));
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function deletarRegistro(timestamp) {
+            if(confirm("Apagar este registro? O estoque será corrigido automaticamente na nuvem.")) {
+                const index = registrosApp.findIndex(reg => reg.timestamp === timestamp);
+                if (index > -1) {
+                    const reg = registrosApp[index];
+                    
+                    Object.keys(reg.saidas).forEach(k => {
+                        let q = reg.saidas[k];
+                        if(q > 0) { 
+                            estoque.cheios[k] += q; 
+                            if (k === 'ag_est' || k === 'ag_ela' || k === 'ag_ped') {
+                                estoque.vazios.agua -= q;
+                            } else {
+                                estoque.vazios[k] -= q; 
+                            }
+                        }
+                    });
+
+                    if(reg.entradas) Object.keys(reg.entradas).forEach(k => {
+                        if (reg.entradas[k] > 0) estoque.cheios[k] -= reg.entradas[k];
+                    });
+
+                    if(reg.retornos) Object.keys(reg.retornos).forEach(k => {
+                        if (reg.retornos[k] > 0) estoque.vazios[k] -= reg.retornos[k];
+                    });
+                    
+                    if(reg.trocas) Object.keys(reg.trocas).forEach(k => {
+                        let q = reg.trocas[k];
+                        if(q > 0) {
+                            estoque.trocas[k] -= q;
+                            if (estoque.cheios[k] !== undefined) {
+                                estoque.cheios[k] += q;
+                            }
+                        }
+                    });
+                    
+                    db.ref('estoque').set(estoque);
+                    registrosApp.splice(index, 1);
+                    db.ref('registros').set(registrosApp);
+                }
+            }
+        }
+
+        function limparTodoHistorico() {
+            if(confirm("Deseja apagar TODO o histórico?")) db.ref('registros').set([]);
+        }
+
+        // ==========================================
+        //  GERADOR DE PDF (COM SOMA E CORREÇÃO DE QUEBRA)
+        // ==========================================
+
+        function formatZero(val) { return Number(val) > 0 ? Number(val) : ''; }
+
+        function formatarItensTexto(obj) {
+            if(!obj) return 'Nada';
+            const itens = Object.keys(obj).filter(k => Number(obj[k]) > 0).map(k => `${obj[k]}x ${getNomeFormatado(k)}`);
+            return itens.length > 0 ? itens.join(', ') : 'Nada';
+        }
+
+        function gerarRelatorioPDF() {
+            let c = estoque.cheios;
+            let v = estoque.vazios;
+            let t = estoque.trocas;
+            let m4 = window.NOME_MARCA_ATUAL;
+
+            // Totais P13 (Forçando Number para evitar falhas de soma)
+            let tot13_c = (Number(c.liq)||0) + (Number(c.sup)||0) + (Number(c.nac)||0) + (Number(c.out)||0) + (Number(c.p13)||0);
+            let tot13_v = (Number(v.liq)||0) + (Number(v.sup)||0) + (Number(v.nac)||0) + (Number(v.out)||0) + (Number(v.p13)||0);
+            let tot13_t = (Number(t.liq)||0) + (Number(t.sup)||0) + (Number(t.nac)||0) + (Number(t.out)||0) + (Number(t.p13||0));
+
+            // Totais P45
+            let tot45_c = (Number(c.p45_liq)||0) + (Number(c.p45_sup)||0) + (Number(c.p45_nac)||0) + (Number(c.p45_out)||0) + (Number(c.p45)||0);
+            let tot45_v = (Number(v.p45_liq)||0) + (Number(v.p45_sup)||0) + (Number(v.p45_nac)||0) + (Number(v.p45_out)||0) + (Number(v.p45)||0);
+            let tot45_t = (Number(t.p45_liq)||0) + (Number(t.p45_sup)||0) + (Number(t.p45_nac)||0) + (Number(t.p45_out)||0) + (Number(t.p45)||0);
+
+            // Totais P20
+            let tot20_c = (Number(c.p20_liq)||0) + (Number(c.p20_sup)||0) + (Number(c.p20_nac)||0) + (Number(c.p20_out)||0) + (Number(c.p20)||0);
+            let tot20_v = (Number(v.p20_liq)||0) + (Number(v.p20_sup)||0) + (Number(v.p20_nac)||0) + (Number(v.p20_out)||0) + (Number(v.p20)||0);
+            let tot20_t = (Number(t.p20_liq)||0) + (Number(t.p20_sup)||0) + (Number(t.p20_nac)||0) + (Number(t.p20_out)||0) + (Number(t.p20)||0);
+
+            // Totais Águas
+            let totAg_c = (Number(c.ag_est)||0) + (Number(c.ag_ela)||0) + (Number(c.ag_ped)||0) + (Number(c.agua)||0);
+            let totAg_t = (Number(t.ag_est)||0) + (Number(t.ag_ela)||0) + (Number(t.ag_ped)||0) + (Number(t.agua||0));
+
+            const divPDF = document.createElement('div');
+            divPDF.style.padding = '20px 30px';
+            divPDF.style.fontFamily = 'Helvetica, Arial, sans-serif';
+            divPDF.style.color = '#333';
+            divPDF.style.backgroundColor = '#fff';
+
+            let htmlDoc = `
+                <div style="border-bottom: 3px solid #0056b3; padding-bottom: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h1 style="margin: 0; color: #0056b3; font-size: 26px; font-weight: 900; text-transform: uppercase;">Gás Vila Nova</h1>
+                        <h2 style="margin: 5px 0 0 0; font-size: 14px; color: #666; letter-spacing: 1px;">RELATÓRIO DE PÁTIO E ESTOQUE</h2>
+                    </div>
+                    <div style="text-align: right; font-size: 11px; color: #555;">
+                        <strong>Data de Emissão:</strong><br>
+                        ${new Date().toLocaleString('pt-BR')}
+                    </div>
+                </div>
+
+                <style>
+                    .tabela-pdf { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12px; font-family: Helvetica, Arial, sans-serif; }
+                    .tabela-pdf th { background-color: #0056b3; color: white; padding: 10px; text-align: center; border: 1px solid #004494; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;}
+                    .tabela-pdf td { padding: 8px 10px; border: 1px solid #dee2e6; text-align: center; color: #333; }
+                    .tabela-pdf tbody tr:nth-child(even) td { background-color: #f8f9fa; }
+                    
+                    .tabela-pdf .grupo-titulo td { background-color: #e9ecef; color: #000; font-weight: bold; text-align: left; font-size: 13px; border-top: 2px solid #adb5bd; }
+                    
+                    .tabela-pdf .resumo-linha td { background-color: #e2e3e5; border-top: 2px solid #adb5bd; border-bottom: 2px solid #adb5bd; font-weight: bold; vertical-align: middle; }
+                    .destaque-vazios { color: #856404; font-size: 11px; font-weight: normal; display: block; margin-top: 4px; }
+                    .destaque-cheios { color: #155724; font-size: 14px; }
+                    .destaque-trocas { color: #4a148c; font-size: 14px; }
+                    
+                    .pdf-peso { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 25px; font-weight: bold; text-align: center;}
+                    .pdf-peso.excesso { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+                    
+                    /* ===== CORREÇÃO DA QUEBRA DE PÁGINA (EVITA CORTAR NO MEIO) ===== */
+                    tr, .hist-item, .evita-corte { 
+                        page-break-inside: avoid !important; 
+                        break-inside: avoid !important; 
+                    }
+                </style>
+
+                <table class="tabela-pdf">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%; text-align: left;">Produto / Marca</th>
+                            <th style="width: 30%;">Cheios (No Pátio)</th>
+                            <th style="width: 30%;">Trocas (Defeito)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- P13 -->
+                        <tr class="grupo-titulo"><td colspan="3">🟡 BOTIJÃO P13</td></tr>
+                        <tr><td style="text-align: left;">Nacional</td><td>${formatZero(c.nac)}</td><td>${formatZero(t.nac)}</td></tr>
+                        <tr><td style="text-align: left;">Super</td><td>${formatZero(c.sup)}</td><td>${formatZero(t.sup)}</td></tr>
+                        <tr><td style="text-align: left;">Liquigás</td><td>${formatZero(c.liq)}</td><td>${formatZero(t.liq)}</td></tr>
+                        <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.out)}</td><td>${formatZero(t.out)}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS P13
+                                <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot13_v || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${tot13_c || '0'}</td>
+                            <td class="destaque-trocas">${tot13_t || '0'}</td>
+                        </tr>
+
+                        <!-- P45 -->
+                        <tr class="grupo-titulo"><td colspan="3">🔵 CILINDRO P45</td></tr>
+                        <tr><td style="text-align: left;">Nacional</td><td>${formatZero(c.p45_nac)}</td><td>${formatZero(t.p45_nac)}</td></tr>
+                        <tr><td style="text-align: left;">Super</td><td>${formatZero(c.p45_sup)}</td><td>${formatZero(t.p45_sup)}</td></tr>
+                        <tr><td style="text-align: left;">Liquigás</td><td>${formatZero(c.p45_liq)}</td><td>${formatZero(t.p45_liq)}</td></tr>
+                        <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.p45_out)}</td><td>${formatZero(t.p45_out)}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS P45
+                                <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot45_v || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${tot45_c || '0'}</td>
+                            <td class="destaque-trocas">${tot45_t || '0'}</td>
+                        </tr>
+
+                        <!-- P20 -->
+                        <tr class="grupo-titulo"><td colspan="3">🟢 CILINDRO P20 (EMPILHADEIRA)</td></tr>
+                        <tr><td style="text-align: left;">Nacional</td><td>${formatZero(c.p20_nac)}</td><td>${formatZero(t.p20_nac)}</td></tr>
+                        <tr><td style="text-align: left;">Super</td><td>${formatZero(c.p20_sup)}</td><td>${formatZero(t.p20_sup)}</td></tr>
+                        <tr><td style="text-align: left;">Liquigás</td><td>${formatZero(c.p20_liq)}</td><td>${formatZero(t.p20_liq)}</td></tr>
+                        <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.p20_out)}</td><td>${formatZero(t.p20_out)}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS P20
+                                <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot20_v || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${tot20_c || '0'}</td>
+                            <td class="destaque-trocas">${tot20_t || '0'}</td>
+                        </tr>
+
+                        <!-- P05 -->
+                        <tr class="grupo-titulo"><td colspan="3">🟠 BOTIJÃO P5</td></tr>
+                        <tr><td style="text-align: left;">P5 (Geral)</td><td>${formatZero(c.p5)}</td><td>${formatZero(t.p5)}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS P5
+                                <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${Number(v.p5) || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${Number(c.p5) || '0'}</td>
+                            <td class="destaque-trocas">${Number(t.p5) || '0'}</td>
+                        </tr>
+
+                        <!-- ÁGUAS -->
+                        <tr class="grupo-titulo"><td colspan="3">💧 GALÃO DE ÁGUA 20L</td></tr>
+                        <tr><td style="text-align: left;">Estância</td><td>${formatZero(c.ag_est)}</td><td>${formatZero(t.ag_est)}</td></tr>
+                        <tr><td style="text-align: left;">Elan</td><td>${formatZero(c.ag_ela)}</td><td>${formatZero(t.ag_ela)}</td></tr>
+                        <tr><td style="text-align: left;">Água da Pedra</td><td>${formatZero(c.ag_ped)}</td><td>${formatZero(t.ag_ped)}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS ÁGUAS
+                                <span class="destaque-vazios" style="color:#0c5460;">📦 VAZIAS NO PÁTIO: ${Number(v.agua) || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${totAg_c || '0'}</td>
+                            <td class="destaque-trocas">${totAg_t || '0'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="evita-corte">
+                    <h3 style="color: #0056b3; font-size: 16px; text-transform: uppercase; margin-bottom: 8px;">Análise de Peso Atual</h3>
+                    <div class="pdf-peso ${document.getElementById('displayPesoTotal').classList.contains('peso-excedido') ? 'excesso' : ''}">
+                        ${document.getElementById('displayPesoTotal').innerHTML.replace(/<br>/g, ' &nbsp;|&nbsp; ').replace(/<b>/g, '').replace(/<\/b>/g, '')}
+                    </div>
+                </div>
+
+                <h3 style="color: #0056b3; font-size: 16px; text-transform: uppercase; margin-top: 30px; border-bottom: 2px solid #ccc; padding-bottom: 8px;">Histórico de Movimentações</h3>
+                <div>
+            `;
+
+            [...registrosApp].sort((a,b)=>b.timestamp - a.timestamp).slice(0, 50).forEach(reg => {
+                let d = new Date(reg.timestamp).toLocaleString('pt-BR');
+                htmlDoc += `
+                    <div class="hist-item">
+                        <strong style="font-size: 12px; color: #333;">🕒 ${d} | Entregador: ${reg.entregador} ${reg.carro ? '('+reg.carro+')' : ''}</strong>
+                        <div style="margin-top: 5px; padding-left: 10px;">
+                            <span><b>Saídas:</b> ${formatarItensTexto(reg.saidas)}</span> &nbsp;•&nbsp; 
+                            <span><b>Entradas (Cheios):</b> ${formatarItensTexto(reg.entradas)}</span> &nbsp;•&nbsp; 
+                            <span><b>Vazios (Retorno):</b> ${formatarItensTexto(reg.retornos)}</span> &nbsp;•&nbsp; 
+                            <span><b>Trocas:</b> ${formatarItensTexto(reg.trocas)}</span>
+                            ${reg.obs ? `<div style="margin-top:4px; color:#666;"><i>Observação: ${reg.obs}</i></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            htmlDoc += `</div>`;
+            divPDF.innerHTML = htmlDoc;
+
+            let opcoesPDF = {
+                margin:       [10, 10, 15, 10],
+                filename:     'Relatorio_Patio_JLH.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'], avoid: ['tr', '.hist-item', '.evita-corte'] }
+            };
+
+            const btn = document.querySelector('.btn-doc');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "⏳ Abrindo visualização...";
+            btn.disabled = true;
+
+            const novaGuia = window.open('', '_blank');
+            if (novaGuia) {
+                novaGuia.document.write('<h3 style="font-family:sans-serif; text-align:center; margin-top:50px; color:#0056b3;">Aguarde, gerando visualização do PDF... ⏳</h3>');
+            } else {
+                alert("O seu navegador bloqueou a nova aba. Por favor, permita os pop-ups para este site.");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
+
+            html2pdf().set(opcoesPDF).from(divPDF).toPdf().get('pdf').then(function(pdf) {
+                const pdfUrl = pdf.output('bloburl');
+                novaGuia.location.href = pdfUrl;
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                novaGuia.close();
+                alert("Erro ao gerar PDF: " + err);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
