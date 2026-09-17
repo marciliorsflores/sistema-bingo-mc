@@ -142,20 +142,9 @@
 
     <div id="loaderNuvem">🔄 Sincronizando com a Nuvem...</div>
 
-    <div id="telaLogin" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; display: flex; align-items: center; justify-content: center; z-index: 9999;">
-        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 300px;">
-            <h2 style="margin-top: 0; color: #0056b3;">Acesso Restrito</h2>
-            <input type="text" id="loginUser" onkeypress="verificarEnter(event)" placeholder="Usuário" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;">
-            <input type="password" id="loginSenha" onkeypress="verificarEnter(event)" placeholder="Senha" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;">
-            <button onclick="fazerLogin()" style="background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer;">Entrar</button>
-            <p id="erroLogin" style="color: red; display: none; font-size: 0.9rem; margin-top: 10px;">Usuário ou senha incorretos!</p>
-        </div>
-    </div>
-
-    <div class="container" id="conteudoSistema" style="display: none;">
+    <div class="container" id="conteudoSistema">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <button class="btn-doc" onclick="gerarRelatorioPDF()">📑 Pré-visualizar PDF</button>
-            <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
         <h1>Controle de Pátio e Cargas</h1>
@@ -300,4 +289,17 @@
             <div class="card" style="border-left: 4px solid var(--danger);">
                 <h3 class="card-title" style="color: var(--danger);">2. SAÍDA DE CHEIOS (Saindo do Pátio)</h3>
                 <div class="grid-inputs">
-                    <div><l
+                    <div><label>P13 LIQ</label><input type="number" id="s_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P13 SUP</label><input type="number" id="s_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P13 NAC</label><input type="number" id="s_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-13">P13 OUT</label><input type="number" id="s_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P13</label><input type="text" id="s_tot_p13" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P20 LIQ</label><input type="number" id="s_p20_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P20 SUP</label><input type="number" id="s_p20_sup" inputmode="numeric" min="0"></div>
+                    <div><label>P20 NAC</label><input type="number" id="s_p20_nac" inputmode="numeric" min="0"></div>
+                    <div><label class="lbl-out-20">P20 OUT</label><input type="number" id="s_p20_out" inputmode="numeric" min="0"></div>
+                    <div><label>TOTAL P20</label><input type="text" id="s_tot_p20" class="input-total" readonly placeholder="0"></div>
+                    <div class="sec-divisor"></div>
+                    <div><label>P45 LIQ</label><input type="number" id="s_p45_liq" inputmode="numeric" min="0"></div>
+                    <div><label>P45 SUP</lab
