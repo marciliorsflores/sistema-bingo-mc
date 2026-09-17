@@ -142,20 +142,9 @@
 
     <div id="loaderNuvem">🔄 Sincronizando com a Nuvem...</div>
 
-    <div id="telaLogin" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; display: flex; align-items: center; justify-content: center; z-index: 9999;">
-        <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 300px;">
-            <h2 style="margin-top: 0; color: #0056b3;">Acesso Restrito</h2>
-            <input type="text" id="loginUser" placeholder="Usuário" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;">
-            <input type="password" id="loginSenha" placeholder="Senha" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box;">
-            <button onclick="fazerLogin()" style="background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer;">Entrar</button>
-            <p id="erroLogin" style="color: red; display: none; font-size: 0.9rem; margin-top: 10px;">Usuário ou senha incorretos!</p>
-        </div>
-    </div>
-
-    <div class="container" id="conteudoSistema" style="display: none;">
+    <div class="container" id="conteudoSistema">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
             <button class="btn-doc" onclick="gerarRelatorioPDF()">📑 Pré-visualizar PDF</button>
-            <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
         <h1>Controle de Pátio e Cargas</h1>
@@ -451,30 +440,6 @@
     </div>
 
     <script>
-        function fazerLogin() {
-            const user = document.getElementById('loginUser').value.trim();
-            const senha = document.getElementById('loginSenha').value.trim();
-            if (user === "admin" && senha === "1234") {
-                document.getElementById('telaLogin').style.display = 'none';
-                document.getElementById('conteudoSistema').style.display = 'block';
-                localStorage.setItem('logadoJLH', 'sim');
-            } else {
-                document.getElementById('erroLogin').style.display = 'block';
-            }
-        }
-
-        function sairSistema() {
-            localStorage.removeItem('logadoJLH');
-            location.reload();
-        }
-
-        window.onload = function() {
-            if (localStorage.getItem('logadoJLH') === 'sim') {
-                document.getElementById('telaLogin').style.display = 'none';
-                document.getElementById('conteudoSistema').style.display = 'block';
-            }
-        };
-
         const firebaseConfig = {
             apiKey: "AIzaSyAy5d-MNdsiX-snU7ThHbu0MXpHTuKz_AI",
             authDomain: "controledepatiogasvila-nova.firebaseapp.com",
@@ -496,6 +461,11 @@
                 }, 800);
             }
         });
+
+        setTimeout(() => {
+            const loader = document.getElementById('loaderNuvem');
+            if(loader) loader.style.display = 'none';
+        }, 3000);
 
         window.NOME_MARCA_ATUAL = "OUTRA MARCA";
         
@@ -610,19 +580,20 @@
         function calcularPesoTotalAtual() {
             let pesoTotal = 0;
             const c = estoque.cheios;
+            const v = estoque.vazios;
             const t = estoque.trocas;
             
-            pesoTotal += ((c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0)) * 13;
-            pesoTotal += ((c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0)) * 20;
-            pesoTotal += ((c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0)) * 45;
-            pesoTotal += (c.p5||0) * 5;
-            pesoTotal += ((c.ag_est||0)+(c.ag_ela||0)+(c.ag_ped||0)+(c.agua||0)) * 20;
+            // Soma de TODOS os recipientes de GÁS (Cheios + Vazios + Trocas), excluindo água
+            let totalP13 = (c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0) + (v.liq||0)+(v.sup||0)+(v.nac||0)+(v.out||0)+(v.p13||0) + (t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0);
+            let totalP20 = (c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0) + (v.p20_liq||0)+(v.p20_sup||0)+(v.p20_nac||0)+(v.p20_out||0)+(v.p20||0) + (t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0);
+            let totalP45 = (c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0) + (v.p45_liq||0)+(v.p45_sup||0)+(v.p45_nac||0)+(v.p45_out||0)+(v.p45||0) + (t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0);
+            let totalP5  = (c.p5||0) + (v.p5||0) + (t.p5||0);
 
-            pesoTotal += ((t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0)) * 13;
-            pesoTotal += ((t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0)) * 20;
-            pesoTotal += ((t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0)) * 45;
-            pesoTotal += (t.p5||0) * 5;
-            pesoTotal += ((t.ag_est||0)+(t.ag_ela||0)+(t.ag_ped||0)+(t.agua||0)) * 20;
+            pesoTotal += totalP13 * 13;
+            pesoTotal += totalP20 * 20;
+            pesoTotal += totalP45 * 45;
+            pesoTotal += totalP5 * 5;
+            // Nota: Água foi intencionalmente excluída do cálculo do limite de peso do pátio.
 
             const display = document.getElementById('displayPesoTotal');
             const displaySugestao = document.getElementById('displaySugestao');
@@ -630,18 +601,18 @@
             if (pesoTotal > PESO_MAXIMO) {
                 const excesso = pesoTotal - PESO_MAXIMO;
                 display.className = 'peso-total peso-excedido';
-                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Peso Total Atual: <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Excedeu: ${excesso} kg`;
+                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Peso Total Atual (Gás): <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Excedeu: ${excesso} kg`;
                 displaySugestao.style.display = 'none';
             } else {
                 const restante = PESO_MAXIMO - pesoTotal;
                 display.className = 'peso-total peso-normal';
-                display.innerHTML = `✅ Peso Seguro no Pátio<br>Peso Total Atual: <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Espaço Livre (Restante): ${restante} kg`;
+                display.innerHTML = `✅ Peso Seguro no Pátio<br>Peso Total Atual (Gás): <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Espaço Livre (Restante): ${restante} kg`;
                 
                 if (restante > 0) {
                     displaySugestao.style.display = 'block';
                     let sug = [];
                     if (restante >= 45) sug.push(`${Math.floor(restante/45)} un. P45`);
-                    if (restante >= 20) sug.push(`${Math.floor(restante/20)} un. P20/ÁGUA`);
+                    if (restante >= 20) sug.push(`${Math.floor(restante/20)} un. P20`);
                     if (restante >= 13) sug.push(`${Math.floor(restante/13)} un. P13`);
                     displaySugestao.innerHTML = `Você ainda pode colocar:<br><br>${sug.join(' <b>OU</b> ')}`;
                 } else { displaySugestao.style.display = 'none'; }
@@ -909,7 +880,7 @@
         }
 
         // ==========================================
-        //  GERADOR DE PDF (COM SOMA E CORREÇÃO DE QUEBRA)
+        //  GERADOR DE PDF (COM SUBTOTAIS E SOMA DE VAZIOS)
         // ==========================================
 
         function formatZero(val) { return Number(val) > 0 ? Number(val) : ''; }
@@ -926,10 +897,10 @@
             let t = estoque.trocas;
             let m4 = window.NOME_MARCA_ATUAL;
 
-            // Totais P13 (Forçando Number para evitar falhas de soma)
+            // Totais P13
             let tot13_c = (Number(c.liq)||0) + (Number(c.sup)||0) + (Number(c.nac)||0) + (Number(c.out)||0) + (Number(c.p13)||0);
             let tot13_v = (Number(v.liq)||0) + (Number(v.sup)||0) + (Number(v.nac)||0) + (Number(v.out)||0) + (Number(v.p13)||0);
-            let tot13_t = (Number(t.liq)||0) + (Number(t.sup)||0) + (Number(t.nac)||0) + (Number(t.out)||0) + (Number(t.p13||0));
+            let tot13_t = (Number(t.liq)||0) + (Number(t.sup)||0) + (Number(t.nac)||0) + (Number(t.out)||0) + (Number(t.p13)||0);
 
             // Totais P45
             let tot45_c = (Number(c.p45_liq)||0) + (Number(c.p45_sup)||0) + (Number(c.p45_nac)||0) + (Number(c.p45_out)||0) + (Number(c.p45)||0);
@@ -943,7 +914,8 @@
 
             // Totais Águas
             let totAg_c = (Number(c.ag_est)||0) + (Number(c.ag_ela)||0) + (Number(c.ag_ped)||0) + (Number(c.agua)||0);
-            let totAg_t = (Number(t.ag_est)||0) + (Number(t.ag_ela)||0) + (Number(t.ag_ped)||0) + (Number(t.agua||0));
+            let totAg_v = Number(v.agua)||0;
+            let totAg_t = (Number(t.ag_est)||0) + (Number(t.ag_ela)||0) + (Number(t.ag_ped)||0) + (Number(t.agua)||0);
 
             const divPDF = document.createElement('div');
             divPDF.style.padding = '20px 30px';
@@ -972,14 +944,13 @@
                     .tabela-pdf .grupo-titulo td { background-color: #e9ecef; color: #000; font-weight: bold; text-align: left; font-size: 13px; border-top: 2px solid #adb5bd; }
                     
                     .tabela-pdf .resumo-linha td { background-color: #e2e3e5; border-top: 2px solid #adb5bd; border-bottom: 2px solid #adb5bd; font-weight: bold; vertical-align: middle; }
-                    .destaque-vazios { color: #856404; font-size: 11px; font-weight: normal; display: block; margin-top: 4px; }
-                    .destaque-cheios { color: #155724; font-size: 14px; }
-                    .destaque-trocas { color: #4a148c; font-size: 14px; }
+                    .destaque-vazios { color: #856404; font-size: 11px; font-weight: bold; display: block; margin-top: 4px; }
+                    .destaque-cheios { color: #155724; font-size: 13px; }
+                    .destaque-trocas { color: #4a148c; font-size: 13px; }
                     
                     .pdf-peso { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 25px; font-weight: bold; text-align: center;}
                     .pdf-peso.excesso { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
                     
-                    /* ===== CORREÇÃO DA QUEBRA DE PÁGINA (EVITA CORTAR NO MEIO) ===== */
                     tr, .hist-item, .evita-corte { 
                         page-break-inside: avoid !important; 
                         break-inside: avoid !important; 
@@ -1003,7 +974,7 @@
                         <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.out)}</td><td>${formatZero(t.out)}</td></tr>
                         <tr class="resumo-linha">
                             <td style="text-align: right; text-transform: uppercase;">
-                                TOTAIS P13
+                                SUBTOTAIS P13
                                 <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot13_v || '0'}</span>
                             </td>
                             <td class="destaque-cheios">${tot13_c || '0'}</td>
@@ -1018,7 +989,7 @@
                         <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.p45_out)}</td><td>${formatZero(t.p45_out)}</td></tr>
                         <tr class="resumo-linha">
                             <td style="text-align: right; text-transform: uppercase;">
-                                TOTAIS P45
+                                SUBTOTAIS P45
                                 <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot45_v || '0'}</span>
                             </td>
                             <td class="destaque-cheios">${tot45_c || '0'}</td>
@@ -1033,7 +1004,7 @@
                         <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.p20_out)}</td><td>${formatZero(t.p20_out)}</td></tr>
                         <tr class="resumo-linha">
                             <td style="text-align: right; text-transform: uppercase;">
-                                TOTAIS P20
+                                SUBTOTAIS P20
                                 <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot20_v || '0'}</span>
                             </td>
                             <td class="destaque-cheios">${tot20_c || '0'}</td>
@@ -1045,7 +1016,7 @@
                         <tr><td style="text-align: left;">P5 (Geral)</td><td>${formatZero(c.p5)}</td><td>${formatZero(t.p5)}</td></tr>
                         <tr class="resumo-linha">
                             <td style="text-align: right; text-transform: uppercase;">
-                                TOTAIS P5
+                                SUBTOTAIS P5
                                 <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${Number(v.p5) || '0'}</span>
                             </td>
                             <td class="destaque-cheios">${Number(c.p5) || '0'}</td>
@@ -1059,8 +1030,8 @@
                         <tr><td style="text-align: left;">Água da Pedra</td><td>${formatZero(c.ag_ped)}</td><td>${formatZero(t.ag_ped)}</td></tr>
                         <tr class="resumo-linha">
                             <td style="text-align: right; text-transform: uppercase;">
-                                TOTAIS ÁGUAS
-                                <span class="destaque-vazios" style="color:#0c5460;">📦 VAZIAS NO PÁTIO: ${Number(v.agua) || '0'}</span>
+                                SUBTOTAIS ÁGUAS
+                                <span class="destaque-vazios" style="color:#0c5460;">📦 VAZIAS NO PÁTIO: ${totAg_v || '0'}</span>
                             </td>
                             <td class="destaque-cheios">${totAg_c || '0'}</td>
                             <td class="destaque-trocas">${totAg_t || '0'}</td>
@@ -1069,7 +1040,7 @@
                 </table>
 
                 <div class="evita-corte">
-                    <h3 style="color: #0056b3; font-size: 16px; text-transform: uppercase; margin-bottom: 8px;">Análise de Peso Atual</h3>
+                    <h3 style="color: #0056b3; font-size: 16px; text-transform: uppercase; margin-bottom: 8px;">Análise de Capacidade do Pátio (Peso Total de Gás)</h3>
                     <div class="pdf-peso ${document.getElementById('displayPesoTotal').classList.contains('peso-excedido') ? 'excesso' : ''}">
                         ${document.getElementById('displayPesoTotal').innerHTML.replace(/<br>/g, ' &nbsp;|&nbsp; ').replace(/<b>/g, '').replace(/<\/b>/g, '')}
                     </div>
