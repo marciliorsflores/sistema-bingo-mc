@@ -154,7 +154,7 @@
 
     <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-doc" onclick="gerarRelatorioPDF()">📑 Exportar PDF Profissional</button>
+            <button class="btn-doc" onclick="gerarRelatorioPDF()">📑 Pré-visualizar PDF</button>
             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -909,7 +909,7 @@
         }
 
         // ==========================================
-        //  GERADOR DE PDF (NOVO LAYOUT PROFISSIONAL)
+        //  GERADOR DE PDF (COM PREVIEW NA NOVA ABA)
         // ==========================================
 
         function formatZero(val) { return val > 0 ? val : ''; }
@@ -926,9 +926,24 @@
             let t = estoque.trocas;
             let m4 = window.NOME_MARCA_ATUAL;
 
+            // Totais P13
+            let tot13_c = (c.liq||0) + (c.sup||0) + (c.nac||0) + (c.out||0) + (c.p13||0);
             let tot13_v = (v.liq||0) + (v.sup||0) + (v.nac||0) + (v.out||0) + (v.p13||0);
-            let tot20_v = (v.p20_liq||0) + (v.p20_sup||0) + (v.p20_nac||0) + (v.p20_out||0) + (v.p20||0);
+            let tot13_t = (t.liq||0) + (t.sup||0) + (t.nac||0) + (t.out||0) + (t.p13||0);
+
+            // Totais P45
+            let tot45_c = (c.p45_liq||0) + (c.p45_sup||0) + (c.p45_nac||0) + (c.p45_out||0) + (c.p45||0);
             let tot45_v = (v.p45_liq||0) + (v.p45_sup||0) + (v.p45_nac||0) + (v.p45_out||0) + (v.p45||0);
+            let tot45_t = (t.p45_liq||0) + (t.p45_sup||0) + (t.p45_nac||0) + (t.p45_out||0) + (t.p45||0);
+
+            // Totais P20
+            let tot20_c = (c.p20_liq||0) + (c.p20_sup||0) + (c.p20_nac||0) + (c.p20_out||0) + (c.p20||0);
+            let tot20_v = (v.p20_liq||0) + (v.p20_sup||0) + (v.p20_nac||0) + (v.p20_out||0) + (v.p20||0);
+            let tot20_t = (t.p20_liq||0) + (t.p20_sup||0) + (t.p20_nac||0) + (t.p20_out||0) + (t.p20||0);
+
+            // Totais Águas
+            let totAg_c = (c.ag_est||0) + (c.ag_ela||0) + (c.ag_ped||0) + (c.agua||0);
+            let totAg_t = (t.ag_est||0) + (t.ag_ela||0) + (t.ag_ped||0) + (t.agua||0);
 
             // Cria um elemento oculto na memória com o novo design
             const divPDF = document.createElement('div');
@@ -956,7 +971,12 @@
                     .tabela-pdf tbody tr:nth-child(even) td { background-color: #f8f9fa; }
                     
                     .tabela-pdf .grupo-titulo td { background-color: #e9ecef; color: #000; font-weight: bold; text-align: left; font-size: 13px; border-top: 2px solid #adb5bd; }
-                    .tabela-pdf .vazios-linha td { background-color: #fff3cd; color: #856404; font-weight: bold; font-size: 12px; border-bottom: 2px solid #ffeeba; text-transform: uppercase; padding: 10px; }
+                    
+                    /* Nova linha de totais profissionais */
+                    .tabela-pdf .resumo-linha td { background-color: #e2e3e5; border-top: 2px solid #adb5bd; border-bottom: 2px solid #adb5bd; font-weight: bold; vertical-align: middle; }
+                    .destaque-vazios { color: #856404; font-size: 11px; font-weight: normal; display: block; margin-top: 4px; }
+                    .destaque-cheios { color: #155724; font-size: 14px; }
+                    .destaque-trocas { color: #4a148c; font-size: 14px; }
                     
                     .pdf-peso { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 25px; font-weight: bold; text-align: center;}
                     .pdf-peso.excesso { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
@@ -980,7 +1000,14 @@
                         <tr><td style="text-align: left;">Super</td><td>${formatZero(c.sup) || '-'}</td><td>${formatZero(t.sup) || '-'}</td></tr>
                         <tr><td style="text-align: left;">Liquigás</td><td>${formatZero(c.liq) || '-'}</td><td>${formatZero(t.liq) || '-'}</td></tr>
                         <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.out) || '-'}</td><td>${formatZero(t.out) || '-'}</td></tr>
-                        <tr class="vazios-linha"><td colspan="3">📦 P13 VAZIOS TOTAIS NO PÁTIO: ${tot13_v || '0'}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS P13
+                                <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot13_v || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${tot13_c || '0'}</td>
+                            <td class="destaque-trocas">${tot13_t || '0'}</td>
+                        </tr>
 
                         <!-- P45 -->
                         <tr class="grupo-titulo"><td colspan="3">🔵 CILINDRO P45</td></tr>
@@ -988,7 +1015,14 @@
                         <tr><td style="text-align: left;">Super</td><td>${formatZero(c.p45_sup) || '-'}</td><td>${formatZero(t.p45_sup) || '-'}</td></tr>
                         <tr><td style="text-align: left;">Liquigás</td><td>${formatZero(c.p45_liq) || '-'}</td><td>${formatZero(t.p45_liq) || '-'}</td></tr>
                         <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.p45_out) || '-'}</td><td>${formatZero(t.p45_out) || '-'}</td></tr>
-                        <tr class="vazios-linha"><td colspan="3">📦 P45 VAZIOS TOTAIS NO PÁTIO: ${tot45_v || '0'}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS P45
+                                <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot45_v || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${tot45_c || '0'}</td>
+                            <td class="destaque-trocas">${tot45_t || '0'}</td>
+                        </tr>
 
                         <!-- P20 -->
                         <tr class="grupo-titulo"><td colspan="3">🟢 CILINDRO P20 (EMPILHADEIRA)</td></tr>
@@ -996,19 +1030,40 @@
                         <tr><td style="text-align: left;">Super</td><td>${formatZero(c.p20_sup) || '-'}</td><td>${formatZero(t.p20_sup) || '-'}</td></tr>
                         <tr><td style="text-align: left;">Liquigás</td><td>${formatZero(c.p20_liq) || '-'}</td><td>${formatZero(t.p20_liq) || '-'}</td></tr>
                         <tr><td style="text-align: left;">${m4}</td><td>${formatZero(c.p20_out) || '-'}</td><td>${formatZero(t.p20_out) || '-'}</td></tr>
-                        <tr class="vazios-linha"><td colspan="3">📦 P20 VAZIOS TOTAIS NO PÁTIO: ${tot20_v || '0'}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS P20
+                                <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${tot20_v || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${tot20_c || '0'}</td>
+                            <td class="destaque-trocas">${tot20_t || '0'}</td>
+                        </tr>
 
                         <!-- P05 -->
                         <tr class="grupo-titulo"><td colspan="3">🟠 BOTIJÃO P5</td></tr>
                         <tr><td style="text-align: left;">P5 (Geral)</td><td>${formatZero(c.p5) || '-'}</td><td>${formatZero(t.p5) || '-'}</td></tr>
-                        <tr class="vazios-linha"><td colspan="3">📦 P5 VAZIOS TOTAIS NO PÁTIO: ${v.p5 || '0'}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS P5
+                                <span class="destaque-vazios">📦 VAZIOS NO PÁTIO: ${v.p5 || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${c.p5 || '0'}</td>
+                            <td class="destaque-trocas">${t.p5 || '0'}</td>
+                        </tr>
 
                         <!-- ÁGUAS -->
                         <tr class="grupo-titulo"><td colspan="3">💧 GALÃO DE ÁGUA 20L</td></tr>
                         <tr><td style="text-align: left;">Estância</td><td>${formatZero(c.ag_est) || '-'}</td><td>${formatZero(t.ag_est) || '-'}</td></tr>
                         <tr><td style="text-align: left;">Elan</td><td>${formatZero(c.ag_ela) || '-'}</td><td>${formatZero(t.ag_ela) || '-'}</td></tr>
                         <tr><td style="text-align: left;">Água da Pedra</td><td>${formatZero(c.ag_ped) || '-'}</td><td>${formatZero(t.ag_ped) || '-'}</td></tr>
-                        <tr class="vazios-linha"><td style="background-color:#d1ecf1; color:#0c5460; border-bottom: 2px solid #bee5eb;" colspan="3">📦 ÁGUAS VAZIAS TOTAIS NO PÁTIO: ${v.agua || '0'}</td></tr>
+                        <tr class="resumo-linha">
+                            <td style="text-align: right; text-transform: uppercase;">
+                                TOTAIS ÁGUAS
+                                <span class="destaque-vazios" style="color:#0c5460;">📦 VAZIAS NO PÁTIO: ${v.agua || '0'}</span>
+                            </td>
+                            <td class="destaque-cheios">${totAg_c || '0'}</td>
+                            <td class="destaque-trocas">${totAg_t || '0'}</td>
+                        </tr>
                     </tbody>
                 </table>
 
@@ -1041,7 +1096,7 @@
             divPDF.innerHTML = htmlDoc;
 
             let opcoesPDF = {
-                margin:       [10, 10, 15, 10], // Margens do PDF [top, left, bottom, right]
+                margin:       [10, 10, 15, 10],
                 filename:     'Relatorio_Patio_JLH.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
@@ -1050,13 +1105,29 @@
 
             const btn = document.querySelector('.btn-doc');
             const originalText = btn.innerHTML;
-            btn.innerHTML = "⏳ Gerando PDF, aguarde...";
+            btn.innerHTML = "⏳ Abrindo visualização...";
             btn.disabled = true;
 
-            html2pdf().set(opcoesPDF).from(divPDF).save().then(() => {
+            // Abre uma nova guia IMEDIATAMENTE (isso impede bloqueadores de popup no celular)
+            const novaGuia = window.open('', '_blank');
+            if (novaGuia) {
+                novaGuia.document.write('<h3 style="font-family:sans-serif; text-align:center; margin-top:50px; color:#0056b3;">Aguarde, gerando visualização do PDF... ⏳</h3>');
+            } else {
+                alert("O seu navegador bloqueou a nova aba. Por favor, permita os pop-ups para este site.");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
+
+            // Gera o arquivo em memória e injeta na nova aba
+            html2pdf().set(opcoesPDF).from(divPDF).toPdf().get('pdf').then(function(pdf) {
+                const pdfUrl = pdf.output('bloburl'); // Cria uma URL segura em memória
+                novaGuia.location.href = pdfUrl;      // Redireciona a nova aba para o PDF
+                
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }).catch(err => {
+                novaGuia.close();
                 alert("Erro ao gerar PDF: " + err);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
