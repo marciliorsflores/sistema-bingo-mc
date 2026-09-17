@@ -9,13 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
-    <!-- BIBLIOTECA PARA GERAR DOCX EDITÁVEL -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.js"></script>
-
-    <!-- TENSORFLOW.JS PARA SUPORTE A VISÃO COMPUTACIONAL NO NAVEGADOR -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
-
     <style>
         :root {
             --primary: #0056b3; --success: #28a745; --danger: #dc3545;
@@ -85,15 +78,9 @@
             border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
         }
         .btn-doc {
-            background: #0056b3; color: #fff; border: none; padding: 10px 15px;
-            border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px; width: auto;
+            background: #0056b3; color: #fff; border: none; padding: 12px 15px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px; width: auto; font-size: 0.95rem;
         }
-        .btn-camera-ia {
-            background: #6f42c1; color: #fff; border: none; padding: 12px 15px;
-            border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
-            display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem;
-        }
-        .btn-camera-ia:hover { background: #5a32a3; }
         
         #painelAjusteEstoque {
             display: none; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px;
@@ -145,36 +132,11 @@
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         
         .sec-divisor { grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0; }
-        
-        #modalCameraIA {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 11000; flex-direction: column; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box;
-        }
     </style>
 </head>
 <body>
 
     <div id="loaderNuvem">🔄 Sincronizando com a Nuvem...</div>
-
-    <!-- MODAL DE PROCESSAMENTO DE CÂMERA IA -->
-    <div id="modalCameraIA">
-        <div style="background: white; padding: 20px; border-radius: 12px; max-width: 400px; width: 100%; text-align: center;">
-            <h3 style="color: #6f42c1; margin-top:0;">🤖 Visão Computacional (IA)</h3>
-            <p id="statusIA" style="font-size: 0.9rem; color: #555;">Carregando modelo de inteligência artificial...</p>
-            
-            <div style="margin: 15px 0;">
-                <video id="videoPreview" autoplay playsinline style="width: 100%; max-height: 250px; background: #000; border-radius: 8px; object-fit: cover; display: none;"></video>
-                <canvas id="canvasPreview" style="display:none;"></canvas>
-            </div>
-
-            <input type="file" id="inputFotoCamera" accept="image/*" capture="environment" style="display:none;" onchange="processarFotoCapturada(event)">
-            
-            <div id="botoesAcaoIA">
-                <button type="button" onclick="dispararCapturaCamera()" class="btn-camera-ia" style="justify-content:center;">📸 Tirar Foto da Carga</button>
-                <button type="button" onclick="fecharModalIA()" style="background: #ccc; border:none; padding: 10px; width:100%; border-radius:6px; font-weight:bold; cursor:pointer;">Cancelar</button>
-            </div>
-        </div>
-    </div>
 
     <div id="telaLogin" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; display: flex; align-items: center; justify-content: center; z-index: 9999;">
         <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 300px;">
@@ -188,7 +150,7 @@
 
     <div class="container" id="conteudoSistema" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-doc" onclick="gerarRelatorioEditavel()">📝 Gerar Relatório Editável (.docx)</button>
+            <button class="btn-doc" onclick="gerarRelatorioEditavel()">📝 Exportar Relatório (.doc)</button>
             <button onclick="sairSistema()" style="background: var(--danger); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -255,7 +217,7 @@
                     <div><label>P45 LIQ</label><input type="number" id="est_v_p45_liq" min="0"></div>
                     <div><label>P45 SUP</label><input type="number" id="est_v_p45_sup" min="0"></div>
                     <div><label>P45 NAC</label><input type="number" id="est_v_p45_nac" min="0"></div>
-                    <div><label>lbl-out-45</label><input type="number" id="est_v_p45_out" min="0"></div>
+                    <div><label class="lbl-out-45">P45 OUT</label><input type="number" id="est_v_p45_out" min="0"></div>
                     <div><label style="color:red">P45 GERAL(L)</label><input type="number" id="est_v_p45" min="0"></div>
                     <div class="sec-divisor"></div>
                     <div><label>ÁGUA TOTAL</label><input type="number" id="est_v_agua" min="0"></div>
@@ -329,11 +291,6 @@
                     <input type="text" id="carro" required autocomplete="off" placeholder="Placa do carro">
                 </div>
             </div>
-
-            <!-- BOTÃO DE IA COM CÂMERA -->
-            <button type="button" class="btn-camera-ia" onclick="abrirModalIA()">
-                📸 Escanear Carga / Identificar com Câmera (IA)
-            </button>
 
             <!-- 2. SAÍDA (CHEIOS) -->
             <div class="card" style="border-left: 4px solid var(--danger);">
@@ -949,74 +906,7 @@
 
 
         // ==========================================
-        //  MÓDULO DE VISÃO COMPUTACIONAL (CÂMERA E IA)
-        // ==========================================
-        let modeloIA = null;
-
-        async function carregarModeloIA() {
-            const status = document.getElementById('statusIA');
-            if (!modeloIA) {
-                try {
-                    status.innerText = "Baixando motor de IA para o celular...";
-                    modeloIA = await cocoSsd.load();
-                    status.innerText = "Pronto! Aponte para a carga e tire a foto.";
-                } catch(e) {
-                    status.innerText = "Modo de contagem manual ativado por foto.";
-                }
-            }
-        }
-
-        function abrirModalIA() {
-            document.getElementById('modalCameraIA').style.display = 'flex';
-            carregarModeloIA();
-        }
-
-        function fecharModalIA() {
-            document.getElementById('modalCameraIA').style.display = 'none';
-        }
-
-        function dispararCapturaCamera() {
-            document.getElementById('inputFotoCamera').click();
-        }
-
-        async function processarFotoCapturada(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const status = document.getElementById('statusIA');
-            status.innerText = "Analisando objetos, cilindros e lacres na imagem...";
-
-            const img = new Image();
-            img.src = URL.createObjectURL(file);
-            img.onload = async function() {
-                let itensDetectados = 0;
-                if (modeloIA) {
-                    const predictions = await modeloIA.detect(img);
-                    // Analisa itens detectados na imagem (como cilindros/garrafas/esferas mapeadas pela IA)
-                    itensDetectados = predictions.length;
-                }
-
-                // Estimativa inteligente baseada na análise visual ou preenchimento guiado
-                let sugerido = itensDetectados > 0 ? itensDetectados : Math.floor(Math.random() * 5) + 3;
-                
-                status.innerText = `Análise concluída! Detectados ${sugerido} itens. Aplicando no campo P13...`;
-                
-                setTimeout(() => {
-                    // Preenche automaticamente o campo principal de Saída P13 NACIONAL como base para validação
-                    const campoS = document.getElementById('s_nac');
-                    if(campoS) {
-                        campoS.value = sugerido;
-                        campoS.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                    fecharModalIA();
-                    alert(`✅ IA aplicada com sucesso!\nForam computados ${sugerido} botijões com base na captura da câmera. Confira e ajuste se necessário.`);
-                }, 1000);
-            };
-        }
-
-
-        // ==========================================
-        //  GERADOR DE RELATÓRIO EDITÁVEL (.docx)
+        //  GERADOR DE RELATÓRIO EDITÁVEL (.DOC NATIVO)
         // ==========================================
 
         function formatZero(val) { return val > 0 ? val : ''; }
@@ -1037,132 +927,132 @@
             let tot20_v = (v.p20_liq||0) + (v.p20_sup||0) + (v.p20_nac||0) + (v.p20_out||0) + (v.p20||0);
             let tot45_v = (v.p45_liq||0) + (v.p45_sup||0) + (v.p45_nac||0) + (v.p45_out||0) + (v.p45||0);
 
+            // Removido o html-docx-js. Usando o formato padrão que o Microsoft Word entende nativamente
+            const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml'><head><meta charset='utf-8'><title>Relatório Pátio</title></head><body style="font-family: Arial, sans-serif; color: #000; font-size: 11pt;">`;
+            
             let htmlDoc = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml'>
-                <head><meta charset='utf-8'><title>Relatório Pátio</title></head>
-                <body style="font-family: Arial, sans-serif; color: #000; font-size: 11pt;">
-                    <h2 style="text-align: center; margin: 0 0 5px 0;">Relatório de Pátio e Cargas</h2>
-                    <p style="text-align: right; font-style: italic; font-size: 10pt; margin: 0 0 15px 0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
+                <h2 style="text-align: center; margin: 0 0 5px 0;">Relatório de Pátio e Cargas</h2>
+                <p style="text-align: right; font-style: italic; font-size: 10pt; margin: 0 0 15px 0;">Emissão: ${new Date().toLocaleString('pt-BR')}</p>
 
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                        <thead>
-                            <tr style="background-color: #d3d3d3;">
-                                <th colspan="4" style="border: 2px solid #000; padding: 6px; font-size: 13pt; text-align:center;">Gás Vila Nova</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- P13 -->
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; width: 22%; padding: 4px;">P13 Nacional</td>
-                                <td style="border: 1px solid #000; width: 12%; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.nac)}</td>
-                                <td style="border: 1px solid #000; width: 33%; padding: 4px;">Trocas P13 Nacional: <b>${formatZero(t.nac)}</b></td>
-                                <td rowspan="4" style="border: 2px solid #000; width: 33%; text-align: center; vertical-align: middle;">
-                                    <b>P13 Vazios:</b><br><br><span style="font-size: 18pt; font-weight: bold;">${formatZero(tot13_v)}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 Super</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.sup)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 Super: <b>${formatZero(t.sup)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 Liquigás</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.liq)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 Liquigás: <b>${formatZero(t.liq)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 ${m4}</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.out)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P13 ${m4}: <b>${formatZero(t.out)}</b></td>
-                            </tr>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;" border="1">
+                    <thead>
+                        <tr style="background-color: #d3d3d3;">
+                            <th colspan="4" style="border: 2px solid #000; padding: 6px; font-size: 13pt; text-align:center;">Gás Vila Nova</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- P13 -->
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; width: 22%; padding: 4px;">P13 Nacional</td>
+                            <td style="border: 1px solid #000; width: 12%; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.nac)}</td>
+                            <td style="border: 1px solid #000; width: 33%; padding: 4px;">Trocas P13 Nacional: <b>${formatZero(t.nac)}</b></td>
+                            <td rowspan="4" style="border: 2px solid #000; width: 33%; text-align: center; vertical-align: middle;">
+                                <b>P13 Vazios:</b><br><br><span style="font-size: 18pt; font-weight: bold;">${formatZero(tot13_v)}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 Super</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.sup)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P13 Super: <b>${formatZero(t.sup)}</b></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 Liquigás</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.liq)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P13 Liquigás: <b>${formatZero(t.liq)}</b></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P13 ${m4}</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.out)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P13 ${m4}: <b>${formatZero(t.out)}</b></td>
+                        </tr>
 
-                            <!-- P45 -->
-                            <tr>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Nacional</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_nac)}</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P45 Nacional: <b>${formatZero(t.p45_nac)}</b></td>
-                                <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
-                                    <b>P45 Vazios:</b><br><br><span style="font-size: 18pt; font-weight: bold;">${formatZero(tot45_v)}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Super</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_sup)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 Super: <b>${formatZero(t.p45_sup)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Liquigás</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_liq)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 Liquigás: <b>${formatZero(t.p45_liq)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 ${m4}</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_out)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P45 ${m4}: <b>${formatZero(t.p45_out)}</b></td>
-                            </tr>
+                        <!-- P45 -->
+                        <tr>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Nacional</td>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_nac)}</td>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P45 Nacional: <b>${formatZero(t.p45_nac)}</b></td>
+                            <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
+                                <b>P45 Vazios:</b><br><br><span style="font-size: 18pt; font-weight: bold;">${formatZero(tot45_v)}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Super</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_sup)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P45 Super: <b>${formatZero(t.p45_sup)}</b></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 Liquigás</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_liq)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P45 Liquigás: <b>${formatZero(t.p45_liq)}</b></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P45 ${m4}</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p45_out)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P45 ${m4}: <b>${formatZero(t.p45_out)}</b></td>
+                        </tr>
 
-                            <!-- P20 -->
-                            <tr>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Nacional</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_nac)}</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P20 Nacional: <b>${formatZero(t.p20_nac)}</b></td>
-                                <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
-                                    <b>P20 Vazios:</b><br><br><span style="font-size: 18pt; font-weight: bold;">${formatZero(tot20_v)}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Super</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_sup)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 Super: <b>${formatZero(t.p20_sup)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Liquigás</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_liq)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 Liquigás: <b>${formatZero(t.p20_liq)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 ${m4}</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_out)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas P20 ${m4}: <b>${formatZero(t.p20_out)}</b></td>
-                            </tr>
+                        <!-- P20 -->
+                        <tr>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Nacional</td>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_nac)}</td>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P20 Nacional: <b>${formatZero(t.p20_nac)}</b></td>
+                            <td rowspan="4" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
+                                <b>P20 Vazios:</b><br><br><span style="font-size: 18pt; font-weight: bold;">${formatZero(tot20_v)}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Super</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_sup)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P20 Super: <b>${formatZero(t.p20_sup)}</b></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 Liquigás</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_liq)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P20 Liquigás: <b>${formatZero(t.p20_liq)}</b></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P20 ${m4}</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p20_out)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas P20 ${m4}: <b>${formatZero(t.p20_out)}</b></td>
+                        </tr>
 
-                            <!-- P05 -->
-                            <tr>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P05 Total</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p5)}</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P05 Total: <b>${formatZero(t.p5)}</b></td>
-                                <td style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
-                                    <b>P05 Vazios:</b><br><span style="font-size: 12pt; font-weight: bold;">${formatZero(v.p5)}</span>
-                                </td>
-                            </tr>
+                        <!-- P05 -->
+                        <tr>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">P05 Total</td>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.p5)}</td>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas P05 Total: <b>${formatZero(t.p5)}</b></td>
+                            <td style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
+                                <b>P05 Vazios:</b><br><span style="font-size: 12pt; font-weight: bold;">${formatZero(v.p5)}</span>
+                            </td>
+                        </tr>
 
-                            <!-- AGUAS -->
-                            <tr>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água Estância</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_est)}</td>
-                                <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas Estância: <b>${formatZero(t.ag_est)}</b></td>
-                                <td rowspan="3" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
-                                    <b>Águas Vazias:</b><br><br><span style="font-size: 18pt; font-weight: bold;">${formatZero(v.agua)}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água Elan</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_ela)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas Elan: <b>${formatZero(t.ag_ela)}</b></td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água da Pedra</td>
-                                <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_ped)}</td>
-                                <td style="border: 1px solid #000; padding: 4px;">Trocas da Pedra: <b>${formatZero(t.ag_ped)}</b></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <!-- AGUAS -->
+                        <tr>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água Estância</td>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_est)}</td>
+                            <td style="border: 1px solid #000; border-top: 2px solid #000; padding: 4px;">Trocas Estância: <b>${formatZero(t.ag_est)}</b></td>
+                            <td rowspan="3" style="border: 2px solid #000; border-top: 2px solid #000; text-align: center; vertical-align: middle;">
+                                <b>Águas Vazias:</b><br><br><span style="font-size: 18pt; font-weight: bold;">${formatZero(v.agua)}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água Elan</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_ela)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas Elan: <b>${formatZero(t.ag_ela)}</b></td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #000; background: #eaeaea; font-weight: bold; padding: 4px;">Água da Pedra</td>
+                            <td style="border: 1px solid #000; text-align: center; font-weight: bold; font-size: 12pt;">${formatZero(c.ag_ped)}</td>
+                            <td style="border: 1px solid #000; padding: 4px;">Trocas da Pedra: <b>${formatZero(t.ag_ped)}</b></td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                    <h3 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 20px;">PESO DO PÁTIO</h3>
-                    <p style="font-size: 11pt; line-height: 1.5; margin-bottom:20px;">${document.getElementById('displayPesoTotal').innerText.replace(/\n/g, '<br>')}</p>
+                <h3 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 20px;">PESO DO PÁTIO</h3>
+                <p style="font-size: 11pt; line-height: 1.5; margin-bottom:20px;">${document.getElementById('displayPesoTotal').innerText.replace(/\n/g, '<br>')}</p>
 
-                    <h3 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 20px;">HISTÓRICO DE MOVIMENTAÇÕES</h3>
-                    <ul style="list-style: none; padding-left: 0; font-size: 10pt;">
+                <h3 style="border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 20px;">HISTÓRICO DE MOVIMENTAÇÕES</h3>
+                <ul style="list-style: none; padding-left: 0; font-size: 10pt;">
             `;
 
             [...registrosApp].sort((a,b)=>b.timestamp - a.timestamp).forEach(reg => {
@@ -1181,12 +1071,15 @@
                 `;
             });
 
-            htmlDoc += `</ul></body></html>`;
+            const postHtml = `</ul></body></html>`;
+            const fullContent = preHtml + htmlDoc + postHtml;
 
             try {
-                const converted = htmlDocx.asBlob(htmlDoc);
-                const file = new File([converted], 'Relatorio_Patio_JLH.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                // Monta o arquivo como .doc usando o tipo mime nativo do MS Word
+                const blob = new Blob(['\ufeff', fullContent], { type: 'application/msword' });
+                const file = new File([blob], 'Relatorio_Patio_JLH.doc', { type: 'application/msword' });
 
+                // Tenta compartilhar pelo WhatsApp/celular
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
                         await navigator.share({ title: 'Relatório Pátio JLH', files: [file] });
@@ -1196,17 +1089,18 @@
                     }
                 }
 
-                const fileURL = URL.createObjectURL(converted);
+                // Faz o download direto se estiver no PC
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = fileURL; 
-                a.download = 'Relatorio_Patio_JLH.docx'; 
+                a.href = url;
+                a.download = 'Relatorio_Patio_JLH.doc';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                URL.revokeObjectURL(fileURL);
-
+                URL.revokeObjectURL(url);
+                
             } catch (err) {
-                alert("Erro ao gerar o relatório editável: " + err);
+                alert("Erro ao gerar o arquivo de relatório: " + err);
             }
         }
     </script>
