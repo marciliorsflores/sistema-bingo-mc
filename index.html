@@ -612,43 +612,29 @@
             // PESO TOTAL DO PÁTIO (Água não entra)
             let pesoTotal = w_p13 + w_p20 + w_p45 + w_p5;
 
-            // ATUALIZAR GRELHA DE PESOS INDIVIDUAIS ACIMA DA CAIXA DE ALERTA
-            document.getElementById('displayDetalhesPeso').innerHTML = `
-                <div class="detalhes-peso-ui">
-                    <div class="detalhes-card-peso">
-                        <div style="font-size: 0.8rem; font-weight: bold; color: #555;">PESO P13</div>
-                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">${w_p13} kg</div>
-                        <div style="font-size: 0.7rem; color: #666;">${u_p13} un x 13kg</div>
-                    </div>
-                    <div class="detalhes-card-peso">
-                        <div style="font-size: 0.8rem; font-weight: bold; color: #555;">PESO P20</div>
-                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">${w_p20} kg</div>
-                        <div style="font-size: 0.7rem; color: #666;">${u_p20} un x 20kg</div>
-                    </div>
-                    <div class="detalhes-card-peso">
-                        <div style="font-size: 0.8rem; font-weight: bold; color: #555;">PESO P45</div>
-                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">${w_p45} kg</div>
-                        <div style="font-size: 0.7rem; color: #666;">${u_p45} un x 45kg</div>
-                    </div>
-                    <div class="detalhes-card-peso">
-                        <div style="font-size: 0.8rem; font-weight: bold; color: #555;">PESO P5</div>
-                        <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">${w_p5} kg</div>
-                        <div style="font-size: 0.7rem; color: #666;">${u_p5} un x 5kg</div>
-                    </div>
-                </div>
-            `;
-
             const display = document.getElementById('displayPesoTotal');
             
-            // LÓGICA DA CAIXA FINAL (IGUAL AO SCREENSHOT)
             if (pesoTotal > PESO_MAXIMO) {
                 const excesso = pesoTotal - PESO_MAXIMO;
+                
+                // Mensagem inteligente sobre o excesso em opções "OU"
+                let sugestoesRemocao = [];
+                if (excesso >= 45) sugestoesRemocao.push(`<b>${(excesso/45).toFixed(1)}</b> un. P45`);
+                if (excesso >= 20) sugestoesRemocao.push(`<b>${(excesso/20).toFixed(1)}</b> un. P20`);
+                if (excesso >= 13) sugestoesRemocao.push(`<b>${(excesso/13).toFixed(1)}</b> un. P13`);
+                
+                let msgExcesso = sugestoesRemocao.join(' &nbsp;<b>OU</b>&nbsp; ');
+                if (msgExcesso === "") msgExcesso = `<b>${(excesso/13).toFixed(1)}</b> un. P13`;
+
                 display.className = 'peso-total peso-excedido';
                 display.innerHTML = `
                     🚨 <b>EXCESSO DE CARGA!</b><br>
                     Peso Total Atual (Gás): <b>${pesoTotal} kg</b><br>
                     Limite Permitido: <b>${PESO_MAXIMO} kg</b><br>
-                    Excedeu: <b>${excesso} kg</b>
+                    <span style="color:#721c24; font-size: 1.1rem;">Excedeu: <b>${excesso} kg</b></span><br><br>
+                    <span style="background: #fff; padding: 5px 10px; border-radius: 4px; border: 1px solid #f5c6cb; display: inline-block;">
+                        Remova o equivalente a ➔ ${msgExcesso}
+                    </span>
                 `;
             } else {
                 const restante = PESO_MAXIMO - pesoTotal;
@@ -675,6 +661,11 @@
 
             grupos.forEach(g => {
                 let total = 0;
+                let pesoMultiplicador = 0;
+                if (g.titulo === 'P13') pesoMultiplicador = 13;
+                if (g.titulo === 'P20') pesoMultiplicador = 20;
+                if (g.titulo === 'P45') pesoMultiplicador = 45;
+
                 g.keys.forEach(k => {
                     let val = obj[k] || 0;
                     total += val;
@@ -688,12 +679,25 @@
                 if(g.titulo === 'P45') { legacyVal = obj.p45 || 0; if(legacyVal > 0) html += `<div><div class="item-val" style="color:red">${legacyVal}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; }
                 total += legacyVal;
 
-                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;"><div class="item-val" style="color:#000;">${total}</div><div class="item-label">TOTAL ${g.titulo}</div></div>`;
+                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;">
+                            <div class="item-val" style="color:#000;">
+                                ${total}
+                                <div style="font-size:0.75rem; color:#555; font-weight:normal; margin-top:-2px;">${total * pesoMultiplicador} kg</div>
+                            </div>
+                            <div class="item-label">TOTAL ${g.titulo}</div>
+                         </div>`;
                 html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
             });
 
             if (tipoEstoque === 'vazios') {
-                html += `<div><div class="item-val">${obj.agua||0}</div><div class="item-label">ÁGUA (VAZIA)</div></div>`;
+                let totAgV = obj.agua||0;
+                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;">
+                            <div class="item-val" style="color:#000;">
+                                ${totAgV}
+                                <div style="font-size:0.75rem; color:#555; font-weight:normal; margin-top:-2px;">${totAgV * 20} kg</div>
+                            </div>
+                            <div class="item-label">TOTAL ÁGUAS</div>
+                         </div>`;
                 html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
             } else {
                 let vEst = obj.ag_est || 0;
@@ -708,11 +712,24 @@
                 let legacyAgua = obj.agua || 0;
                 if(legacyAgua > 0) { html += `<div><div class="item-val" style="color:red">${legacyAgua}</div><div class="item-label" style="color:red">GERAL(L)</div></div>`; totAg += legacyAgua; }
 
-                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;"><div class="item-val" style="color:#000;">${totAg}</div><div class="item-label">TOTAL ÁGUAS</div></div>`;
+                html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;">
+                            <div class="item-val" style="color:#000;">
+                                ${totAg}
+                                <div style="font-size:0.75rem; color:#555; font-weight:normal; margin-top:-2px;">${totAg * 20} kg</div>
+                            </div>
+                            <div class="item-label">TOTAL ÁGUAS</div>
+                         </div>`;
                 html += `<div style="grid-column: 1 / -1; height: 1px; background: #ccc; margin: 8px 0;"></div>`;
             }
 
-            html += `<div><div class="item-val">${obj.p5||0}</div><div class="item-label">TOTAL P5</div></div>`;
+            let p5Val = obj.p5||0;
+            html += `<div style="background: #e9ecef; border-radius: 6px; padding: 5px;">
+                        <div class="item-val" style="color:#000;">
+                            ${p5Val}
+                            <div style="font-size:0.75rem; color:#555; font-weight:normal; margin-top:-2px;">${p5Val * 5} kg</div>
+                        </div>
+                        <div class="item-label">TOTAL P5</div>
+                     </div>`;
             return html;
         }
 
@@ -990,9 +1007,6 @@
                     .pdf-peso { border: 1px solid #ccc; padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 25px; text-align: center;}
                     .pdf-peso.excesso { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
                     
-                    .detalhes-peso-ui { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; background: #fff; padding: 10px; margin-bottom: 15px;}
-                    .detalhes-card-peso { background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6; }
-
                     tr, .hist-item, .evita-corte { page-break-inside: avoid !important; break-inside: avoid !important; }
                 </style>
 
@@ -1080,7 +1094,6 @@
 
                 <div class="evita-corte">
                     <h3 style="color: #0056b3; font-size: 16px; text-transform: uppercase; margin-bottom: 8px;">Detalhes e Capacidade (Somente Gás)</h3>
-                    ${document.getElementById('displayDetalhesPeso').innerHTML}
                     <div class="pdf-peso ${document.getElementById('displayPesoTotal').classList.contains('peso-excedido') ? 'excesso' : ''}">
                         ${document.getElementById('displayPesoTotal').innerHTML.replace(/<br>/g, ' &nbsp;|&nbsp; ').replace(/<b>/g, '').replace(/<\/b>/g, '')}
                     </div>
