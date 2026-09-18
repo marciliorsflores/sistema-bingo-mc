@@ -63,7 +63,7 @@
         .item-label { font-size: 0.7rem; color: #555; font-weight: bold; text-transform: uppercase;}
         
         .peso-total {
-            text-align: center; font-size: 1.1rem; font-weight: bold; margin-top: 15px;
+            text-align: center; font-size: 1.1rem; margin-top: 15px;
             padding: 15px; border-radius: 8px; border: 2px solid transparent; line-height: 1.5;
         }
         .peso-normal { background: #d4edda; color: #155724; border-color: #c3e6cb; }
@@ -73,6 +73,14 @@
             background: #e2e3e5; color: #383d41; padding: 12px; border-radius: 8px;
             margin-top: 15px; font-weight: bold; border: 1px solid #d6d8db; display: none; text-align: center;
         }
+
+        .detalhes-peso-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left;
+            background: rgba(255,255,255,0.8); padding: 15px; border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.1); margin-bottom: 15px; font-size: 0.95rem;
+        }
+        @media (max-width: 768px) { .detalhes-peso-grid { grid-template-columns: 1fr; } }
+        .linha-detalhe { border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-bottom: 5px;}
         
         @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.8; background: #f5c6cb; } 100% { opacity: 1; } }
 
@@ -152,7 +160,7 @@
         <div class="status-nuvem">🟢 Conectado ao banco de dados em Nuvem (Firebase)</div>
         
         <div class="card" id="areaRelatorioPDF">
-            <h3 class="card-title">Estoque Atual & Peso do Pátio</h3>
+            <h3 class="card-title">Estoque Atual & Análise de Peso do Pátio</h3>
             
             <div class="config-marca">
                 <label style="margin:0; font-size:0.9rem;">Nome da 4ª Marca (Gás):</label>
@@ -161,9 +169,10 @@
 
             <button class="btn-ajuste" onclick="toggleAjusteEstoque()">⚙️ Ajustar Estoque Inicial Manualmente</button>
             
+            <!-- PAINEL DE AJUSTE OCULTO -->
             <div id="painelAjusteEstoque">
                 <p style="font-size:0.85rem; color:#dc3545; font-weight:bold; text-align:center; background:#f8d7da; padding:10px; border-radius:6px;">
-                    ATENÇÃO: Os campos "GERAL(L)" são valores antigos que não sumiram. Zere eles aqui e adicione a mesma quantia na marca correta correspondente (LIQ, SUP, NAC).
+                    ATENÇÃO: Os campos "GERAL(L)" são valores antigos. Zere eles aqui e adicione a mesma quantia na marca correta.
                 </p>
                 <p><strong>🟩 CHEIOS (No Pátio)</strong></p>
                 <div class="grid-inputs" style="margin-bottom:15px;">
@@ -249,6 +258,7 @@
                 <button class="btn-salvar-manual" onclick="salvarEstoqueManual()">Salvar Ajuste na Nuvem</button>
             </div>
 
+            <!-- TABELAS VISUAIS DO ESTOQUE -->
             <div class="estoque-grid">
                 <div class="estoque-box" style="border-top: 4px solid var(--success);">
                     <h4>🟩 CHEIOS NO PÁTIO</h4>
@@ -264,14 +274,13 @@
                 </div>
             </div>
             
+            <!-- PAINEL DE ANÁLISE DE CAPACIDADE DO PÁTIO -->
             <div id="displayPesoTotal" class="peso-total"></div>
             <div id="displaySugestao" class="sugestao-carga"></div>
         </div>
 
-        <!-- FORMULÁRIO COM O BOTÃO FLUTUANTE -->
+        <!-- FORMULÁRIOS DE REGISTRO -->
         <form id="registroForm">
-            
-            <!-- BOTÃO FLUTUANTE INFERIOR ESQUERDO -->
             <button type="submit" class="btn-flutuante">💾 Gravar</button>
 
             <!-- 1. MOTORISTA -->
@@ -577,44 +586,114 @@
             return nomes[k] || k.toUpperCase();
         }
 
+        // ==========================================
+        //  NOVA LÓGICA DE CALCULO DE PESO (PRO)
+        // ==========================================
         function calcularPesoTotalAtual() {
-            let pesoTotal = 0;
             const c = estoque.cheios;
             const v = estoque.vazios;
             const t = estoque.trocas;
             
-            // Soma de TODOS os recipientes de GÁS (Cheios + Vazios + Trocas), excluindo água
-            let totalP13 = (c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0) + (v.liq||0)+(v.sup||0)+(v.nac||0)+(v.out||0)+(v.p13||0) + (t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0);
-            let totalP20 = (c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0) + (v.p20_liq||0)+(v.p20_sup||0)+(v.p20_nac||0)+(v.p20_out||0)+(v.p20||0) + (t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0);
-            let totalP45 = (c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0) + (v.p45_liq||0)+(v.p45_sup||0)+(v.p45_nac||0)+(v.p45_out||0)+(v.p45||0) + (t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0);
-            let totalP5  = (c.p5||0) + (v.p5||0) + (t.p5||0);
+            // SOMATÓRIO INDIVIDUAL DE UNIDADES POR CATEGORIA
+            // P13
+            let c_p13 = (c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0);
+            let v_p13 = (v.liq||0)+(v.sup||0)+(v.nac||0)+(v.out||0)+(v.p13||0);
+            let t_p13 = (t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0);
+            let u_p13 = c_p13 + v_p13 + t_p13;
+            let w_p13 = u_p13 * 13;
 
-            pesoTotal += totalP13 * 13;
-            pesoTotal += totalP20 * 20;
-            pesoTotal += totalP45 * 45;
-            pesoTotal += totalP5 * 5;
-            // Nota: Água foi intencionalmente excluída do cálculo do limite de peso do pátio.
+            // P20
+            let c_p20 = (c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0);
+            let v_p20 = (v.p20_liq||0)+(v.p20_sup||0)+(v.p20_nac||0)+(v.p20_out||0)+(v.p20||0);
+            let t_p20 = (t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0);
+            let u_p20 = c_p20 + v_p20 + t_p20;
+            let w_p20 = u_p20 * 20;
+
+            // P45
+            let c_p45 = (c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0);
+            let v_p45 = (v.p45_liq||0)+(v.p45_sup||0)+(v.p45_nac||0)+(v.p45_out||0)+(v.p45||0);
+            let t_p45 = (t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0);
+            let u_p45 = c_p45 + v_p45 + t_p45;
+            let w_p45 = u_p45 * 45;
+
+            // P5
+            let c_p5 = (c.p5||0);
+            let v_p5 = (v.p5||0);
+            let t_p5 = (t.p5||0);
+            let u_p5 = c_p5 + v_p5 + t_p5;
+            let w_p5 = u_p5 * 5;
+
+            // PESO TOTAL DO PÁTIO (Água não entra)
+            let pesoTotal = w_p13 + w_p20 + w_p45 + w_p5;
+
+            // MONTAGEM DO HTML COM O DETALHAMENTO DE CADA CLASSE
+            let htmlDetalhes = `
+                <div class="detalhes-peso-grid">
+                    <div class="linha-detalhe">
+                        <strong style="color:var(--primary);">🔵 P13:</strong> ${u_p13} unidades<br>
+                        <span style="font-size:0.8rem; color:#555;">(${c_p13} Cheios | ${v_p13} Vazios | ${t_p13} Trocas)</span> ➔ <b>${w_p13} kg</b>
+                    </div>
+                    <div class="linha-detalhe">
+                        <strong style="color:var(--primary);">🔵 P20:</strong> ${u_p20} unidades<br>
+                        <span style="font-size:0.8rem; color:#555;">(${c_p20} Cheios | ${v_p20} Vazios | ${t_p20} Trocas)</span> ➔ <b>${w_p20} kg</b>
+                    </div>
+                    <div class="linha-detalhe">
+                        <strong style="color:var(--primary);">🔵 P45:</strong> ${u_p45} unidades<br>
+                        <span style="font-size:0.8rem; color:#555;">(${c_p45} Cheios | ${v_p45} Vazios | ${t_p45} Trocas)</span> ➔ <b>${w_p45} kg</b>
+                    </div>
+                    <div class="linha-detalhe">
+                        <strong style="color:var(--primary);">🔵 P5:</strong> ${u_p5} unidades<br>
+                        <span style="font-size:0.8rem; color:#555;">(${c_p5} Cheios | ${v_p5} Vazios | ${t_p5} Trocas)</span> ➔ <b>${w_p5} kg</b>
+                    </div>
+                </div>
+            `;
 
             const display = document.getElementById('displayPesoTotal');
             const displaySugestao = document.getElementById('displaySugestao');
             
+            window.HTML_DETALHES_PDF = htmlDetalhes; // Salva para o PDF usar
+
             if (pesoTotal > PESO_MAXIMO) {
                 const excesso = pesoTotal - PESO_MAXIMO;
+                
+                // Mensagem inteligente sobre o excesso em unidades reais
+                let msgExcesso = "";
+                if (excesso >= 45) { msgExcesso += `<b>${(excesso/45).toFixed(1)}</b> unidades de P45`; }
+                else if (excesso >= 20) { msgExcesso += `<b>${(excesso/20).toFixed(1)}</b> unidades de P20`; }
+                else { msgExcesso += `<b>${(excesso/13).toFixed(1)}</b> unidades de P13`; }
+
                 display.className = 'peso-total peso-excedido';
-                display.innerHTML = `🚨 EXCESSO DE CARGA!<br>Peso Total Atual (Gás): <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Excedeu: ${excesso} kg`;
+                display.innerHTML = htmlDetalhes + `
+                    <div style="margin-top:10px;">
+                        🚨 <strong style="font-size: 1.2rem;">EXCESSO DE CARGA!</strong><br><br>
+                        Peso Total Atual (Somente Gás): <b>${pesoTotal} kg</b><br>
+                        Limite Permitido: <b>${PESO_MAXIMO} kg</b><br>
+                        <span style="color:#721c24; font-size: 1.2rem;">Excedeu o pátio em: <b>${excesso} kg</b></span><br><br>
+                        <span style="background: #fff; padding: 5px 10px; border-radius: 4px; border: 1px solid #f5c6cb; display: inline-block;">
+                            Remova o equivalente a ➔ ${msgExcesso}
+                        </span>
+                    </div>
+                `;
                 displaySugestao.style.display = 'none';
             } else {
                 const restante = PESO_MAXIMO - pesoTotal;
                 display.className = 'peso-total peso-normal';
-                display.innerHTML = `✅ Peso Seguro no Pátio<br>Peso Total Atual (Gás): <b>${pesoTotal} kg</b><br>Limite Permitido: ${PESO_MAXIMO} kg<br>Espaço Livre (Restante): ${restante} kg`;
+                display.innerHTML = htmlDetalhes + `
+                    <div style="margin-top:10px;">
+                        ✅ <strong style="font-size: 1.2rem;">PESO SEGURO NO PÁTIO</strong><br><br>
+                        Peso Total Atual (Somente Gás): <b>${pesoTotal} kg</b><br>
+                        Limite Permitido: <b>${PESO_MAXIMO} kg</b><br>
+                        <span style="color:#155724; font-size: 1.1rem;">Espaço Livre (Restante): <b>${restante} kg</b></span>
+                    </div>
+                `;
                 
                 if (restante > 0) {
                     displaySugestao.style.display = 'block';
                     let sug = [];
-                    if (restante >= 45) sug.push(`${Math.floor(restante/45)} un. P45`);
-                    if (restante >= 20) sug.push(`${Math.floor(restante/20)} un. P20`);
-                    if (restante >= 13) sug.push(`${Math.floor(restante/13)} un. P13`);
-                    displaySugestao.innerHTML = `Você ainda pode colocar:<br><br>${sug.join(' <b>OU</b> ')}`;
+                    if (restante >= 45) sug.push(`<b>${Math.floor(restante/45)}</b> un. P45`);
+                    if (restante >= 20) sug.push(`<b>${Math.floor(restante/20)}</b> un. P20`);
+                    if (restante >= 13) sug.push(`<b>${Math.floor(restante/13)}</b> un. P13`);
+                    displaySugestao.innerHTML = `Você ainda pode colocar:<br><br>${sug.join(' &nbsp;<b>OU</b>&nbsp; ')}`;
                 } else { displaySugestao.style.display = 'none'; }
             }
         }
@@ -880,7 +959,7 @@
         }
 
         // ==========================================
-        //  GERADOR DE PDF (COM SUBTOTAIS E SOMA DE VAZIOS)
+        //  GERADOR DE PDF
         // ==========================================
 
         function formatZero(val) { return Number(val) > 0 ? Number(val) : ''; }
@@ -897,22 +976,18 @@
             let t = estoque.trocas;
             let m4 = window.NOME_MARCA_ATUAL;
 
-            // Totais P13
             let tot13_c = (Number(c.liq)||0) + (Number(c.sup)||0) + (Number(c.nac)||0) + (Number(c.out)||0) + (Number(c.p13)||0);
             let tot13_v = (Number(v.liq)||0) + (Number(v.sup)||0) + (Number(v.nac)||0) + (Number(v.out)||0) + (Number(v.p13)||0);
             let tot13_t = (Number(t.liq)||0) + (Number(t.sup)||0) + (Number(t.nac)||0) + (Number(t.out)||0) + (Number(t.p13)||0);
 
-            // Totais P45
             let tot45_c = (Number(c.p45_liq)||0) + (Number(c.p45_sup)||0) + (Number(c.p45_nac)||0) + (Number(c.p45_out)||0) + (Number(c.p45)||0);
             let tot45_v = (Number(v.p45_liq)||0) + (Number(v.p45_sup)||0) + (Number(v.p45_nac)||0) + (Number(v.p45_out)||0) + (Number(v.p45)||0);
             let tot45_t = (Number(t.p45_liq)||0) + (Number(t.p45_sup)||0) + (Number(t.p45_nac)||0) + (Number(t.p45_out)||0) + (Number(t.p45)||0);
 
-            // Totais P20
             let tot20_c = (Number(c.p20_liq)||0) + (Number(c.p20_sup)||0) + (Number(c.p20_nac)||0) + (Number(c.p20_out)||0) + (Number(c.p20)||0);
             let tot20_v = (Number(v.p20_liq)||0) + (Number(v.p20_sup)||0) + (Number(v.p20_nac)||0) + (Number(v.p20_out)||0) + (Number(v.p20)||0);
             let tot20_t = (Number(t.p20_liq)||0) + (Number(t.p20_sup)||0) + (Number(t.p20_nac)||0) + (Number(t.p20_out)||0) + (Number(t.p20)||0);
 
-            // Totais Águas
             let totAg_c = (Number(c.ag_est)||0) + (Number(c.ag_ela)||0) + (Number(c.ag_ped)||0) + (Number(c.agua)||0);
             let totAg_v = Number(v.agua)||0;
             let totAg_t = (Number(t.ag_est)||0) + (Number(t.ag_ela)||0) + (Number(t.ag_ped)||0) + (Number(t.agua)||0);
@@ -922,6 +997,8 @@
             divPDF.style.fontFamily = 'Helvetica, Arial, sans-serif';
             divPDF.style.color = '#333';
             divPDF.style.backgroundColor = '#fff';
+
+            let painelDetalhesHTML = window.HTML_DETALHES_PDF || ""; // Pega o cálculo detalhado já montado da tela
 
             let htmlDoc = `
                 <div style="border-bottom: 3px solid #0056b3; padding-bottom: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end;">
@@ -948,13 +1025,13 @@
                     .destaque-cheios { color: #155724; font-size: 13px; }
                     .destaque-trocas { color: #4a148c; font-size: 13px; }
                     
-                    .pdf-peso { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 25px; font-weight: bold; text-align: center;}
+                    .pdf-peso { border: 1px solid #ccc; padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 25px; text-align: center;}
                     .pdf-peso.excesso { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
                     
-                    tr, .hist-item, .evita-corte { 
-                        page-break-inside: avoid !important; 
-                        break-inside: avoid !important; 
-                    }
+                    .detalhes-peso-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6; }
+                    .linha-detalhe { border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-bottom: 5px; }
+
+                    tr, .hist-item, .evita-corte { page-break-inside: avoid !important; break-inside: avoid !important; }
                 </style>
 
                 <table class="tabela-pdf">
@@ -1040,7 +1117,7 @@
                 </table>
 
                 <div class="evita-corte">
-                    <h3 style="color: #0056b3; font-size: 16px; text-transform: uppercase; margin-bottom: 8px;">Análise de Capacidade do Pátio (Peso Total de Gás)</h3>
+                    <h3 style="color: #0056b3; font-size: 16px; text-transform: uppercase; margin-bottom: 8px;">Detalhes e Capacidade (Somente Gás)</h3>
                     <div class="pdf-peso ${document.getElementById('displayPesoTotal').classList.contains('peso-excedido') ? 'excesso' : ''}">
                         ${document.getElementById('displayPesoTotal').innerHTML.replace(/<br>/g, ' &nbsp;|&nbsp; ').replace(/<b>/g, '').replace(/<\/b>/g, '')}
                     </div>
@@ -1109,3 +1186,4 @@
     </script>
 </body>
 </html>
+
