@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -87,14 +86,22 @@
             border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 15px;
         }
         .btn-doc {
-            background: #0056b3; color: #fff; border: none; padding: 12px 15px;
-            border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 15px; width: auto; font-size: 0.95rem;
+            background: #0056b3; color: #fff; border: none; padding: 10px 15px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; width: auto; font-size: 0.95rem;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         
-        #painelAjusteEstoque {
-            display: none; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px;
-        }
+        .botoes-topo { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; align-items: center; justify-content: space-between; }
+        .botoes-topo-esq { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-gerenciar { background: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        
+        /* MODAIS */
+        .modal { display: none; position: fixed; z-index: 20000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-modal:hover { color: #000; }
+
+        #painelAjusteEstoque { display: none; background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px; }
         
         .motoristas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
         .btn-motorista {
@@ -147,9 +154,7 @@
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px; flex-wrap: wrap; gap: 10px;
         }
-        #filtroDataHistorico {
-            padding: 8px; border-radius: 6px; border: 1px solid var(--border); font-weight: bold; font-size: 0.9rem;
-        }
+        #filtroDataHistorico { padding: 8px; border-radius: 6px; border: 1px solid var(--border); font-weight: bold; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -157,12 +162,17 @@
     <div id="loaderNuvem">🔄 Sincronizando com a Nuvem...</div>
 
     <div class="container" id="conteudoSistema">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        
+        <!-- BOTÕES DO TOPO (GERENCIADORES E PDF) -->
+        <div class="botoes-topo">
+            <div class="botoes-topo-esq">
+                <button class="btn-gerenciar" onclick="abrirModalMotoristas()">👥 Motoristas</button>
+                <button class="btn-gerenciar" onclick="abrirModalFechamentos()" style="background:#17a2b8;">📅 Fechamentos do Dia</button>
+            </div>
             <button class="btn-doc" onclick="gerarRelatorioPDF()">📑 Pré-visualizar PDF</button>
         </div>
         
         <h1>Controle de Pátio e Cargas</h1>
-        
         <div class="status-nuvem">🟢 Conectado ao banco de dados em Nuvem (Firebase)</div>
         
         <div class="card" id="areaRelatorioPDF">
@@ -283,8 +293,6 @@
             <!-- EXIBIÇÃO DETALHADA E TOTAL DA CARGA -->
             <div id="displayDetalhesPeso"></div>
             <div id="displayPesoTotal" class="peso-total"></div>
-            
-            <div id="displaySugestao" class="sugestao-carga"></div>
         </div>
 
         <!-- FORMULÁRIOS DE REGISTRO -->
@@ -430,7 +438,7 @@
             </div>
         </form>
 
-        <!-- HISTÓRICO -->
+        <!-- HISTÓRICO DE MOVIMENTAÇÕES DA CARGA -->
         <div class="card" style="margin-top: 20px;" id="areaHistoricoPDF">
             <div class="cabecalho-historico">
                 <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico de Movimentações</h3>
@@ -457,6 +465,54 @@
                     </thead>
                     <tbody id="tabelaCorpo"></tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GERENCIAR MOTORISTAS -->
+    <div id="modalMotoristas" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="fecharModal('modalMotoristas')">&times;</span>
+            <h3 style="margin-top:0;">👥 Gerenciar Motoristas</h3>
+            <div style="display:flex; gap:10px; margin-bottom: 20px;">
+                <input type="text" id="novoNomeMotorista" placeholder="Nome do novo motorista..." style="flex:1;">
+                <button class="btn-salvar-manual" style="margin-top:0; width:auto; padding:8px 15px; font-size:0.9rem;" onclick="adicionarMotorista()">Adicionar</button>
+            </div>
+            <div id="listaGerenciarMotoristas" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: HISTÓRICO DE FECHAMENTOS (ESTOQUE DIÁRIO) -->
+    <div id="modalFechamentos" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-modal" onclick="fecharModal('modalFechamentos')">&times;</span>
+            <h3 style="margin-top:0; color:#17a2b8;">📅 Histórico de Fechamentos (Posição do Pátio)</h3>
+            
+            <button class="btn-ajuste" onclick="salvarFechamentoHoje()" style="background:var(--success); color:white; margin-bottom:20px;">
+                💾 GRAVAR POSIÇÃO DE HOJE COMO FECHAMENTO
+            </button>
+            
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom: 20px;">
+                <label style="font-size:0.9rem; text-align:left;">Selecione um dia anterior para consultar:</label>
+                <select id="selectFechamentos" onchange="carregarFechamentoSelecionado()" style="width:100%; padding: 10px; border-radius:6px; font-size:1rem; border:1px solid #ccc;"></select>
+            </div>
+            
+            <div id="displayFechamentoDetalhes" style="display:none;">
+                <h4 style="text-align:center; color:#555; border-bottom:1px solid #ddd; padding-bottom:10px;">Estoque do Pátio no dia selecionado:</h4>
+                <div class="estoque-grid">
+                    <div class="estoque-box" style="border-top: 4px solid var(--success);">
+                        <h4>🟩 CHEIOS</h4>
+                        <div class="estoque-items" id="fechamentoCheios"></div>
+                    </div>
+                    <div class="estoque-box" style="border-top: 4px solid var(--warning);">
+                        <h4>🟧 VAZIOS</h4>
+                        <div class="estoque-items" id="fechamentoVazios"></div>
+                    </div>
+                    <div class="estoque-box" style="border-top: 4px solid var(--purple);">
+                        <h4>🟪 TROCAS</h4>
+                        <div class="estoque-items" id="fechamentoTrocas"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -490,8 +546,10 @@
         }, 3000);
 
         window.NOME_MARCA_ATUAL = "OUTRA MARCA";
-        
-        const MOTORISTAS = [
+        window.fechamentosData = {}; // Cache local para os fechamentos
+
+        // Motoristas Iniciais Padrão (Serão jogados para a nuvem se a nuvem estiver vazia)
+        const MOTORISTAS_PADRAO = [
             { nome: "Aécio", placa: "" }, { nome: "Alemão", placa: "" }, { nome: "Alexandre", placa: "" }, 
             { nome: "Anderson", placa: "" }, { nome: "Anderson Alemão", placa: "" }, { nome: "Ayrton", placa: "" }, 
             { nome: "Edgar", placa: "" }, { nome: "Evandro", placa: "" }, { nome: "Everton", placa: "" }, 
@@ -500,6 +558,8 @@
             { nome: "Nei", placa: "" }, { nome: "Nicolas", placa: "" }, { nome: "Pedro", placa: "" }, 
             { nome: "Rafa", placa: "" }, { nome: "Soares", placa: "" }, { nome: "Soveral", placa: "" }, { nome: "Yuri", placa: "" }
         ];
+        
+        let listaMotoristasAtivos = [];
         
         const PESO_MAXIMO = 6240;
         
@@ -511,6 +571,122 @@
 
         let registrosApp = [];
 
+        // --- SISTEMA DE MODAIS ---
+        function abrirModalMotoristas() { document.getElementById('modalMotoristas').style.display = 'block'; }
+        
+        function abrirModalFechamentos() {
+            document.getElementById('modalFechamentos').style.display = 'block';
+            carregarListaFechamentosNuvem();
+        }
+        
+        function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // --- GESTÃO DE MOTORISTAS ---
+        db.ref('config/motoristas').on('value', (snapshot) => {
+            let val = snapshot.val();
+            if (!val) {
+                // Se não existir na nuvem, carrega a lista padrão e salva na nuvem.
+                val = [...MOTORISTAS_PADRAO];
+                db.ref('config/motoristas').set(val);
+            }
+            // Ordenar alfabeticamente sempre que carregar
+            listaMotoristasAtivos = val.sort((a, b) => a.nome.localeCompare(b.nome));
+            renderizarPainelMotoristas(registrosApp);
+            renderizarListaGerenciadorMotoristas();
+        });
+
+        function renderizarListaGerenciadorMotoristas() {
+            const div = document.getElementById('listaGerenciarMotoristas');
+            if(!div) return;
+            div.innerHTML = '';
+            listaMotoristasAtivos.forEach((m, index) => {
+                div.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #ddd; background:#f9f9f9; margin-bottom:5px; border-radius:6px;">
+                        <span style="font-weight:bold; font-size:1rem;">${m.nome}</span>
+                        <button class="btn-excluir" onclick="removerMotorista(${index})">Excluir</button>
+                    </div>
+                `;
+            });
+        }
+
+        function adicionarMotorista() {
+            const input = document.getElementById('novoNomeMotorista');
+            const nome = input.value.trim();
+            if(nome) {
+                // Verifica se já existe
+                if(listaMotoristasAtivos.some(m => m.nome.toLowerCase() === nome.toLowerCase())) {
+                    alert("Este motorista já existe!");
+                    return;
+                }
+                listaMotoristasAtivos.push({nome: nome, placa: ""});
+                db.ref('config/motoristas').set(listaMotoristasAtivos);
+                input.value = '';
+            }
+        }
+
+        function removerMotorista(index) {
+            if(confirm('Tem certeza que deseja excluir este motorista do sistema?')) {
+                listaMotoristasAtivos.splice(index, 1);
+                db.ref('config/motoristas').set(listaMotoristasAtivos);
+            }
+        }
+
+        // --- FECHAMENTO DO DIA ---
+        function salvarFechamentoHoje() {
+            if(!confirm('Deseja salvar a contagem ATUAL do pátio como o Fechamento de Hoje? (Você pode substituir clicando novamente depois)')) return;
+            
+            // Pega a data atual no formato YYYY-MM-DD local
+            const dateObj = new Date();
+            const ano = dateObj.getFullYear();
+            const mes = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dia = String(dateObj.getDate()).padStart(2, '0');
+            const dataString = `${ano}-${mes}-${dia}`;
+            
+            db.ref('fechamentos/' + dataString).set(estoque).then(() => {
+                alert('Estoque salvo como fechamento do dia!');
+                carregarListaFechamentosNuvem();
+            });
+        }
+
+        function carregarListaFechamentosNuvem() {
+            db.ref('fechamentos').once('value', (snap) => {
+                const select = document.getElementById('selectFechamentos');
+                select.innerHTML = '<option value="">-- Selecione uma data --</option>';
+                const dados = snap.val();
+                if(dados) {
+                    window.fechamentosData = dados;
+                    const datas = Object.keys(dados).sort().reverse(); // Mais recente primeiro
+                    datas.forEach(d => {
+                        const parts = d.split('-'); // 2026-03-10
+                        const formatedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                        select.innerHTML += `<option value="${d}">${formatedDate}</option>`;
+                    });
+                } else {
+                    select.innerHTML = '<option value="">Nenhum fechamento registrado ainda.</option>';
+                }
+            });
+        }
+
+        function carregarFechamentoSelecionado() {
+            const dateStr = document.getElementById('selectFechamentos').value;
+            const container = document.getElementById('displayFechamentoDetalhes');
+            
+            if(!dateStr || !window.fechamentosData[dateStr]) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            const estSnapshot = window.fechamentosData[dateStr];
+
+            // Reutiliza a função visual de grupos para renderizar o fechamento!
+            document.getElementById('fechamentoCheios').innerHTML = renderizarGrupo('cheios', estSnapshot.cheios || {});
+            document.getElementById('fechamentoVazios').innerHTML = renderizarGrupo('vazios', estSnapshot.vazios || {});
+            document.getElementById('fechamentoTrocas').innerHTML = renderizarGrupo('trocas', estSnapshot.trocas || {});
+        }
+
+
+        // --- FUNÇÕES EXISTENTES DO SISTEMA ---
         function popularFiltroDias() {
             const select = document.getElementById('filtroDataHistorico');
             if(!select) return;
@@ -613,39 +789,28 @@
             return nomes[k] || k.toUpperCase();
         }
 
-        // ==========================================
-        //  NOVA LÓGICA DE CALCULO DE PESO COM UI SEPARADA
-        // ==========================================
         function calcularPesoTotalAtual() {
             const c = estoque.cheios;
             const v = estoque.vazios;
             const t = estoque.trocas;
             
-            // P13
             let u_p13 = (c.liq||0)+(c.sup||0)+(c.nac||0)+(c.out||0)+(c.p13||0) + (v.liq||0)+(v.sup||0)+(v.nac||0)+(v.out||0)+(v.p13||0) + (t.liq||0)+(t.sup||0)+(t.nac||0)+(t.out||0)+(t.p13||0);
             let w_p13 = u_p13 * 13;
 
-            // P20
             let u_p20 = (c.p20_liq||0)+(c.p20_sup||0)+(c.p20_nac||0)+(c.p20_out||0)+(c.p20||0) + (v.p20_liq||0)+(v.p20_sup||0)+(v.p20_nac||0)+(v.p20_out||0)+(v.p20||0) + (t.p20_liq||0)+(t.p20_sup||0)+(t.p20_nac||0)+(t.p20_out||0)+(t.p20||0);
             let w_p20 = u_p20 * 20;
 
-            // P45
             let u_p45 = (c.p45_liq||0)+(c.p45_sup||0)+(c.p45_nac||0)+(c.p45_out||0)+(c.p45||0) + (v.p45_liq||0)+(v.p45_sup||0)+(v.p45_nac||0)+(v.p45_out||0)+(v.p45||0) + (t.p45_liq||0)+(t.p45_sup||0)+(t.p45_nac||0)+(t.p45_out||0)+(t.p45||0);
             let w_p45 = u_p45 * 45;
 
-            // P5
             let u_p5 = (c.p5||0) + (v.p5||0) + (t.p5||0);
             let w_p5 = u_p5 * 5;
 
-            // PESO TOTAL DO PÁTIO (Água não entra)
             let pesoTotal = w_p13 + w_p20 + w_p45 + w_p5;
-
             const display = document.getElementById('displayPesoTotal');
             
             if (pesoTotal > PESO_MAXIMO) {
                 const excesso = pesoTotal - PESO_MAXIMO;
-                
-                // Mensagem inteligente sobre o excesso em opções "OU"
                 let sugestoesRemocao = [];
                 if (excesso >= 45) sugestoesRemocao.push(`<b>${(excesso/45).toFixed(1)}</b> un. P45`);
                 if (excesso >= 20) sugestoesRemocao.push(`<b>${(excesso/20).toFixed(1)}</b> un. P20`);
@@ -791,7 +956,7 @@
             grid.innerHTML = '';
             const hoje = new Date().toDateString();
 
-            MOTORISTAS.forEach(motorista => {
+            listaMotoristasAtivos.forEach(motorista => {
                 const viagens = registros.filter(reg => reg.entregador === motorista.nome && new Date(reg.timestamp).toDateString() === hoje).length;
                 const btn = document.createElement('div');
                 btn.className = 'btn-motorista';
