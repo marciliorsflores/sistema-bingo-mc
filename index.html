@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -141,6 +142,14 @@
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         
         .sec-divisor { grid-column: 1 / -1; width: 100%; height: 1px; background: #ccc; margin: 8px 0; }
+        
+        .cabecalho-historico {
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px; flex-wrap: wrap; gap: 10px;
+        }
+        #filtroDataHistorico {
+            padding: 8px; border-radius: 6px; border: 1px solid var(--border); font-weight: bold; font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -423,9 +432,14 @@
 
         <!-- HISTÓRICO -->
         <div class="card" style="margin-top: 20px;" id="areaHistoricoPDF">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); margin-bottom: 15px; padding-bottom: 10px;">
-                <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico (Últimos 20 Dias)</h3>
-                <button onclick="limparTodoHistorico()" class="btn-excluir" style="font-weight: bold;">🗑️ Limpar Tudo</button>
+            <div class="cabecalho-historico">
+                <h3 class="card-title" style="border: none; margin: 0; padding: 0;">Histórico de Movimentações</h3>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <select id="filtroDataHistorico" onchange="renderizarTabela(registrosApp)">
+                        <!-- Opções geradas via JS -->
+                    </select>
+                    <button onclick="limparTodoHistorico()" class="btn-excluir" style="font-weight: bold;">🗑️ Limpar Tudo</button>
+                </div>
             </div>
             <div class="table-responsive">
                 <table>
@@ -478,13 +492,13 @@
         window.NOME_MARCA_ATUAL = "OUTRA MARCA";
         
         const MOTORISTAS = [
-            { nome: "Aécio", placa: "" }, { nome: "Alexandre", placa: "" }, { nome: "Anderson", placa: "" },
-            { nome: "Anderson Alemão", placa: "" }, { nome: "Ayrton", placa: "" }, { nome: "Edgar", placa: "" },
-            { nome: "Evandro", placa: "" }, { nome: "Everton", placa: "" }, { nome: "Jackson", placa: "" },
-            { nome: "Kleber", placa: "" }, { nome: "Lucas", placa: "" }, { nome: "Lucas Telefone", placa: "" },
-            { nome: "Marcílio", placa: "" }, { nome: "Nei", placa: "" }, { nome: "Nicolas", placa: "" },
-            { nome: "Pedro", placa: "" }, { nome: "Rafa", placa: "" }, { nome: "Soares", placa: "" },
-            { nome: "Soveral", placa: "" }, { nome: "Yuri", placa: "" }
+            { nome: "Aécio", placa: "" }, { nome: "Alemão", placa: "" }, { nome: "Alexandre", placa: "" }, 
+            { nome: "Anderson", placa: "" }, { nome: "Anderson Alemão", placa: "" }, { nome: "Ayrton", placa: "" }, 
+            { nome: "Edgar", placa: "" }, { nome: "Evandro", placa: "" }, { nome: "Everton", placa: "" }, 
+            { nome: "Henrique", placa: "" }, { nome: "Jackson", placa: "" }, { nome: "Kleber", placa: "" }, 
+            { nome: "Lucas", placa: "" }, { nome: "Lucas Telefone", placa: "" }, { nome: "Marcílio", placa: "" }, 
+            { nome: "Nei", placa: "" }, { nome: "Nicolas", placa: "" }, { nome: "Pedro", placa: "" }, 
+            { nome: "Rafa", placa: "" }, { nome: "Soares", placa: "" }, { nome: "Soveral", placa: "" }, { nome: "Yuri", placa: "" }
         ];
         
         const PESO_MAXIMO = 6240;
@@ -496,6 +510,20 @@
         };
 
         let registrosApp = [];
+
+        function popularFiltroDias() {
+            const select = document.getElementById('filtroDataHistorico');
+            if(!select) return;
+            select.innerHTML = '<option value="todos">Mostrar Tudo (Últimos 20 dias)</option>';
+            for(let i=0; i<=10; i++) {
+                let d = new Date();
+                d.setDate(d.getDate() - i);
+                let lbl = i === 0 ? "Hoje" : (i === 1 ? "Ontem" : `${i} dias atrás`);
+                select.innerHTML += `<option value="${i}">${lbl} (${d.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})})</option>`;
+            }
+        }
+        
+        popularFiltroDias();
         
         db.ref('config/nomeMarca').on('value', (snapshot) => {
             const nomeSalvo = snapshot.val() || "OUTRA MARCA";
@@ -798,7 +826,24 @@
         function renderizarTabela(registros) {
             const tbody = document.getElementById('tabelaCorpo');
             tbody.innerHTML = '';
-            [...registros].sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
+            
+            const filtroDropdown = document.getElementById('filtroDataHistorico');
+            const filtroValor = filtroDropdown ? filtroDropdown.value : 'todos';
+            
+            let registrosFiltrados = [...registros];
+            
+            if (filtroValor !== 'todos') {
+                const diasAtras = parseInt(filtroValor);
+                const dataAlvo = new Date();
+                dataAlvo.setDate(dataAlvo.getDate() - diasAtras);
+                const stringDataAlvo = dataAlvo.toDateString();
+                
+                registrosFiltrados = registrosFiltrados.filter(reg => {
+                    return new Date(reg.timestamp).toDateString() === stringDataAlvo;
+                });
+            }
+
+            registrosFiltrados.sort((a, b) => b.timestamp - a.timestamp).forEach(reg => {
                 const tr = document.createElement('tr');
                 const hora = new Date(reg.timestamp).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
                 tr.innerHTML = `
@@ -1162,4 +1207,3 @@
     </script>
 </body>
 </html>
-
